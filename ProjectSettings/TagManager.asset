@@ -25,6 +25,7 @@ TagManager:
   - 
   - 
   - 
+  - Dialog
   - 
   - 
   - 
@@ -33,11 +34,13 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - Barrier
   - 
   - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: UIManager
+    uniqueID: 1298594455
     locked: 0
