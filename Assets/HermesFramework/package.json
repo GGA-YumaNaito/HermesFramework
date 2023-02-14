@@ -22,19 +22,9 @@
   "unity": "2021.3",
   "samples": [
       {
-          "displayName": "UIManager Sample Prefabs",
+          "displayName": "UIManagerSample",
           "description": "UIManager Sample.",
-          "path": "UIManager/Prefabs/Sample"
-      },
-      {
-          "displayName": "UIManager Sample Scenes",
-          "description": "UIManager Sample.",
-          "path": "UIManager/Scenes/Sample"
-      },
-      {
-          "displayName": "UIManager Sample Scripts",
-          "description": "UIManager Sample.",
-          "path": "UIManager/Scripts/Sample"
+          "path": "Samples/UIManager"
       }
   ]
 }
