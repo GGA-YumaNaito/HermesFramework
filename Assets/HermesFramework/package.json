@@ -14,11 +14,27 @@
   ],
   "displayName": "Hermes Framework",
   "dependencies": {
-    "com.neuecc.unirx": "https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts",
-    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.neuecc.unirx": "7.1.0",
+    "com.cysharp.unitask": "2.3.3",
     "com.unity.addressables": "1.19.19",
     "com.unity.inputsystem": "1.4.4"
   },
   "unity": "2021.3.17f1",
-  "type": "framework"
+  "samples": [
+        {
+            "displayName": "UIManager Sample Prefabs",
+            "description": "UIManager Sample.",
+            "path": "UIManager/Prefabs/Sample"
+        },
+        {
+            "displayName": "UIManager Sample Scenes",
+            "description": "UIManager Sample.",
+            "path": "UIManager/Scenes/Sample"
+        },
+        {
+            "displayName": "UIManager Sample Scripts
+            "description": "UIManager Sample.",
+            "path": "UIManager/Scripts/Sample"
+        }
+    ]
 }
