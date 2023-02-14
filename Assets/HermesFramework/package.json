@@ -24,7 +24,7 @@
       {
           "displayName": "UIManagerSample",
           "description": "UIManager Sample.",
-          "path": "Samples/UIManager"
+          "path": "Samples~/UIManager"
       }
   ]
 }
