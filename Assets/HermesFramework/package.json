@@ -1,0 +1,24 @@
+{
+  "name": "com.gga.hermes-framework",
+  "version": "0.0.1",
+  "description": "This HermesFramework is designed to facilitate various developments.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GGA-YumaNaito/HermesFramework.git"
+  },
+  "author": "GGA-YumaNaito <y_naito@gravityga.jp> (https://github.com/GGA-YumaNaito)",
+  "keywords": [
+    "hermes",
+    "framework"
+  ],
+  "displayName": "Hermes Framework",
+  "dependencies": {
+    "com.neuecc.unirx": "https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.unity.addressables": "1.19.19",
+    "com.unity.inputsystem": "1.4.4"
+  },
+  "unity": "2021.3.17f1",
+  "type": "framework"
+}
