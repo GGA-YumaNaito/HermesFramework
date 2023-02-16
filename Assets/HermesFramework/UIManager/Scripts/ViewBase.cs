@@ -1,30 +1,30 @@
-using UniRx;
+ï»¿using UniRx;
 using UnityEngine;
 
 namespace Hermes.UI
 {
     /// <summary>
-    /// ‰æ–Ê‚ÌŠî’êƒNƒ‰ƒX
+    /// ç”»é¢ã®åŸºåº•ã‚¯ãƒ©ã‚¹
     /// </summary>
     public abstract class ViewBase : MonoBehaviour
     {
-        /// <summary>‘O‚Ì‰æ–Ê‚É–ß‚ê‚é‚©ƒtƒ‰ƒO</summary>
+        /// <summary>å‰ã®ç”»é¢ã«æˆ»ã‚Œã‚‹ã‹ãƒ•ãƒ©ã‚°</summary>
         public abstract bool IsBack { get; protected set; }
-        /// <summary>‰æ–Ê‘ÎÛ</summary>
+        /// <summary>ç”»é¢å¯¾è±¡</summary>
         [SerializeField] protected RectTransform targetTransform;
-        /// <summary>‰æ–Ê‚Ìó‘Ô</summary>
+        /// <summary>ç”»é¢ã®çŠ¶æ…‹</summary>
         ReactiveProperty<eStatus> status = new ReactiveProperty<eStatus>(eStatus.None);
-        /// <summary>‰æ–Ê‚Ìó‘Ô</summary>
+        /// <summary>ç”»é¢ã®çŠ¶æ…‹</summary>
         public ReadOnlyReactiveProperty<eStatus> Status;
 
-        /// <summary>ƒ[ƒhˆ—</summary>
+        /// <summary>ãƒ­ãƒ¼ãƒ‰å‡¦ç†</summary>
         public abstract void OnLoad(object options);
 
-        /// <summary>ƒAƒ“ƒ[ƒhˆ—</summary>
+        /// <summary>ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰å‡¦ç†</summary>
         public abstract void OnUnload();
 
         /// <summary>
-        /// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+        /// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
         /// </summary>
         public ViewBase()
         {
@@ -32,7 +32,7 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ‰Šú‰»ˆ—
+        /// åˆæœŸåŒ–å‡¦ç†
         /// </summary>
         public void Initialize()
         {
@@ -45,7 +45,7 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ‰æ–Ê‚Ìó‘ÔXV
+        /// ç”»é¢ã®çŠ¶æ…‹æ›´æ–°
         /// </summary>
         /// <param name="status"></param>
         protected void SetStatus(eStatus status)

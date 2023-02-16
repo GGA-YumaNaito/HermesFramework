@@ -1,5 +1,5 @@
+ï»¿using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using System.Threading.Tasks;
 
 /// <summary>
 /// AsyncExtensions
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 static class AsyncExtensions
 {
     /// <summary>
-    /// ”ñ“¯Šúˆ—‚ğ‘Ò‚½‚È‚¢
+    /// éåŒæœŸå‡¦ç†ã‚’å¾…ãŸãªã„
     /// </summary>
     /// <param name="t"></param>
     public static void NoAwait(this Task t)
@@ -17,7 +17,7 @@ static class AsyncExtensions
     }
 
     /// <summary>
-    /// ”ñ“¯Šúˆ—‚ğ‘Ò‚½‚È‚¢
+    /// éåŒæœŸå‡¦ç†ã‚’å¾…ãŸãªã„
     /// </summary>
     /// <param name="t"></param>
     public static void NoAwait(this UniTask t)

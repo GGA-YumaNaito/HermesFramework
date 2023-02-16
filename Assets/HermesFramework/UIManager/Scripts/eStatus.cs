@@ -1,19 +1,19 @@
-namespace Hermes.UI
+ï»¿namespace Hermes.UI
 {
     /// <summary>
-    /// ‰æ–Ê‚Ìó‘Ô
+    /// ç”»é¢ã®çŠ¶æ…‹
     /// </summary>
     public enum eStatus
     {
-        /// <summary>–³</summary>
+        /// <summary>ç„¡</summary>
         None,
-        /// <summary>‰æ–Ê•\¦‘JˆÚ’†</summary>
+        /// <summary>ç”»é¢è¡¨ç¤ºé·ç§»ä¸­</summary>
         Enable,
-        /// <summary>‰æ–Ê•\¦’†</summary>
+        /// <summary>ç”»é¢è¡¨ç¤ºä¸­</summary>
         Display,
-        /// <summary>‰æ–Ê”ñ•\¦‘JˆÚ’†</summary>
+        /// <summary>ç”»é¢éè¡¨ç¤ºé·ç§»ä¸­</summary>
         Disable,
-        /// <summary>I—¹</summary>
+        /// <summary>çµ‚äº†</summary>
         End
     }
 }

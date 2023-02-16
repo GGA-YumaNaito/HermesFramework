@@ -1,10 +1,10 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Hermes.Common
 {
     /// <summary>
-    /// Awake‘O‚ÉManagerScene‚ğ©“®‚Åƒ[ƒh‚·‚éƒNƒ‰ƒX
+    /// Awakeå‰ã«ManagerSceneã‚’è‡ªå‹•ã§ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã‚¯ãƒ©ã‚¹
     /// </summary>
     public class ManagerSceneAutoLoader
     {
@@ -12,12 +12,12 @@ namespace Hermes.Common
         const string managerSceneName = "ManagerScene";
 
         /// <summary>
-        /// ƒQ[ƒ€ŠJn(ƒV[ƒ““Ç‚İ‚İ‘O)‚ÉÀs‚³‚ê‚é
+        /// ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚(ã‚·ãƒ¼ãƒ³èª­ã¿è¾¼ã¿å‰)ã«å®Ÿè¡Œã•ã‚Œã‚‹
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void LoadManagerScene()
         {
-            // ManagerScene‚ª—LŒø‚Å‚È‚¢(‚Ü‚¾“Ç‚İ‚ñ‚Å‚¢‚È‚¢)‚¾‚¯’Ç‰Áƒ[ƒh‚·‚é‚æ‚¤‚É
+            // ManagerSceneãŒæœ‰åŠ¹ã§ãªã„æ™‚(ã¾ã èª­ã¿è¾¼ã‚“ã§ã„ãªã„æ™‚)ã ã‘è¿½åŠ ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã‚ˆã†ã«
             if (!SceneManager.GetSceneByName(managerSceneName).IsValid())
             {
                 SceneManager.LoadScene(managerSceneName, LoadSceneMode.Additive);

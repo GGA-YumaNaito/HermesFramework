@@ -1,7 +1,7 @@
-namespace Hermes.UI
+ï»¿namespace Hermes.UI
 {
     /// <summary>
-    /// ƒoƒbƒNƒ{ƒ^ƒ“
+    /// ãƒãƒƒã‚¯ãƒœã‚¿ãƒ³
     /// </summary>
     public class UIBackButton : UIButton
     {

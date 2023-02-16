@@ -1,9 +1,9 @@
-using UnityEngine.UI;
+ï»¿using UnityEngine.UI;
 
 namespace Hermes.UI
 {
     /// <summary>
-    /// ƒCƒ[ƒW‚Ìƒ‰ƒbƒp[ƒNƒ‰ƒX
+    /// ã‚¤ãƒ¡ãƒ¼ã‚¸ã®ãƒ©ãƒƒãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹
     /// </summary>
     public class UIImage : Image
     {

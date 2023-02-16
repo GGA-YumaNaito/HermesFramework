@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 
 namespace Hermes
@@ -9,7 +9,7 @@ namespace Hermes
     /// <typeparam name="T"></typeparam>
     public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {
-        /// <summary>DontDestroyOnLoad‚É‚·‚é‚©‚Ìƒtƒ‰ƒO</summary>
+        /// <summary>DontDestroyOnLoadã«ã™ã‚‹ã‹ã®ãƒ•ãƒ©ã‚°</summary>
         protected abstract bool isDontDestroyOnLoad { get; }
         /// <summary>Instance</summary>
         static T instance;

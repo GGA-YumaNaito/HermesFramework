@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 namespace Hermes.UI.Sample
 {
@@ -6,7 +6,7 @@ namespace Hermes.UI.Sample
     {
         public override bool IsBack { get; protected set; } = true;
 
-        /// <summary>ƒIƒvƒVƒ‡ƒ“</summary>
+        /// <summary>ã‚ªãƒ—ã‚·ãƒ§ãƒ³</summary>
         public class Options
         {
             public string sumpleText;

@@ -1,35 +1,35 @@
+ï»¿using System;
 using DG.Tweening;
-using System;
 using UnityEngine;
 
 namespace Hermes.UI
 {
     /// <summary>
-    /// ƒ_ƒCƒAƒƒO‰æ–Ê
+    /// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ç”»é¢
     /// </summary>
     public abstract class Dialog : ViewBase
     {
-        /// <summary>ƒ[ƒh‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ƒpƒ‰ƒ[ƒ^</summary>
+        /// <summary>ãƒ­ãƒ¼ãƒ‰æ™‚ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿</summary>
         [SerializeField] AnimationParam loadAnimParam = new AnimationParam();
-        /// <summary>ƒAƒ“ƒ[ƒh‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ƒpƒ‰ƒ[ƒ^</summary>
+        /// <summary>ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ‰æ™‚ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿</summary>
         [SerializeField] AnimationParam unloadAnimParam = new AnimationParam();
         /// <summary>
-        /// ƒAƒjƒ[ƒVƒ‡ƒ“ƒpƒ‰ƒ[ƒ^
+        /// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
         /// </summary>
         [Serializable] struct AnimationParam
         {
-            /// <summary>ƒC[ƒWƒ“ƒO</summary>
+            /// <summary>ã‚¤ãƒ¼ã‚¸ãƒ³ã‚°</summary>
             public Ease ease;
-            /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“ƒJ[ƒu</summary>
+            /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚«ãƒ¼ãƒ–</summary>
             public AnimationCurve animationCurve;
-            /// <summary>ƒAƒjƒ[ƒVƒ‡ƒ“ŠÔ</summary>
+            /// <summary>ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æ™‚é–“</summary>
             public float moveTime;
-            /// <summary>ƒ^[ƒQƒbƒgƒ|ƒWƒVƒ‡ƒ“</summary>
+            /// <summary>ã‚¿ãƒ¼ã‚²ãƒƒãƒˆãƒã‚¸ã‚·ãƒ§ãƒ³</summary>
             public Vector3 targetPos;
         }
 
         /// <summary>
-        /// Status‚ğDisplay‚É•ÏX
+        /// Statusã‚’Displayã«å¤‰æ›´
         /// </summary>
         void DoStatusDisplay()
         {
@@ -37,7 +37,7 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// Status‚ğEnd‚É•ÏX
+        /// Statusã‚’Endã«å¤‰æ›´
         /// </summary>
         void DoStatusEnd()
         {

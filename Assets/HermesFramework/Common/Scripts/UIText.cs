@@ -1,9 +1,9 @@
-using UnityEngine.UI;
+ï»¿using UnityEngine.UI;
 
 namespace Hermes.UI
 {
     /// <summary>
-    /// ƒeƒLƒXƒg‚Ìƒ‰ƒbƒp[ƒNƒ‰ƒX
+    /// ãƒ†ã‚­ã‚¹ãƒˆã®ãƒ©ãƒƒãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹
     /// </summary>
     public class UIText : Text
     {

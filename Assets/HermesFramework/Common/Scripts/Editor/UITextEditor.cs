@@ -1,11 +1,11 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.UI;
 
 namespace Hermes.UI.Editor
 {
     /// <summary>
-    /// UIText‚ÌŠg’£
+    /// UITextã®æ‹¡å¼µ
     /// </summary>
     public class UITextEditor : EditorWindow
     {
@@ -13,11 +13,11 @@ namespace Hermes.UI.Editor
         static void ChangeTextToUIText(MenuCommand menuCommand)
         {
             EditorGUI.BeginChangeCheck();
-            // Text‚ğæ“¾
+            // Textã‚’å–å¾—
             var _text = menuCommand.context as Text;
-            // ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ğæ“¾
+            // ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
             var gameObject = _text.gameObject;
-            // Text‚Ìƒf[ƒ^‚ğ•Û‘¶
+            // Textã®ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜
             var text = _text.text;
             var font = _text.font;
             var fontStyle = _text.fontStyle;
@@ -34,11 +34,11 @@ namespace Hermes.UI.Editor
             var raycastTarget = _text.raycastTarget;
             var raycastPadding = _text.raycastPadding;
             var maskable = _text.maskable;
-            // Text‚Ìíœ
+            // Textã®å‰Šé™¤
             DestroyImmediate(_text);
-            // UIText’Ç‰Á
+            // UITextè¿½åŠ 
             var uiText = gameObject.AddComponent<UIText>();
-            // ƒf[ƒ^‚Ì•Û‘¶
+            // ãƒ‡ãƒ¼ã‚¿ã®ä¿å­˜
             uiText.text = text;
             uiText.font = font;
             uiText.fontStyle = fontStyle;
@@ -55,7 +55,7 @@ namespace Hermes.UI.Editor
             uiText.raycastTarget = raycastTarget;
             uiText.raycastPadding = raycastPadding;
             uiText.maskable = maskable;
-            // •Û‘¶
+            // ä¿å­˜
             EditorUtility.SetDirty(gameObject);
         }
     }

@@ -1,11 +1,11 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.UI;
 
 namespace Hermes.UI.Editor
 {
     /// <summary>
-    /// UIButton‚ÌŠg’£
+    /// UIButtonã®æ‹¡å¼µ
     /// </summary>
     public class UIButtonEditor : EditorWindow
     {
@@ -23,22 +23,22 @@ namespace Hermes.UI.Editor
         static void ChangeProcess<T>(MenuCommand menuCommand) where T : Button
         {
             EditorGUI.BeginChangeCheck();
-            // Button‚ğæ“¾
+            // Buttonã‚’å–å¾—
             var button = menuCommand.context as Button;
-            // ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ğæ“¾
+            // ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
             var gameObject = button.gameObject;
-            // Button‚Ìƒf[ƒ^‚ğ•Û‘¶
+            // Buttonã®ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜
             var interactable = button.interactable;
             var transition = button.transition;
             var targetGraphic = button.targetGraphic;
             var colors = button.colors;
             var navigation = button.navigation;
             var onClick = button.onClick;
-            // Button‚Ìíœ
+            // Buttonã®å‰Šé™¤
             DestroyImmediate(button);
-            // UIButton’Ç‰Á
+            // UIButtonè¿½åŠ 
             var uiButton = gameObject.AddComponent<T>();
-            // ƒf[ƒ^‚Ì•Û‘¶
+            // ãƒ‡ãƒ¼ã‚¿ã®ä¿å­˜
             uiButton.interactable = interactable;
             uiButton.transition = transition;
             uiButton.targetGraphic = targetGraphic;
@@ -47,7 +47,7 @@ namespace Hermes.UI.Editor
             uiButton.colors = colors;
             uiButton.navigation = navigation;
             uiButton.onClick = onClick;
-            // •Û‘¶
+            // ä¿å­˜
             EditorUtility.SetDirty(gameObject);
         }
     }

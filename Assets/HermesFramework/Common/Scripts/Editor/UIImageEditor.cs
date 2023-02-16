@@ -1,11 +1,11 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.UI;
 
 namespace Hermes.UI.Editor
 {
     /// <summary>
-    /// UIImage‚ÌŠg’£
+    /// UIImageã®æ‹¡å¼µ
     /// </summary>
     public class UIImageEditor : EditorWindow
     {
@@ -13,29 +13,29 @@ namespace Hermes.UI.Editor
         static void ChangeImageToUIImage(MenuCommand menuCommand)
         {
             EditorGUI.BeginChangeCheck();
-            // Image‚ğæ“¾
+            // Imageã‚’å–å¾—
             var image = menuCommand.context as Image;
-            // ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ğæ“¾
+            // ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—
             var gameObject = image.gameObject;
-            // Image‚Ìƒf[ƒ^‚ğ•Û‘¶
+            // Imageã®ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜
             var sprite = image.sprite;
             var color = image.color;
             var material = image.material;
             var raycastTarget = image.raycastTarget;
             var raycastPadding = image.raycastPadding;
             var maskable = image.maskable;
-            // Image‚Ìíœ
+            // Imageã®å‰Šé™¤
             DestroyImmediate(image);
-            // UIImage’Ç‰Á
+            // UIImageè¿½åŠ 
             var uiImage = gameObject.AddComponent<UIImage>();
-            // ƒf[ƒ^‚Ì•Û‘¶
+            // ãƒ‡ãƒ¼ã‚¿ã®ä¿å­˜
             uiImage.sprite = sprite;
             uiImage.color = color;
             uiImage.material = material;
             uiImage.raycastTarget = raycastTarget;
             uiImage.raycastPadding = raycastPadding;
             uiImage.maskable = maskable;
-            // •Û‘¶
+            // ä¿å­˜
             EditorUtility.SetDirty(gameObject);
         }
     }

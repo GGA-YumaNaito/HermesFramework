@@ -1,6 +1,6 @@
-using Cysharp.Threading.Tasks;
-using System;
+ï»¿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
@@ -14,27 +14,27 @@ namespace Hermes.UI
     {
         protected override bool isDontDestroyOnLoad => false;
 
-        /// <summary>Œ»İ‚ÌView</summary>
+        /// <summary>ç¾åœ¨ã®View</summary>
         [SerializeField] ViewBase currentView;
-        /// <summary>Œ»İ‚ÌView</summary>
+        /// <summary>ç¾åœ¨ã®View</summary>
         public ViewBase CurrentView { get { return currentView; } private set { currentView = value; } }
-        /// <summary>Œ»İ‚ÌScene</summary>
+        /// <summary>ç¾åœ¨ã®Scene</summary>
         [SerializeField] Screen currentScene;
-        /// <summary>Œ»İ‚ÌView</summary>
+        /// <summary>ç¾åœ¨ã®View</summary>
         public Screen CurrentScene { get { return currentScene; } private set { currentScene = value; } }
-        /// <summary>‘JˆÚStackType</summary>
+        /// <summary>é·ç§»StackType</summary>
         [SerializeField] Stack<Type> stackType = new Stack<Type>();
-        /// <summary>‘JˆÚStackOptions</summary>
+        /// <summary>é·ç§»StackOptions</summary>
         [SerializeField] Stack<object> stackOptions = new Stack<object>();
-        /// <summary>ƒoƒŠƒA</summary>
+        /// <summary>ãƒãƒªã‚¢</summary>
         [SerializeField] GameObject barrier;
-        /// <summary>ƒ_ƒCƒAƒƒO—pBG</summary>
+        /// <summary>ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ç”¨BG</summary>
         [SerializeField] GameObject dialogBG;
-        /// <summary>ƒ_ƒCƒAƒƒORoot</summary>
+        /// <summary>ãƒ€ã‚¤ã‚¢ãƒ­ã‚°Root</summary>
         [SerializeField] Transform dialogRoot;
 
         /// <summary>
-        /// ViewBase‚ğŒp³‚µ‚½ƒNƒ‰ƒX‚ÌLoadAsync
+        /// ViewBaseã‚’ç¶™æ‰¿ã—ãŸã‚¯ãƒ©ã‚¹ã®LoadAsync
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="options"></param>
@@ -42,13 +42,13 @@ namespace Hermes.UI
         public async UniTask LoadAsync<T>(object options = null) where T : ViewBase
         {
             var type = typeof(T);
-            // “¯‚¶‰æ–Ê‚È‚ç•\¦‚µ‚È‚¢
+            // åŒã˜ç”»é¢ãªã‚‰è¡¨ç¤ºã—ãªã„
             if (CurrentScene != null && type == CurrentScene.GetType())
                 return;
 
-            // ƒoƒŠƒAON
+            // ãƒãƒªã‚¢ON
             barrier.SetActive(true);
-            // Šù‚É‘¶İ‚µ‚Ä‚¢‚½‚çStack‚©‚çŠO‚µ‚Ä‚¢‚­
+            // æ—¢ã«å­˜åœ¨ã—ã¦ã„ãŸã‚‰Stackã‹ã‚‰å¤–ã—ã¦ã„ã
             Action<Type> StackPopAction = type =>
             {
                 if (!stackType.Contains(type))
@@ -66,7 +66,7 @@ namespace Hermes.UI
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
             {
-                // Œ»İ‚ÌÅV‚ªƒ_ƒCƒAƒƒO‚¾‚Á‚½‚çíœ‚·‚é
+                // ç¾åœ¨ã®æœ€æ–°ãŒãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã ã£ãŸã‚‰å‰Šé™¤ã™ã‚‹
                 if (CurrentView is Dialog)
                 {
                     dialogBG.SetActive(false);
@@ -90,14 +90,14 @@ namespace Hermes.UI
                         this.stackOptions.Push(stackOptions.Pop());
                     }
                 }
-                // Šù‚ÉƒV[ƒ“‚ª‘¶İ‚µ‚½‚ç
+                // æ—¢ã«ã‚·ãƒ¼ãƒ³ãŒå­˜åœ¨ã—ãŸã‚‰
                 StackPopAction(type);
-                // ‚Ü‚¾CurrentScene‚ª‚È‚©‚Á‚½‚çUnload‚Í‚µ‚È‚¢
+                // ã¾ã CurrentSceneãŒãªã‹ã£ãŸã‚‰Unloadã¯ã—ãªã„
                 if (CurrentScene != null)
                 {
                     await OnUnloadScreen(CurrentScene);
                 }
-                // ƒV[ƒ“ƒ[ƒh
+                // ã‚·ãƒ¼ãƒ³ãƒ­ãƒ¼ãƒ‰
                 await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive);
                 
                 CurrentScene = FindObjectOfType<T>() as Screen;
@@ -107,10 +107,10 @@ namespace Hermes.UI
             else
             {
                 dialogBG.SetActive(true);
-                // Šù‚Éƒ_ƒCƒAƒƒO‚ª‘¶İ‚µ‚½‚ç
-                //StackPopAction(type); // TODO: ¡‚ÍŠO‚µ‚Ä‚¨‚­
+                // æ—¢ã«ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒå­˜åœ¨ã—ãŸã‚‰
+                //StackPopAction(type); // TODO: ä»Šã¯å¤–ã—ã¦ãŠã
 
-                // ƒ[ƒhƒAƒZƒbƒg
+                // ãƒ­ãƒ¼ãƒ‰ã‚¢ã‚»ãƒƒãƒˆ
                 var handle = Addressables.LoadAssetAsync<GameObject>(type.Name);
                 await handle.ToUniTask();
                 var dialog = handle.Result;
@@ -131,19 +131,19 @@ namespace Hermes.UI
             CurrentView.OnLoad(options);
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display);
 
-            // ƒoƒŠƒAOFF
+            // ãƒãƒªã‚¢OFF
             barrier.SetActive(false);
         }
 
         /// <summary>
-        /// ‘O‰æ–Ê•\¦
+        /// å‰ç”»é¢è¡¨ç¤º
         /// </summary>
         public async UniTask BackAsync()
         {
             barrier.SetActive(true);
             if (CurrentView != null && !CurrentView.IsBack)
             {
-                // TODO:‘O‚Ì‰æ–Ê‚É–ß‚ê‚È‚¢‚Ìˆ—
+                // TODO:å‰ã®ç”»é¢ã«æˆ»ã‚Œãªã„æ™‚ã®å‡¦ç†
 
             }
             if (stackType.Count > 1)
@@ -154,16 +154,16 @@ namespace Hermes.UI
             }
             else
             {
-                // TODO:ƒXƒ^ƒbƒN‚ª–³‚©‚Á‚½‚çƒQ[ƒ€I—¹
+                // TODO:ã‚¹ã‚¿ãƒƒã‚¯ãŒç„¡ã‹ã£ãŸã‚‰ã‚²ãƒ¼ãƒ çµ‚äº†
             }
-            // ƒ_ƒCƒAƒƒO‚ª–³‚©‚Á‚½‚çƒoƒŠƒA‚ğOFF‚É‚·‚é
+            // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒç„¡ã‹ã£ãŸã‚‰ãƒãƒªã‚¢ã‚’OFFã«ã™ã‚‹
             dialogBG.SetActive(CurrentView is Dialog);
 
             barrier.SetActive(false);
         }
 
         /// <summary>
-        /// ‘O‰æ–Ê•\¦ˆ—
+        /// å‰ç”»é¢è¡¨ç¤ºå‡¦ç†
         /// </summary>
         /// <param name="isScreen"></param>
         /// <returns></returns>
@@ -193,17 +193,17 @@ namespace Hermes.UI
             {
                 if (isScreen)
                 {
-                    // stack‚ğˆê“I‚É”²‚¢‚Ä‚¨‚­
+                    // stackã‚’ä¸€æ™‚çš„ã«æŠœã„ã¦ãŠã
                     stackType.Pop();
                     stackOptions.Pop();
 
                     await BackProcess(true);
 
-                    // stack‚ğ–ß‚·
+                    // stackã‚’æˆ»ã™
                     stackType.Push(type);
                     stackOptions.Push(options);
 
-                    // ƒ[ƒhƒAƒZƒbƒg
+                    // ãƒ­ãƒ¼ãƒ‰ã‚¢ã‚»ãƒƒãƒˆ
                     var handle = Addressables.LoadAssetAsync<GameObject>(type.Name);
                     await handle.ToUniTask();
                     var dialog = handle.Result;
@@ -228,7 +228,7 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ƒXƒNƒŠ[ƒ“íœ
+        /// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³å‰Šé™¤
         /// </summary>
         /// <param name="viewBase"></param>
         /// <returns></returns>
@@ -240,7 +240,7 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ƒ_ƒCƒAƒƒOíœ
+        /// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°å‰Šé™¤
         /// </summary>
         /// <param name="viewBase"></param>
         /// <returns></returns>
@@ -252,7 +252,7 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ƒXƒ^ƒbƒNƒNƒŠƒA
+        /// ã‚¹ã‚¿ãƒƒã‚¯ã‚¯ãƒªã‚¢
         /// </summary>
         public void ClearStack()
         {
@@ -261,11 +261,11 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ˆê‚Âc‚µ‚ÄƒXƒ^ƒbƒN‚ğƒNƒŠƒA‚·‚é
+        /// ä¸€ã¤æ®‹ã—ã¦ã‚¹ã‚¿ãƒƒã‚¯ã‚’ã‚¯ãƒªã‚¢ã™ã‚‹
         /// </summary>
         public void ClearStackLeaveOne()
         {
-            // ˆê‚Âc‚µ‚ÄƒNƒŠƒA‚·‚é
+            // ä¸€ã¤æ®‹ã—ã¦ã‚¯ãƒªã‚¢ã™ã‚‹
             var count = stackType.Count - 1;
             for (int i = 0; i < count; i++)
             {

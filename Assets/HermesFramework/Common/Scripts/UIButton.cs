@@ -1,9 +1,9 @@
-using UnityEngine.UI;
+ï»¿using UnityEngine.UI;
 
 namespace Hermes.UI
 {
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚Ìƒ‰ƒbƒp[ƒNƒ‰ƒX
+    /// ãƒœã‚¿ãƒ³ã®ãƒ©ãƒƒãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹
     /// </summary>
     public class UIButton : Button
     {
