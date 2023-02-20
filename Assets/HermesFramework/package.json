@@ -29,6 +29,11 @@
             "displayName": "CompositeToggleSample",
             "description": "CompositeToggle Sample.",
             "path": "Samples~/ExternalAssets/Mobcast/Coffee/CompositeToggle"
+        },
+        {
+            "displayName": "ScrollExSample",
+            "description": "ScrollEx Sample.",
+            "path": "Samples~/ExternalAssets/Mobcast/Coffee/ScrollEx"
         }
     ]
 }
