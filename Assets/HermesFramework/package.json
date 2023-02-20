@@ -1,29 +1,34 @@
 {
-  "name": "com.gga.hermes-framework",
-  "version": "0.0.1",
-  "description": "This HermesFramework is designed to facilitate various developments.",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GGA-YumaNaito/HermesFramework.git"
-  },
-  "author": "GGA-YumaNaito <y_naito@gravityga.jp> (https://github.com/GGA-YumaNaito)",
-  "keywords": [
-    "hermes",
-    "framework"
-  ],
-  "displayName": "HermesFramework",
-  "dependencies": {
-    "com.neuecc.unirx": "7.1.0",
-    "com.cysharp.unitask": "2.3.3",
-    "com.unity.addressables": "1.19.19"
-  },
-  "unity": "2021.3",
-  "samples": [
-      {
-          "displayName": "UIManagerSample",
-          "description": "UIManager Sample.",
-          "path": "Samples~/UIManager"
-      }
-  ]
+    "name": "com.gga.hermes-framework",
+    "version": "0.0.1",
+    "description": "This HermesFramework is designed to facilitate various developments.",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GGA-YumaNaito/HermesFramework.git"
+    },
+    "author": "GGA-YumaNaito <y_naito@gravityga.jp> (https://github.com/GGA-YumaNaito)",
+    "keywords": [
+        "hermes",
+        "framework"
+    ],
+    "displayName": "HermesFramework",
+    "dependencies": {
+        "com.neuecc.unirx": "7.1.0",
+        "com.cysharp.unitask": "2.3.3",
+        "com.unity.addressables": "1.19.19"
+    },
+    "unity": "2021.3",
+    "samples": [
+        {
+            "displayName": "UIManagerSample",
+            "description": "UIManager Sample.",
+            "path": "Samples~/HermesFramework/UIManager"
+        },
+        {
+            "displayName": "CompositeToggleSample",
+            "description": "CompositeToggle Sample.",
+            "path": "Samples~/ExternalAssets/Mobcast/Coffee/CompositeToggle"
+        }
+    ]
 }
