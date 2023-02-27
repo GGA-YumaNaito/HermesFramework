@@ -6,7 +6,7 @@ namespace Hermes
     /// <summary>
     /// AsyncExtensions
     /// </summary>
-    static class AsyncExtensions
+    public static partial class AsyncExtensions
     {
         /// <summary>
         /// 非同期処理を待たない
