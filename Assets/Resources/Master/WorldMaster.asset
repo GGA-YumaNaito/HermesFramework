@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 102a42cd7470448e6a8cc89e773ed569, type: 3}
+  m_Name: WorldMaster
+  m_EditorClassIdentifier: 
+  List:
+  - Id: 1
+    WorldName: WORLD_NAME_1
+    IsRelease: 1
+  - Id: 2
+    WorldName: WORLD_NAME_2
+    IsRelease: 1
+  - Id: 3
+    WorldName: WORLD_NAME_3
+    IsRelease: 1
+  - Id: 4
+    WorldName: WORLD_NAME_4
+    IsRelease: 0
+  - Id: 5
+    WorldName: WORLD_NAME_5
+    IsRelease: 0
+  - Id: 6
+    WorldName: WORLD_NAME_6
+    IsRelease: 0
+  - Id: 7
+    WorldName: WORLD_NAME_7
+    IsRelease: 0
+  - Id: 8
+    WorldName: WORLD_NAME_8
+    IsRelease: 0
+  - Id: 9
+    WorldName: WORLD_NAME_9
+    IsRelease: 0
+  - Id: 10
+    WorldName: WORLD_NAME_10
+    IsRelease: 0

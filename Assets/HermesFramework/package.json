@@ -26,6 +26,11 @@
             "path": "Samples~/HermesFramework/UIManager"
         },
         {
+            "displayName": "MasterSample",
+            "description": "Master Sample.",
+            "path": "Samples~/HermesFramework/Master"
+        },
+        {
             "displayName": "CompositeToggleSample",
             "description": "CompositeToggle Sample.",
             "path": "Samples~/ExternalAssets/Mobcast/Coffee/CompositeToggle"
