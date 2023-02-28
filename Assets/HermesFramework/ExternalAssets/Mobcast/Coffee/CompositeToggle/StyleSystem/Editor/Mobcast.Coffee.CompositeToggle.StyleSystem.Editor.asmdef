@@ -1,0 +1,16 @@
+{
+    "name": "Mobcast.Coffee.CompositeToggle.StyleSystem.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:6890a9416ea4b4e6bb753a1938093273"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,16 @@
+{
+    "name": "Mobcast.Coffee.ScrollEx.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5babaef1f330b4c8dbc907a3e1d346aa"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
