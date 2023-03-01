@@ -117,7 +117,8 @@ namespace Hermes.UI
 
                 // Instantiate
                 CurrentView = Instantiate(dialog, dialogRoot).GetComponent<T>();
-                Addressables.Release(handle);
+                // AsyncOperationHandleをDialogに渡す
+                ((Dialog)CurrentView).SetAsyncOperationHandle(handle);
             }
 
             stackType.Push(type);
@@ -210,7 +211,8 @@ namespace Hermes.UI
 
                     // Instantiate
                     CurrentView = (ViewBase)Instantiate(dialog, dialogRoot).GetComponent(type);
-                    Addressables.Release(handle);
+                    // AsyncOperationHandleをDialogに渡す
+                    ((Dialog)CurrentView).SetAsyncOperationHandle(handle);
                 }
                 else
                 {

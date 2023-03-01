@@ -1,6 +1,8 @@
 ﻿using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Hermes.UI
 {
@@ -27,6 +29,9 @@ namespace Hermes.UI
             /// <summary>ターゲットポジション</summary>
             public Vector3 targetPos;
         }
+
+        /// <summary>AsyncOperationHandle</summary>
+        AsyncOperationHandle<GameObject> asyncOperationHandle = new AsyncOperationHandle<GameObject>();
 
         /// <summary>
         /// StatusをDisplayに変更
@@ -80,6 +85,23 @@ namespace Hermes.UI
             }
 
             DoStatusEnd();
+        }
+
+        /// <summary>
+        /// このダイアログのAsyncOperationHandleを取得する
+        /// </summary>
+        /// <param name="asyncOperationHandle"></param>
+        public void SetAsyncOperationHandle(AsyncOperationHandle<GameObject> asyncOperationHandle)
+        {
+            this.asyncOperationHandle = asyncOperationHandle;
+        }
+
+        /// <summary>
+        /// OnDestroy
+        /// </summary>
+        void OnDestroy()
+        {
+            Addressables.Release(asyncOperationHandle);
         }
     }
 }
