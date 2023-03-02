@@ -129,6 +129,7 @@ namespace Hermes.UI
 
             // Initialize & Load
             CurrentView.Initialize();
+            CurrentView.OnEnableAnimation();
             CurrentView.OnLoad(options);
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display);
 
@@ -225,6 +226,7 @@ namespace Hermes.UI
                 throw new Exception($"{type.Name} is Null");
 
             CurrentView.Initialize();
+            CurrentView.OnEnableAnimation();
             CurrentView.OnLoad(options);
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display);
         }
@@ -236,6 +238,7 @@ namespace Hermes.UI
         /// <returns></returns>
         async UniTask OnUnloadScreen(ViewBase viewBase)
         {
+            viewBase.OnDisableAnimation();
             viewBase.OnUnload();
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End);
             await SceneManager.UnloadSceneAsync(viewBase.GetType().Name);
@@ -248,6 +251,7 @@ namespace Hermes.UI
         /// <returns></returns>
         async UniTask OnUnloadDialog(ViewBase viewBase)
         {
+            viewBase.OnDisableAnimation();
             viewBase.OnUnload();
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End);
             Destroy(viewBase.gameObject);

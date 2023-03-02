@@ -31,20 +31,17 @@ namespace Hermes.UI
         /// <summary>
         /// StatusをDisplayに変更
         /// </summary>
-        void DoStatusDisplay()
-        {
-            SetStatus(eStatus.Display);
-        }
+        void DoStatusDisplay() => SetStatus(eStatus.Display);
 
         /// <summary>
         /// StatusをEndに変更
         /// </summary>
-        void DoStatusEnd()
-        {
-            SetStatus(eStatus.End);
-        }
+        void DoStatusEnd() => SetStatus(eStatus.End);
 
-        public override void OnLoad(object options)
+        public override void OnLoad(object options) { }
+        public override void OnUnload() { }
+
+        public sealed override void OnEnableAnimation()
         {
             SetStatus(eStatus.Enable);
 
@@ -64,7 +61,7 @@ namespace Hermes.UI
             DoStatusDisplay();
         }
 
-        public override void OnUnload()
+        public sealed override void OnDisableAnimation()
         {
             SetStatus(eStatus.Disable);
 

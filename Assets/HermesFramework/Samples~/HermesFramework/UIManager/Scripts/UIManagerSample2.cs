@@ -13,7 +13,6 @@ namespace Hermes.UI.Sample
         }
         public override void OnLoad(object options)
         {
-            base.OnLoad(options);
             var op = options as Options;
             if (op != null)
             {

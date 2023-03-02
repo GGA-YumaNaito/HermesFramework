@@ -23,6 +23,12 @@ namespace Hermes.UI
         /// <summary>アンロード処理</summary>
         public abstract void OnUnload();
 
+        /// <summary>出現アニメーション</summary>
+        public abstract void OnEnableAnimation();
+
+        /// <summary>退出アニメーション</summary>
+        public abstract void OnDisableAnimation();
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
