@@ -25,6 +25,42 @@ MonoBehaviour:
     m_Address: UIManagerSampleDialog2
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 60c23747e929c8746bb13e8da59a9a2a
+    m_Address: se_thunderstorm1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0d1c3c9295201c44c832c963b4162530
+    m_Address: se_magic-flame2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d4bae8195c9f0454bab4922158f66040
+    m_Address: se_sword-slash1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: cfef5de45523ab545bb0300081287556
+    m_Address: se_sword-gesture1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5fc688ef001acc040a79d4415595117c
+    m_Address: voice_info-lady1-kidoushimashita1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0b431994fc4bc7c4ba074ef39a7276f8
+    m_Address: bgm_maoudamashii_fantasy01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2865a9d04973ce74294885079f31dbb8
+    m_Address: bgm_maoudamashii_fantasy15
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: cd678562a6b3cd5469209d7a2bddf668
+    m_Address: bgm_maoudamashii_neorock83
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: bf8e75936ce6863459c2ca603588e77b
+    m_Address: bgm_maoudamashii_orchestra16
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1cd4bf7deae1cdd4ea4ef1d5b0e55302, type: 2}
   m_SchemaSet:
