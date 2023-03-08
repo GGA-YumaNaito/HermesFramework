@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Hermes.UI.Sample
 {
@@ -22,7 +23,7 @@ namespace Hermes.UI.Sample
 
         public async void OnClickSampleDialog2()
         {
-            await UIManager.Instance.LoadAsync<UIManagerSampleDialog2>(new UIManagerSampleDialog2.Options() { sumpleText = "UIManagerSampleDialog2" });
+            await UIManager.Instance.LoadAsync<UIManagerSampleDialog2>(new UIManagerSampleDialog2.Options() { sumpleText = "UIManagerSampleDialog2" }, this.GetCancellationTokenOnDestroy());
         }
     }
 }

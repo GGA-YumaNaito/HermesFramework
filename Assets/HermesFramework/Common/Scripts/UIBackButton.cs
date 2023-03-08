@@ -1,4 +1,6 @@
-﻿namespace Hermes.UI
+﻿using Cysharp.Threading.Tasks;
+
+namespace Hermes.UI
 {
     /// <summary>
     /// バックボタン
@@ -8,7 +10,7 @@
         protected override void Awake()
         {
             base.Awake();
-            onClick.AddListener(() => UIManager.Instance.BackAsync().NoAwait());
+            onClick.AddListener(() => UIManager.Instance.BackAsync(this.GetCancellationTokenOnDestroy()).NoAwait());
         }
     }
 }
