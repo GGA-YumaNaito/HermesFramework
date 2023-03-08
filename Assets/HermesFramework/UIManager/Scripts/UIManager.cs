@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -38,8 +39,9 @@ namespace Hermes.UI
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="options"></param>
-        /// <returns></returns>
-        public async UniTask LoadAsync<T>(object options = null) where T : ViewBase
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
             var type = typeof(T);
             // 同じ画面なら表示しない
@@ -81,7 +83,7 @@ namespace Hermes.UI
                         if (t.IsSubclassOf(typeof(Screen)))
                             break;
                         CurrentView = (ViewBase)FindObjectOfType(t);
-                        await OnUnloadDialog(CurrentView);
+                        await OnUnloadDialog(CurrentView, cancellationToken);
                     }
                     count = stackType.Count;
                     for (int i = 0; i < count; i++)
@@ -95,10 +97,10 @@ namespace Hermes.UI
                 // まだCurrentSceneがなかったらUnloadはしない
                 if (CurrentScene != null)
                 {
-                    await OnUnloadScreen(CurrentScene);
+                    await OnUnloadScreen(CurrentScene, cancellationToken);
                 }
                 // シーンロード
-                await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive);
+                await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
                 
                 CurrentScene = FindObjectOfType<T>() as Screen;
                 CurrentView = CurrentScene;
@@ -112,7 +114,7 @@ namespace Hermes.UI
 
                 // ロードアセット
                 var handle = Addressables.LoadAssetAsync<GameObject>(type.Name);
-                await handle.ToUniTask();
+                await handle.ToUniTask(cancellationToken: cancellationToken);
                 var dialog = handle.Result;
 
                 // Instantiate
@@ -131,7 +133,7 @@ namespace Hermes.UI
             CurrentView.Initialize();
             CurrentView.OnEnableAnimation();
             CurrentView.OnLoad(options);
-            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display);
+            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
@@ -140,7 +142,9 @@ namespace Hermes.UI
         /// <summary>
         /// 前画面表示
         /// </summary>
-        public async UniTask BackAsync()
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        public async UniTask BackAsync(CancellationToken cancellationToken)
         {
             barrier.SetActive(true);
             if (CurrentView != null && !CurrentView.IsBack)
@@ -152,7 +156,7 @@ namespace Hermes.UI
             {
                 stackType.Pop();
                 stackOptions.Pop();
-                await BackProcess(CurrentView is Screen);
+                await BackProcess(CurrentView is Screen, cancellationToken);
             }
             else
             {
@@ -168,8 +172,9 @@ namespace Hermes.UI
         /// 前画面表示処理
         /// </summary>
         /// <param name="isScreen"></param>
-        /// <returns></returns>
-        async UniTask BackProcess(bool isScreen)
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        async UniTask BackProcess(bool isScreen, CancellationToken cancellationToken)
         {
             var type = stackType.Peek();
             var options = stackOptions.Peek();
@@ -178,14 +183,14 @@ namespace Hermes.UI
             {
                 if (isScreen)
                 {
-                    await OnUnloadScreen(CurrentScene);
-                    await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive);
+                    await OnUnloadScreen(CurrentScene, cancellationToken);
+                    await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
                     CurrentScene = FindObjectOfType(type) as Screen;
                     CurrentView = CurrentScene;
                 }
                 else
                 {
-                    await OnUnloadDialog(CurrentView);
+                    await OnUnloadDialog(CurrentView, cancellationToken);
                     CurrentView = (ViewBase)FindObjectOfType(type);
                     return;
                 }
@@ -199,7 +204,7 @@ namespace Hermes.UI
                     stackType.Pop();
                     stackOptions.Pop();
 
-                    await BackProcess(true);
+                    await BackProcess(true, cancellationToken);
 
                     // stackを戻す
                     stackType.Push(type);
@@ -207,7 +212,7 @@ namespace Hermes.UI
 
                     // ロードアセット
                     var handle = Addressables.LoadAssetAsync<GameObject>(type.Name);
-                    await handle.ToUniTask();
+                    await handle.ToUniTask(cancellationToken: cancellationToken);
                     var dialog = handle.Result;
 
                     // Instantiate
@@ -217,7 +222,7 @@ namespace Hermes.UI
                 }
                 else
                 {
-                    await OnUnloadDialog(CurrentView);
+                    await OnUnloadDialog(CurrentView, cancellationToken);
                     CurrentView = (ViewBase)FindObjectOfType(type);
                     return;
                 }
@@ -228,32 +233,34 @@ namespace Hermes.UI
             CurrentView.Initialize();
             CurrentView.OnEnableAnimation();
             CurrentView.OnLoad(options);
-            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display);
+            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// スクリーン削除
         /// </summary>
         /// <param name="viewBase"></param>
-        /// <returns></returns>
-        async UniTask OnUnloadScreen(ViewBase viewBase)
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        async UniTask OnUnloadScreen(ViewBase viewBase, CancellationToken cancellationToken)
         {
             viewBase.OnDisableAnimation();
             viewBase.OnUnload();
-            await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End);
-            await SceneManager.UnloadSceneAsync(viewBase.GetType().Name);
+            await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
+            await SceneManager.UnloadSceneAsync(viewBase.GetType().Name).ToUniTask(cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// ダイアログ削除
         /// </summary>
         /// <param name="viewBase"></param>
-        /// <returns></returns>
-        async UniTask OnUnloadDialog(ViewBase viewBase)
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        async UniTask OnUnloadDialog(ViewBase viewBase, CancellationToken cancellationToken)
         {
             viewBase.OnDisableAnimation();
             viewBase.OnUnload();
-            await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End);
+            await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
             Destroy(viewBase.gameObject);
         }
 
