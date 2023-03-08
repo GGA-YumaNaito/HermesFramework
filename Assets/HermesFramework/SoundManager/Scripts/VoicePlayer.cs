@@ -14,7 +14,7 @@ namespace Hermes.Sound
         /// </summary>
         /// <param name="key"></param>
         /// <param name="playType"></param>
-        public void Play(string key, ePlayType playType = ePlayType.Play) => PlayAsync(key, playType).Forget();
+        public void Play(string key, ePlayType playType = ePlayType.Play) => PlayAsync(key, playType, this.GetCancellationTokenOnDestroy()).Forget();
 
         /// <summary>
 		/// 停止

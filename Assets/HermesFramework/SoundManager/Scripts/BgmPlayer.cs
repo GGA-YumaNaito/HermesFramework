@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using DateTime = System.DateTime;
 
 namespace Hermes.Sound
 {
@@ -66,8 +62,9 @@ namespace Hermes.Sound
         /// <summary>
         /// 駆動
         /// </summary>
-        protected virtual void Update()
+        protected override void Update()
         {
+            base.Update();
             for (var i = 0; i < source.Length; i++)
             {
                 var smsc = subChannel(i);
@@ -148,6 +145,54 @@ namespace Hermes.Sound
             }
         }
 
+        /// <summary>
+        /// 再生Async
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        protected async UniTask PlayAsync(string key, CancellationToken cancellationToken)
+        {
+            var smsc = subChannel(playChannel); // 裏チャネル
+
+            // 再生中の裏と一致
+            if (useList.ContainsKey(key))
+            {
+                var keyIndex = useList[key][0].Key;
+                if (keyIndex < 0)
+                    return;
+                if (source[smsc].isPlaying && source[smsc].clip == source[keyIndex].clip)
+                {
+                    state[playChannel] = source[playChannel].isPlaying ? eStatus.FADEOUT : eStatus.STOP; // 表を停止
+                    state[smsc] = eStatus.FADEIN; // 裏を開始
+                    playChannel = smsc; // 表裏入れ替え
+                }
+            }
+            // どちらとも一致しない
+            else
+            {
+                var i = clipList.IndexOf(null);
+                // 同時再生数を超えていたら処理をしない
+                if (i < 0)
+                {
+                    Debug.LogError("The number of simultaneous playback of sound is exceeded.");
+                    return;
+                }
+                playChannel = musicActiveChannel; // アクティブな方を表に
+                smsc = subChannel(playChannel);
+                state[playChannel] = source[playChannel].isPlaying ? eStatus.FADEOUT : eStatus.STOP; // 表をフェードアウト
+                lastState[smsc] = eStatus.STOP; // 裏を即時停止
+                source[smsc].Stop();
+                source[smsc].volume = 0f;
+                state[smsc] = eStatus.WAIT_INTERVAL; // 裏を開始
+                playChannel = smsc; // 表裏入れ替え
+                await PlayAsync(key, ePlayType.IfNot, cancellationToken);
+                // BGMが全て消えていたら
+                if (clipList.Count(x => x == null) >= max)
+                    playChannel = 1; // 初期化
+            }
+        }
+
         /// <summary>サブチャネル</summary>
         protected int subChannel(int main) => (main == 0) ? 1 : 0;
 
@@ -197,55 +242,11 @@ namespace Hermes.Sound
             }
         }
 
-        protected async UniTask PlayAsync(string key)
-        {
-            var smsc = subChannel(playChannel); // 裏チャネル
-
-            // 再生中の裏と一致
-            if (useList.ContainsKey(key))
-            {
-                var keyIndex = useList[key][0].Key;
-                if (keyIndex < 0)
-                    return;
-                if (source[smsc].isPlaying && source[smsc].clip == source[keyIndex].clip)
-                {
-                Debug.Log($"裏と一致 : musicActiveChannel = {musicActiveChannel} : playChannel = {playChannel}");
-                    state[playChannel] = source[playChannel].isPlaying ? eStatus.FADEOUT : eStatus.STOP; // 表を停止
-                    state[smsc] = eStatus.FADEIN; // 裏を開始
-                    playChannel = smsc; // 表裏入れ替え
-                }
-            }
-            // どちらとも一致しない
-            else
-            {
-                var i = clipList.IndexOf(null);
-                // 同時再生数を超えていたら処理をしない
-                if (i < 0)
-                {
-                    Debug.LogError("The number of simultaneous playback of sound is exceeded.");
-                    return;
-                }
-                Debug.Log($"一致しない : musicActiveChannel = {musicActiveChannel} : playChannel = {playChannel}");
-                playChannel = musicActiveChannel; // アクティブな方を表に
-                smsc = subChannel(playChannel);
-                state[playChannel] = source[playChannel].isPlaying ? eStatus.FADEOUT : eStatus.STOP; // 表をフェードアウト
-                lastState[smsc] = eStatus.STOP; // 裏を即時停止
-                source[smsc].Stop();
-                source[smsc].volume = 0f;
-                state[smsc] = eStatus.WAIT_INTERVAL; // 裏を開始
-                playChannel = smsc; // 表裏入れ替え
-                await PlayAsync(key, ePlayType.IfNot);
-                // BGMが全て消えていたら
-                if (clipList.Count(x => x == null) >= max)
-                    playChannel = 1; // 初期化
-            }
-        }
-
         /// <summary>
         /// 再生
         /// </summary>
         /// <param name="key"></param>
-        public void Play(string key) => PlayAsync(key).Forget();
+        public void Play(string key) => PlayAsync(key, this.GetCancellationTokenOnDestroy()).Forget();
 
         /// <summary>
 		/// 停止

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -36,6 +37,8 @@ namespace Hermes.Sound
         protected float volume;
         /// <summary>音量係数</summary>
         protected float coefficient = 1f;
+        /// <summary>1フレームで出した音リスト</summary>
+        protected List<string> frameSounds = new List<string>();
 
         /// <summary>
         /// 初期化
@@ -55,12 +58,21 @@ namespace Hermes.Sound
         }
 
         /// <summary>
+        /// 駆動
+        /// </summary>
+        protected virtual void Update()
+        {
+            frameSounds.Clear();
+        }
+
+        /// <summary>
         /// 再生Async
         /// </summary>
         /// <param name="key"></param>
         /// <param name="playType"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        protected async UniTask PlayAsync(string key, ePlayType playType = ePlayType.Play)
+        protected virtual async UniTask PlayAsync(string key, ePlayType playType = ePlayType.Play, CancellationToken cancellationToken = default)
         {
             var i = clipList.IndexOf(null);
             // 同時再生数を超えていたら処理をしない
@@ -69,6 +81,11 @@ namespace Hermes.Sound
                 Debug.LogError("The number of simultaneous playback of sound is exceeded.");
                 return;
             }
+
+            // 1フレーム内で同じ音は出さない
+            if (frameSounds.Contains(key))
+                return;
+            frameSounds.Add(key);
 
             // 存在していなかったら追加
             if (!useList.ContainsKey(key))
@@ -82,15 +99,15 @@ namespace Hermes.Sound
             {
                 // 同じ音を制限数まで鳴らす
                 case ePlayType.Play:
-                    await PlayAsyncTypePlay(key, i);
+                    await PlayAsyncTypePlay(key, i, cancellationToken);
                     break;
                 // 同じ音が鳴っていたら止めてから鳴らす
                 case ePlayType.StopPlus:
-                    await PlayAsyncTypeStopPlus(key, i);
+                    await PlayAsyncTypeStopPlus(key, i, cancellationToken);
                     break;
                 // 同じ音が鳴っていない場合だけ鳴らす
                 case ePlayType.IfNot:
-                    await PlayAsyncTypeIfNot(key, i);
+                    await PlayAsyncTypeIfNot(key, i, cancellationToken);
                     break;
             }
         }
@@ -100,8 +117,9 @@ namespace Hermes.Sound
         /// </summary>
         /// <param name="key"></param>
         /// <param name="i"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        protected async UniTask PlayAsyncTypePlay(string key, int i)
+        async UniTask PlayAsyncTypePlay(string key, int i, CancellationToken cancellationToken)
         {
             // 超えていたら古い音を最初から再生する
             if (useList[key].Count(x => x.Value) >= sameMax)
@@ -121,7 +139,7 @@ namespace Hermes.Sound
             // 新たに追加する
             else
             {
-                await PlayAsyncCreate(key, i);
+                await PlayAsyncCreate(key, i, cancellationToken);
             }
         }
 
@@ -130,8 +148,9 @@ namespace Hermes.Sound
         /// </summary>
         /// <param name="key"></param>
         /// <param name="i"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        protected async UniTask PlayAsyncTypeStopPlus(string key, int i)
+        async UniTask PlayAsyncTypeStopPlus(string key, int i, CancellationToken cancellationToken)
         {
             var time = 0f;
             var l = -1;
@@ -147,7 +166,7 @@ namespace Hermes.Sound
                 }
             }
             if (l < 0)
-                await PlayAsyncCreate(key, i);
+                await PlayAsyncCreate(key, i, cancellationToken);
             else
                 source[l].Play();
         }
@@ -157,15 +176,16 @@ namespace Hermes.Sound
         /// </summary>
         /// <param name="key"></param>
         /// <param name="i"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        protected async UniTask PlayAsyncTypeIfNot(string key, int i)
+        async UniTask PlayAsyncTypeIfNot(string key, int i, CancellationToken cancellationToken)
         {
             // 鳴っていたら鳴らさない
             foreach (var use in useList[key])
                 if (use.Value)
                     return;
 
-            await PlayAsyncCreate(key, i);
+            await PlayAsyncCreate(key, i, cancellationToken);
         }
 
         /// <summary>
@@ -173,11 +193,12 @@ namespace Hermes.Sound
         /// </summary>
         /// <param name="key"></param>
         /// <param name="i"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        protected async UniTask PlayAsyncCreate(string key, int i)
+        async UniTask PlayAsyncCreate(string key, int i, CancellationToken cancellationToken)
         {
             var handle = Addressables.LoadAssetAsync<AudioClip>(key);
-            await handle.ToUniTask();
+            await handle.ToUniTask(cancellationToken: cancellationToken);
             var result = handle.Result;
 
             clipList[i] = result;
@@ -186,7 +207,7 @@ namespace Hermes.Sound
 
             var l = useList[key].FindIndex(x => !x.Value);
             useList[key][l] = new KeyValuePair<int, bool>(i, true);
-            await UniTask.WaitUntil(() => !source[i].isPlaying);
+            await UniTask.WaitUntil(() => !source[i].isPlaying, cancellationToken: cancellationToken);
 
             Addressables.Release(handle);
             clipList[i] = null;
