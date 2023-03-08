@@ -207,7 +207,7 @@ namespace Hermes.Sound
 
             var l = useList[key].FindIndex(x => !x.Value);
             useList[key][l] = new KeyValuePair<int, bool>(i, true);
-            await UniTask.WaitUntil(() => !source[i].isPlaying, cancellationToken: cancellationToken);
+            await UniTask.WaitUntil(() => source[i].clip != result || !source[i].isPlaying, cancellationToken: cancellationToken);
 
             Addressables.Release(handle);
             clipList[i] = null;
