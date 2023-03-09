@@ -45,15 +45,15 @@ namespace Hermes.Asset
             if (asyncOperationHandleList.ContainsKey(key))
                 return (T)asyncOperationHandleList[key].Result;
 
-            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
-            asyncOperationHandleList.Add(key, (AsyncOperationHandle<UnityEngine.Object>)(object)handle);
+            var handle = Addressables.LoadAssetAsync<UnityEngine.Object>(key);
+            asyncOperationHandleList.Add(key, handle);
             await handle.ToUniTask(cancellationToken: token);
 
             // 自動的にGameObjectが破棄された時にhandleをreleaseする
             if (releaseTarget)
                 releaseTarget.GetOrAddComponent<DestroyEventListener>().OnDestroyed += () => Release(key);
 
-            return handle.Result;
+            return (T)handle.Result;
         }
 
         /// <summary>
