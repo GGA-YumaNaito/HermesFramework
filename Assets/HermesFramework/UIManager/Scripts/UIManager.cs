@@ -23,16 +23,19 @@ namespace Hermes.UI
         [SerializeField] Screen currentScene;
         /// <summary>現在のView</summary>
         public Screen CurrentScene { get { return currentScene; } private set { currentScene = value; } }
-        /// <summary>遷移StackType</summary>
-        [SerializeField] Stack<Type> stackType = new Stack<Type>();
-        /// <summary>遷移StackOptions</summary>
-        [SerializeField] Stack<object> stackOptions = new Stack<object>();
         /// <summary>バリア</summary>
         [SerializeField] GameObject barrier;
         /// <summary>ダイアログ用BG</summary>
         [SerializeField] GameObject dialogBG;
         /// <summary>ダイアログRoot</summary>
         [SerializeField] Transform dialogRoot;
+
+        /// <summary>遷移StackName</summary>
+        [SerializeField] List<string> stackName = new List<string>();
+        /// <summary>遷移StackType</summary>
+        Stack<Type> stackType = new Stack<Type>();
+        /// <summary>遷移StackOptions</summary>
+        Stack<object> stackOptions = new Stack<object>();
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync
@@ -58,6 +61,7 @@ namespace Hermes.UI
                 var count = stackType.Count;
                 for (int i = 0; i < count; i++)
                 {
+                    stackName.Pop();
                     var t = stackType.Pop();
                     stackOptions.Pop();
                     if (t == type)
@@ -77,6 +81,7 @@ namespace Hermes.UI
                     var count = this.stackType.Count;
                     for (int i = 0; i < count; i++)
                     {
+                        stackName.Pop();
                         stackType.Push(this.stackType.Pop());
                         stackOptions.Push(this.stackOptions.Pop());
                         var t = stackType.Peek();
@@ -88,8 +93,7 @@ namespace Hermes.UI
                     count = stackType.Count;
                     for (int i = 0; i < count; i++)
                     {
-                        this.stackType.Push(stackType.Pop());
-                        this.stackOptions.Push(stackOptions.Pop());
+                        StackPush(stackType.Pop(), stackOptions.Pop());
                     }
                 }
                 // 既にシーンが存在したら
@@ -123,8 +127,7 @@ namespace Hermes.UI
                 ((Dialog)CurrentView).SetAsyncOperationHandle(handle);
             }
 
-            stackType.Push(type);
-            stackOptions.Push(options);
+            StackPush(type, options);
 
             if (CurrentView == null)
                 throw new Exception($"{typeof(T).Name} is Null");
@@ -154,8 +157,7 @@ namespace Hermes.UI
             }
             if (stackType.Count > 1)
             {
-                stackType.Pop();
-                stackOptions.Pop();
+                StackPop();
                 await BackProcess(CurrentView is Screen, cancellationToken);
             }
             else
@@ -176,6 +178,7 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         async UniTask BackProcess(bool isScreen, CancellationToken cancellationToken)
         {
+            var name = stackName.Peek();
             var type = stackType.Peek();
             var options = stackOptions.Peek();
             // Screen
@@ -184,7 +187,7 @@ namespace Hermes.UI
                 if (isScreen)
                 {
                     await OnUnloadScreen(CurrentScene, cancellationToken);
-                    await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+                    await SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
                     CurrentScene = FindObjectOfType(type) as Screen;
                     CurrentView = CurrentScene;
                 }
@@ -201,17 +204,15 @@ namespace Hermes.UI
                 if (isScreen)
                 {
                     // stackを一時的に抜いておく
-                    stackType.Pop();
-                    stackOptions.Pop();
+                    StackPop();
 
                     await BackProcess(true, cancellationToken);
 
                     // stackを戻す
-                    stackType.Push(type);
-                    stackOptions.Push(options);
+                    StackPush(type, options);
 
                     // ロードアセット
-                    var handle = Addressables.LoadAssetAsync<GameObject>(type.Name);
+                    var handle = Addressables.LoadAssetAsync<GameObject>(name);
                     await handle.ToUniTask(cancellationToken: cancellationToken);
                     var dialog = handle.Result;
 
@@ -228,7 +229,7 @@ namespace Hermes.UI
                 }
             }
             if (CurrentView == null)
-                throw new Exception($"{type.Name} is Null");
+                throw new Exception($"{name} is Null");
 
             CurrentView.Initialize();
             CurrentView.OnEnableAnimation();
@@ -262,6 +263,28 @@ namespace Hermes.UI
             viewBase.OnUnload();
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
             Destroy(viewBase.gameObject);
+        }
+
+        /// <summary>
+        /// Stack pop
+        /// </summary>
+        void StackPop()
+        {
+            stackName.Pop();
+            stackType.Pop();
+            stackOptions.Pop();
+        }
+
+        /// <summary>
+        /// Stack push
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="options"></param>
+        void StackPush(Type type, object options)
+        {
+            stackName.Push(type.Name);
+            stackType.Push(type);
+            stackOptions.Push(options);
         }
 
         /// <summary>
