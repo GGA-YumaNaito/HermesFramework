@@ -53,7 +53,7 @@ namespace Hermes.Asset
             if (releaseTarget)
                 releaseTarget.GetOrAddComponent<DestroyEventListener>().OnDestroyed += () => Release(key);
 
-            return (T)handle.Result;
+            return (T)Convert<T>(handle.Result);
         }
 
         /// <summary>
@@ -78,6 +78,32 @@ namespace Hermes.Asset
             foreach (var op in asyncOperationHandleList)
                 Addressables.Release(op.Value);
             asyncOperationHandleList.Clear();
+        }
+
+        /// <summary>
+        /// Convert
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns>T</returns>
+        public static object Convert<T>(UnityEngine.Object obj) where T : UnityEngine.Object
+        {
+            Debug.Log("obj = " + obj);
+            // Texture2D
+            if (obj is Texture2D)
+            {
+                // Texture2Dに変換
+                var tex = (Texture2D)obj;
+
+                // T = Sprite
+                if (typeof(T).Equals(typeof(Sprite)))
+                {
+                    // Texture2DをSpriteに変換
+                    Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
+                    return sprite;
+                }
+            }
+            return null;
         }
 
         /// <summary>
