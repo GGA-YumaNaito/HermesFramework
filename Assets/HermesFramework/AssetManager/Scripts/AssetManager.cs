@@ -43,7 +43,7 @@ namespace Hermes.Asset
         public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             if (asyncOperationHandleList.ContainsKey(key))
-                return (T)asyncOperationHandleList[key].Result;
+                return (T)Convert<T>(asyncOperationHandleList[key].Result);
 
             var handle = Addressables.LoadAssetAsync<UnityEngine.Object>(key);
             asyncOperationHandleList.Add(key, handle);
