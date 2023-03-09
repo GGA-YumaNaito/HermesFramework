@@ -103,7 +103,8 @@ namespace Hermes.Asset
                     return sprite;
                 }
             }
-            return null;
+            // そのまま返す
+            return obj;
         }
 
         /// <summary>
