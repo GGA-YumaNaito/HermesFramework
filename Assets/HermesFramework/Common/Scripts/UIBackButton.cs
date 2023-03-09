@@ -10,7 +10,7 @@ namespace Hermes.UI
         protected override void Awake()
         {
             base.Awake();
-            onClick.AddListener(() => UIManager.Instance.BackAsync(this.GetCancellationTokenOnDestroy()).NoAwait());
+            onClick.AddListener(() => UIManager.Instance.BackAsync(this.GetCancellationTokenOnDestroy()).Forget());
         }
     }
 }
