@@ -28,6 +28,11 @@ namespace Hermes.Asset
         /// <param name="token"></param>
         public static async void Load<T>(string key, Action<T> onLoaded, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
+            if (asyncOperationHandleList.Count > 0)
+                foreach (var pair in asyncOperationHandleList)
+                    Debug.Log($"kye = {pair.Key} : value = {pair.Value}");
+            else
+                Debug.Log("asyncOperationHandleList.Count = 0");
             var ob = await LoadAsync<T>(key, releaseTarget, token);
             onLoaded?.Invoke(ob);
         }
@@ -42,8 +47,6 @@ namespace Hermes.Asset
         /// <returns>UniTask<T></returns>
         public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
-            foreach (var pair in asyncOperationHandleList)
-                Debug.Log($"kye = {pair.Key} : value = {pair.Value}");
             if (asyncOperationHandleList.ContainsKey(key))
                 return (T)Convert<T>(asyncOperationHandleList[key].Result);
 
