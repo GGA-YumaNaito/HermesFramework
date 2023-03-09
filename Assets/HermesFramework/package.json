@@ -36,6 +36,11 @@
             "path": "Samples~/HermesFramework/SoundManager"
         },
         {
+            "displayName": "AssetManagerSample",
+            "description": "AssetManager Sample.",
+            "path": "Samples~/HermesFramework/AssetManager"
+        },
+        {
             "displayName": "CompositeToggleSample",
             "description": "CompositeToggle Sample.",
             "path": "Samples~/ExternalAssets/Mobcast/Coffee/CompositeToggle"
