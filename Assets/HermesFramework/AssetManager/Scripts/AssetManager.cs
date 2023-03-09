@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.EventSystems;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Hermes.Asset
@@ -66,7 +64,7 @@ namespace Hermes.Asset
         {
             if (asyncOperationHandleList.ContainsKey(key))
             {
-                Addressables.Release(asyncOperationHandleList[key]);
+                Addressables.Release(asyncOperationHandleList[key].Value);
                 asyncOperationHandleList.Remove(key);
                 return;
             }
@@ -78,7 +76,7 @@ namespace Hermes.Asset
         public static void ReleaseAll()
         {
             foreach (var op in asyncOperationHandleList)
-                Addressables.Release(op.Value);
+                Addressables.Release(op.Value.Value);
             asyncOperationHandleList.Clear();
         }
 
