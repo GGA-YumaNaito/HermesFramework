@@ -28,12 +28,6 @@ namespace Hermes.Asset
         /// <param name="token"></param>
         public static async void Load<T>(string key, Action<T> onLoaded, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
-            Debug.Log($"Load kye = {key}");
-            if (asyncOperationHandleList.Count > 0)
-                foreach (var pair in asyncOperationHandleList)
-                    Debug.Log($"kye = {pair.Key} : value = {pair.Value}");
-            else
-                Debug.Log("asyncOperationHandleList.Count = 0");
             var ob = await LoadAsync<T>(key, releaseTarget, token);
             onLoaded?.Invoke(ob);
         }
@@ -49,7 +43,10 @@ namespace Hermes.Asset
         public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             if (asyncOperationHandleList.ContainsKey(key))
+            {
+                await asyncOperationHandleList[key].ToUniTask(cancellationToken: token);
                 return (T)Convert<T>(asyncOperationHandleList[key].Result);
+            }
 
             var handle = Addressables.LoadAssetAsync<UnityEngine.Object>(key);
             asyncOperationHandleList.Add(key, handle);
@@ -94,7 +91,6 @@ namespace Hermes.Asset
         /// <returns>T</returns>
         public static object Convert<T>(UnityEngine.Object obj) where T : UnityEngine.Object
         {
-            Debug.Log("obj = " + obj);
             // Texture2D
             if (obj is Texture2D)
             {
