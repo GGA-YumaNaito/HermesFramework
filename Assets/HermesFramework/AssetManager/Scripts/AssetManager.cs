@@ -28,6 +28,7 @@ namespace Hermes.Asset
         /// <param name="token"></param>
         public static async void Load<T>(string key, Action<T> onLoaded, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
+            Debug.Log($"Load kye = {key}");
             if (asyncOperationHandleList.Count > 0)
                 foreach (var pair in asyncOperationHandleList)
                     Debug.Log($"kye = {pair.Key} : value = {pair.Value}");
