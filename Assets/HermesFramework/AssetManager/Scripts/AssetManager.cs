@@ -16,7 +16,7 @@ namespace Hermes.Asset
         protected override bool isDontDestroyOnLoad => false;
 
         /// <summary>AsyncOperationHandleList</summary>
-        static Dictionary<string, AsyncOperationHandle<UnityEngine.Object>?> asyncOperationHandleList = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>?>();
+        static Dictionary<string, AsyncOperationHandle<UnityEngine.Object>> asyncOperationHandleList = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>>();
 
         /// <summary>
         /// Load
@@ -43,17 +43,17 @@ namespace Hermes.Asset
         public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             if (asyncOperationHandleList.ContainsKey(key))
-                return (T)asyncOperationHandleList[key].Value.Result;
+                return (T)asyncOperationHandleList[key].Result;
 
-            AsyncOperationHandle<T>? handle = Addressables.LoadAssetAsync<T>(key);
-            asyncOperationHandleList.Add(key, handle as AsyncOperationHandle<UnityEngine.Object>?);
+            AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
+            asyncOperationHandleList.Add(key, (AsyncOperationHandle<UnityEngine.Object>)(object)handle);
             await handle.ToUniTask(cancellationToken: token);
 
             // 自動的にGameObjectが破棄された時にhandleをreleaseする
             if (releaseTarget)
                 releaseTarget.GetOrAddComponent<DestroyEventListener>().OnDestroyed += () => Release(key);
 
-            return handle.Value.Result;
+            return handle.Result;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Hermes.Asset
         {
             if (asyncOperationHandleList.ContainsKey(key))
             {
-                Addressables.Release(asyncOperationHandleList[key].Value);
+                Addressables.Release(asyncOperationHandleList[key]);
                 asyncOperationHandleList.Remove(key);
                 return;
             }
@@ -76,7 +76,7 @@ namespace Hermes.Asset
         public static void ReleaseAll()
         {
             foreach (var op in asyncOperationHandleList)
-                Addressables.Release(op.Value.Value);
+                Addressables.Release(op.Value);
             asyncOperationHandleList.Clear();
         }
 
