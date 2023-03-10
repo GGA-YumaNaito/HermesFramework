@@ -49,6 +49,11 @@
             "displayName": "ScrollExSample",
             "description": "ScrollEx Sample.",
             "path": "Samples~/ExternalAssets/Mobcast/Coffee/ScrollEx"
+        },
+        {
+            "displayName": "UITransition",
+            "description": "UITransition Sample.",
+            "path": "Samples~/ExternalAssets/Mobcast/Coffee/UITransition"
         }
     ]
 }

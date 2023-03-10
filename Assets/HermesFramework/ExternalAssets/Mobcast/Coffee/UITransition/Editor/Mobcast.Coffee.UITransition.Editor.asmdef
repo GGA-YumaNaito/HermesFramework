@@ -1,0 +1,18 @@
+{
+    "name": "Mobcast.Coffee.UITransition.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:87b97029abc154e6d9256a091ddba72a"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
