@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Hermes.Asset;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 namespace Hermes.UI
@@ -30,6 +31,13 @@ namespace Hermes.UI
         [SerializeField] GameObject dialogBG;
         /// <summary>ダイアログRoot</summary>
         [SerializeField] Transform dialogRoot;
+
+        /// <summary>SubSceneList</summary>
+        [SerializeField] List<Screen> subSceneList = new List<Screen>();
+        /// <summary>SubSceneList</summary>
+        public List<Screen> SubSceneList { get { return subSceneList; } private set { subSceneList = value; } }
+        /// <summary>SubSceneList</summary>
+        [SerializeField] List<SceneInstance> subSceneInstanceList = new List<SceneInstance>();
 
         /// <summary>遷移StackName</summary>
         [SerializeField] List<string> stackName = new List<string>();
@@ -267,6 +275,70 @@ namespace Hermes.UI
             // DialogBGの位置を下げる
             var dialogBGTransform = dialogBG.transform;
             dialogBGTransform.SetSiblingIndex(dialogBGTransform.GetSiblingIndex() - 1);
+        }
+
+        /// <summary>
+        /// SubSceneのLoadAsync
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="options"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        public async UniTask SubSceneLoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        {
+            // バリアON
+            barrier.SetActive(true);
+
+            var type = typeof(T);
+            // シーンロード
+            var instance = await Addressables.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+            var screen = FindObjectOfType(type) as Screen;
+
+            if (screen == null)
+                throw new Exception($"{typeof(T).Name} is Null");
+
+            SubSceneList.Add(screen);
+            subSceneInstanceList.Add(instance);
+
+            // Initialize & Load
+            screen.Initialize();
+            screen.OnEnableAnimation();
+            screen.OnLoad(options);
+            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+
+            // バリアOFF
+            barrier.SetActive(false);
+        }
+
+        /// <summary>
+        /// SubSceneのUnloadAsync
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>UniTask</returns>
+        public async UniTask SubSceneUnloadAsync<T>(CancellationToken cancellationToken = default) where T : ViewBase
+        {
+            // バリアON
+            barrier.SetActive(true);
+
+            var type = typeof(T);
+            for (int i = 0; i < SubSceneList.Count; i++)
+            {
+                if (SubSceneList[i].GetType() == type)
+                {
+                    SubSceneList[i].OnDisableAnimation();
+                    SubSceneList[i].OnUnload();
+                    await UniTask.WaitUntil(() => SubSceneList[i].Status.Value == eStatus.End, cancellationToken: cancellationToken);
+
+                    // シーンアンロード
+                    await Addressables.UnloadSceneAsync(subSceneInstanceList[i]).ToUniTask(cancellationToken: cancellationToken);
+                    SubSceneList.RemoveAt(i);
+                    subSceneInstanceList.RemoveAt(i);
+                    return;
+                }
+            }
+
+            // バリアOFF
+            barrier.SetActive(false);
         }
 
         /// <summary>
