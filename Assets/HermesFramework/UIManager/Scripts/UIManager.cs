@@ -281,25 +281,37 @@ namespace Hermes.UI
         /// SubSceneのLoadAsync
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
         /// <param name="options"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        public async UniTask SubSceneLoadAsync<T>(string name, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        public async UniTask SubSceneLoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        {
+            await SubSceneLoadAsync<T>(typeof(T).Name, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// SubSceneのLoadAsync
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sceneName"></param>
+        /// <param name="options"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        public async UniTask SubSceneLoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
             // バリアON
             barrier.SetActive(true);
 
             var type = typeof(T);
             // シーンロード
-            var instance = await Addressables.LoadSceneAsync(name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+            var instance = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
             var screen = FindObjectOfType(type) as Screen;
 
             if (screen == null)
                 throw new Exception($"{typeof(T).Name} is Null");
 
             SubSceneList.Add(screen);
-            subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(name, instance));
+            subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(sceneName, instance));
 
             // Initialize & Load
             screen.Initialize();
@@ -314,16 +326,28 @@ namespace Hermes.UI
         /// <summary>
         /// SubSceneのUnloadAsync
         /// </summary>
-        /// <param name="name"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cancellationToken"></param>
         /// <returns>UniTask</returns>
-        public async UniTask SubSceneUnloadAsync(string name, CancellationToken cancellationToken = default)
+        public async UniTask SubSceneUnloadAsync<T>(CancellationToken cancellationToken = default) where T : ViewBase
+        {
+            await SubSceneUnloadAsync(typeof(T).Name, cancellationToken);
+        }
+
+        /// <summary>
+        /// SubSceneのUnloadAsync
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        public async UniTask SubSceneUnloadAsync(string sceneName, CancellationToken cancellationToken = default)
         {
             // バリアON
             barrier.SetActive(true);
 
             for (int i = 0; i < SubSceneList.Count; i++)
             {
-                if (subSceneInstanceList[i].Key == name)
+                if (subSceneInstanceList[i].Key == sceneName)
                 {
                     SubSceneList[i].OnDisableAnimation();
                     SubSceneList[i].OnUnload();
