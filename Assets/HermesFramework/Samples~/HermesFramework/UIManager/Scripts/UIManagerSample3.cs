@@ -19,6 +19,7 @@ namespace Hermes.UI.Sample
             {
                 Debug.Log(op.sumpleText);
             }
+            await UniTask.CompletedTask;
         }
     }
 }
