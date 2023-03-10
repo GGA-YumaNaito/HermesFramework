@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Hermes.UI.Sample
 {
@@ -11,7 +12,7 @@ namespace Hermes.UI.Sample
         {
             public string sumpleText;
         }
-        public override void OnLoad(object options)
+        public override async UniTask OnLoad(object options)
         {
             var op = options as Options;
             if (op != null)
