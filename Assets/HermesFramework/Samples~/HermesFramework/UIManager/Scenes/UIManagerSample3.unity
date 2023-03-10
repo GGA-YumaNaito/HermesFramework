@@ -268,10 +268,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 715945999}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c0a80adf3a1ec948a2b0faa8ce31db7, type: 3}
+  m_Script: {fileID: 11500000, guid: 972eafe8b98844d149b7ed7402a0be67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetTransform: {fileID: 485502837}
+  targetTransform: {fileID: 0}
   loadAnimParam:
     ease: 0
     animationCurve:

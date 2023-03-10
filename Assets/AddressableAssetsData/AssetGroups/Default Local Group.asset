@@ -17,11 +17,11 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: aa0a9f12f6353524aa73650cc9b6b6d2
   m_SerializeEntries:
-  - m_GUID: 7558edb9129bdda4dad8b080d94b87b9
+  - m_GUID: e8c37894478474d21aec1580985eed84
     m_Address: UIManagerSampleDialog1
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: c3ada41f1daec424090e12d2acfed965
+  - m_GUID: fab713b63f1704b0d9e4b3b4ed551a7b
     m_Address: UIManagerSampleDialog2
     m_ReadOnly: 0
     m_SerializedLabels: []
