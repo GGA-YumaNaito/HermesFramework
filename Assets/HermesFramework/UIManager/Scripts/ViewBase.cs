@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Mobcast.Coffee.Transition;
 using UniRx;
 using UnityEngine;
 
@@ -13,32 +14,12 @@ namespace Hermes.UI
     {
         /// <summary>前の画面に戻れるかフラグ</summary>
         public abstract bool IsBack { get; protected set; }
-        /// <summary>画面対象</summary>
-        [SerializeField] protected RectTransform targetTransform;
         /// <summary>画面の状態</summary>
         ReactiveProperty<eStatus> status = new ReactiveProperty<eStatus>(eStatus.None);
         /// <summary>画面の状態</summary>
         public ReadOnlyReactiveProperty<eStatus> Status;
-        // TODO: 今は仮でこのアニメーションを使ってるけど、そのうちちゃんとしたのを作る
-        /// <summary>ロード時のアニメーションパラメータ</summary>
-        [SerializeField] AnimationParam loadAnimParam = new AnimationParam();
-        /// <summary>アンロード時のアニメーションパラメータ</summary>
-        [SerializeField] AnimationParam unloadAnimParam = new AnimationParam();
-        /// <summary>
-        /// アニメーションパラメータ
-        /// </summary>
-        [Serializable]
-        struct AnimationParam
-        {
-            /// <summary>イージング</summary>
-            public Ease ease;
-            /// <summary>アニメーションカーブ</summary>
-            public AnimationCurve animationCurve;
-            /// <summary>アニメーション時間</summary>
-            public float moveTime;
-            /// <summary>ターゲットポジション</summary>
-            public Vector3 targetPos;
-        }
+        /// <summary>アニメーションパラメータ</summary>
+        [SerializeField] UITransition transition;
 
         /// <summary>
         /// コンストラクタ
@@ -92,24 +73,14 @@ namespace Hermes.UI
         {
             SetStatus(eStatus.Enable);
 
-            if (targetTransform)
+            if (transition)
             {
-                if (loadAnimParam.ease != Ease.Unset)
-                {
-                    targetTransform.localPosition = loadAnimParam.targetPos;
-                    targetTransform.DOLocalMove(Vector3.zero, loadAnimParam.moveTime).SetEase(loadAnimParam.ease).OnComplete(DoStatusDisplay);
-                    return;
-                }
-                else if (loadAnimParam.animationCurve != null)
-                {
-                    targetTransform.localPosition = loadAnimParam.targetPos;
-                    targetTransform.DOLocalMove(Vector3.zero, loadAnimParam.moveTime).SetEase(loadAnimParam.animationCurve).OnComplete(DoStatusDisplay);
-                    return;
-                }
+                await UniTask.WaitUntil(() => !transition.isShow);
+                transition.Show();
+                await UniTask.WaitUntil(() => !transition.isPlaying);
             }
 
             DoStatusDisplay();
-            await UniTask.CompletedTask;
         }
 
         /// <summary>
@@ -120,22 +91,13 @@ namespace Hermes.UI
         {
             SetStatus(eStatus.Disable);
 
-            if (targetTransform)
+            if (transition)
             {
-                if (unloadAnimParam.ease != Ease.Unset)
-                {
-                    targetTransform.DOLocalMove(unloadAnimParam.targetPos, unloadAnimParam.moveTime).SetEase(unloadAnimParam.ease).OnComplete(DoStatusEnd);
-                    return;
-                }
-                else if (unloadAnimParam.animationCurve != null)
-                {
-                    targetTransform.DOLocalMove(unloadAnimParam.targetPos, unloadAnimParam.moveTime).SetEase(unloadAnimParam.animationCurve).OnComplete(DoStatusEnd);
-                    return;
-                }
+                transition.Hide();
+                await UniTask.WaitUntil(() => !transition.isPlaying);
             }
 
             DoStatusEnd();
-            await UniTask.CompletedTask;
         }
 
         /// <summary>
