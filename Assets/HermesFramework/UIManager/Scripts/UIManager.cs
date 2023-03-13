@@ -84,6 +84,7 @@ namespace Hermes.UI
                 // 現在の最新がダイアログだったら削除する
                 if (CurrentView is Dialog)
                 {
+                    // TODO:現在ダイアログから他のシーンに遷移する時にダイアログをDestroyしてからシーンをUnloadしてるけど、不自然なためシーンの中にダイアログを入れ込む形にした方が良さそう
                     // なぜかダイアログから他のシーンに遷移する時に画面がチラつくからBGをOFFにする
                     dialogBG.SetActive(false);
                     var stackType = new Stack<Type>();
