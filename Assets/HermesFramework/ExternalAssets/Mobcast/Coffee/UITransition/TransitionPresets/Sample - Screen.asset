@@ -19,7 +19,7 @@ MonoBehaviour:
       m_Preset: {fileID: 0}
       m_TweenDatas:
       - relative: 0
-        duration: 5
+        duration: 1
         delay: 0
         curve:
           serializedVersion: 2
@@ -52,7 +52,7 @@ MonoBehaviour:
       m_Preset: {fileID: 0}
       m_TweenDatas:
       - relative: 0
-        duration: 5
+        duration: 1
         delay: 0
         curve:
           serializedVersion: 2
