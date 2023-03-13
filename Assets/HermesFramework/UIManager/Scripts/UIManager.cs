@@ -103,6 +103,23 @@ namespace Hermes.UI
                     {
                         StackPush(stackType.Pop(), stackOptions.Pop());
                     }
+                    // ダイアログが全て消えるまで待機
+                    for (int i = 0; i < this.stackType.Count; i++)
+                    {
+                        stackName.Pop();
+                        stackType.Push(this.stackType.Pop());
+                        stackOptions.Push(this.stackOptions.Pop());
+                        var t = stackType.Peek();
+                        if (t.IsSubclassOf(typeof(Screen)))
+                            break;
+                        CurrentView = (ViewBase)FindObjectOfType(t);
+                        await UniTask.WaitUntil(() => CurrentView == null, cancellationToken: cancellationToken);
+                    }
+                    count = stackType.Count;
+                    for (int i = 0; i < count; i++)
+                    {
+                        StackPush(stackType.Pop(), stackOptions.Pop());
+                    }
                     dialogBG.SetActive(false);
                 }
                 // 既にシーンが存在したら
