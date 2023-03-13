@@ -84,6 +84,8 @@ namespace Hermes.UI
                 // 現在の最新がダイアログだったら削除する
                 if (CurrentView is Dialog)
                 {
+                    // なぜかダイアログから他のシーンに遷移する時に画面がチラつくからBGをOFFにする
+                    dialogBG.SetActive(false);
                     var stackType = new Stack<Type>();
                     var stackOptions = new Stack<object>();
                     var count = this.stackType.Count;
@@ -120,7 +122,6 @@ namespace Hermes.UI
                     {
                         StackPush(stackType.Pop(), stackOptions.Pop());
                     }
-                    dialogBG.SetActive(false);
                 }
                 // 既にシーンが存在したら
                 StackPopAction(type);
