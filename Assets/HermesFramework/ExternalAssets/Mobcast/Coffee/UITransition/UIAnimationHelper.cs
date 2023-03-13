@@ -28,8 +28,8 @@ namespace Mobcast.Coffee.Transition
 
 	public class UIAnimationHelper
 	{
-		public float[] m_Rates = new float[(int)UITweenData.PropertyType.Custom + 1];
-		public float[] m_Delays = new float[(int)UITweenData.PropertyType.Custom + 1];
+		public float[] m_Rates = new float[(int)UITweenData.PropertyType.ImageFillAmount + 1];
+		public float[] m_Delays = new float[(int)UITweenData.PropertyType.ImageFillAmount + 1];
 
 		public event Action onFinished;
 
@@ -268,7 +268,7 @@ namespace Mobcast.Coffee.Transition
 							m_CanvasGroup.alpha = from + rate * (to - from);
 						}
 						break;
-					case UITweenData.PropertyType.Custom:
+					case UITweenData.PropertyType.ImageFillAmount:
 						if (m_Image)
 						{
 							var from = imageFillAmount;

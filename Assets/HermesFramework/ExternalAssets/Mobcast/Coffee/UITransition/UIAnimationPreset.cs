@@ -56,7 +56,7 @@ namespace Mobcast.Coffee.Transition
 			Scale,
 			Size,
 			Alpha,
-			Custom,
+			ImageFillAmount,
 		}
 
 		/// <summary>相対データかどうか.</summary>
@@ -75,7 +75,7 @@ namespace Mobcast.Coffee.Transition
 		public LoopMode loop = LoopMode.Once;
 
 		[FormerlySerializedAs("type")]
-		public PropertyType propertyType = PropertyType.Custom;
+		public PropertyType propertyType = PropertyType.ImageFillAmount;
 
 		/// <summary>移動量.</summary>
 		public Vector3 movement;
