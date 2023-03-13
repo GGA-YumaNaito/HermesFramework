@@ -43,11 +43,14 @@ namespace Mobcast.Coffee.Transition
 		public Vector3 size = Vector3.zero;
 		/// <summary>ローカルスケール.</summary>
 		public float alpha = 1;
+		/// <summary>イメージFillAmount.</summary>
+		public float imageFillAmount = 1;
 
 		public bool isPlaying { get; private set;}
 		public bool m_Backuped = false;
 		CanvasGroup m_CanvasGroup;
 		Transform m_Transform;
+		Image m_Image;
 
 
 		[System.NonSerialized]public PlayDirection playDirection = PlayDirection.Forward;
@@ -58,6 +61,7 @@ namespace Mobcast.Coffee.Transition
 			{
 				m_Transform = target.GetComponent<Transform>();
 				m_CanvasGroup = target.GetComponent<CanvasGroup>();
+				m_Image = target.GetComponent<Image>();
 			}
 			if (!m_Backuped)
 			{
@@ -89,6 +93,9 @@ namespace Mobcast.Coffee.Transition
 
 			if (m_CanvasGroup)
 				alpha = m_CanvasGroup.alpha;
+
+			if (m_Image)
+				imageFillAmount = m_Image.fillAmount;
 		}
 
 		/// <summary>
@@ -112,6 +119,9 @@ namespace Mobcast.Coffee.Transition
 
 			if (m_CanvasGroup)
 				m_CanvasGroup.alpha = alpha;
+
+			if (m_Image)
+				m_Image.fillAmount = imageFillAmount;
 		}
 
 
@@ -259,6 +269,12 @@ namespace Mobcast.Coffee.Transition
 						}
 						break;
 					case UITweenData.PropertyType.Custom:
+						if (m_Image)
+						{
+							var from = imageFillAmount;
+							var to = data.relative ? from + data.movement.x : data.movement.x;
+							m_Image.fillAmount = from + rate * (to - from);
+						}
 						break;
 				}
 			}

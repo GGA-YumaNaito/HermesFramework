@@ -39,7 +39,7 @@ namespace Mobcast.Coffee.Transition
 				{ PropertyType.Scale, EditorGUIUtility.FindTexture("ScaleTool") },
 				{ PropertyType.Size, EditorGUIUtility.FindTexture("RectTool") },
 				{ PropertyType.Alpha, EditorGUIUtility.FindTexture("ViewToolOrbit") },
-				{ PropertyType.Custom, EditorGUIUtility.FindTexture("d_editicon.sml") },
+				{ PropertyType.ImageFillAmount, EditorGUIUtility.FindTexture("d_editicon.sml") },
 			};
 
 			contentPlay = new GUIContent(EditorGUIUtility.FindTexture("Profiler.NextFrame"), "Play");
@@ -333,7 +333,8 @@ namespace Mobcast.Coffee.Transition
 					case PropertyType.Alpha:
 						spMovement.vector3Value += (spRelative.boolValue ? -1 : 1) * new Vector3(helper.alpha, 0);
 						break;
-					case PropertyType.Custom:
+					case PropertyType.ImageFillAmount:
+						spMovement.vector3Value += (spRelative.boolValue ? -1 : 1) * new Vector3(helper.imageFillAmount, 0);
 						break;
 				}
 			}
@@ -346,6 +347,12 @@ namespace Mobcast.Coffee.Transition
 			{
 				EditorGUIUtility.labelWidth = 35;
 				EditorGUI.PropertyField(rField, spMovement.FindPropertyRelative("x"), new GUIContent("Alpha"));
+			}
+            // ImageFillAmount
+            else if ((PropertyType)spType.intValue == PropertyType.ImageFillAmount)
+			{
+				EditorGUIUtility.labelWidth = 35;
+				EditorGUI.PropertyField(rField, spMovement.FindPropertyRelative("x"), new GUIContent("ImageFillAmount"));
 			}
 			// Vector2/Vector3
 			else
