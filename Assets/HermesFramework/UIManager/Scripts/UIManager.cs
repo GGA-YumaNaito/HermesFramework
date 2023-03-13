@@ -96,7 +96,7 @@ namespace Hermes.UI
                         if (t.IsSubclassOf(typeof(Screen)))
                             break;
                         CurrentView = (ViewBase)FindObjectOfType(t);
-                        await OnUnloadDialog(CurrentView, false, cancellationToken);
+                        OnUnloadDialog(CurrentView, false, cancellationToken).Forget();
                     }
                     count = stackType.Count;
                     for (int i = 0; i < count; i++)
@@ -273,9 +273,12 @@ namespace Hermes.UI
             if (isBack)
                 await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
             Destroy(viewBase.gameObject);
-            // DialogBGの位置を下げる
-            var dialogBGTransform = dialogBG.transform;
-            dialogBGTransform.SetSiblingIndex(dialogBGTransform.GetSiblingIndex() - 1);
+            if (isBack)
+            {
+                // DialogBGの位置を下げる
+                var dialogBGTransform = dialogBG.transform;
+                dialogBGTransform.SetSiblingIndex(dialogBGTransform.GetSiblingIndex() - 1);
+            }
         }
 
         /// <summary>
