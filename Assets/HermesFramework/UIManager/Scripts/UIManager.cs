@@ -96,7 +96,7 @@ namespace Hermes.UI
                         if (t.IsSubclassOf(typeof(Screen)))
                             break;
                         CurrentView = (ViewBase)FindObjectOfType(t);
-                        OnUnloadDialog(CurrentView, false, cancellationToken).Forget();
+                        await OnUnloadDialog(CurrentView, false, cancellationToken);
                     }
                     count = stackType.Count;
                     for (int i = 0; i < count; i++)
@@ -267,7 +267,8 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         async UniTask OnUnloadDialog(ViewBase viewBase, bool isBack, CancellationToken cancellationToken)
         {
-            await viewBase.OnDisableAnimation();
+            if (isBack)
+                await viewBase.OnDisableAnimation();
             await viewBase.OnUnload();
             if (isBack)
                 await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
