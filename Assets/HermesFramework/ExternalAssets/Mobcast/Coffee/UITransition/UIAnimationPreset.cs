@@ -57,7 +57,8 @@ namespace Mobcast.Coffee.Transition
 			Size,
 			Alpha,
 			ImageFillAmount,
-		}
+			Calculation,
+        }
 
 		/// <summary>相対データかどうか.</summary>
 		public bool relative = true;
@@ -75,7 +76,7 @@ namespace Mobcast.Coffee.Transition
 		public LoopMode loop = LoopMode.Once;
 
 		[FormerlySerializedAs("type")]
-		public PropertyType propertyType = PropertyType.ImageFillAmount;
+		public PropertyType propertyType = PropertyType.Calculation;
 
 		/// <summary>移動量.</summary>
 		public Vector3 movement;

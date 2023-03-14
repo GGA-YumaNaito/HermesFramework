@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 using UnityEngine.UI;
-
+using TMPro;
 
 namespace Mobcast.Coffee.Transition
 {
@@ -28,8 +28,8 @@ namespace Mobcast.Coffee.Transition
 
 	public class UIAnimationHelper
 	{
-		public float[] m_Rates = new float[(int)UITweenData.PropertyType.ImageFillAmount + 1];
-		public float[] m_Delays = new float[(int)UITweenData.PropertyType.ImageFillAmount + 1];
+		public float[] m_Rates = new float[(int)UITweenData.PropertyType.Calculation + 1];
+		public float[] m_Delays = new float[(int)UITweenData.PropertyType.Calculation + 1];
 
 		public event Action onFinished;
 
@@ -45,12 +45,17 @@ namespace Mobcast.Coffee.Transition
 		public float alpha = 1;
 		/// <summary>イメージFillAmount.</summary>
 		public float imageFillAmount = 1;
+        /// <summary>計算.</summary>
+        public long calculation = 0;
 
-		public bool isPlaying { get; private set;}
+        public bool isPlaying { get; private set;}
 		public bool m_Backuped = false;
 		CanvasGroup m_CanvasGroup;
 		Transform m_Transform;
 		Image m_Image;
+		Text m_Text;
+		TextMeshPro m_TMP;
+		TextMeshProUGUI m_TMP_U;
 
 
 		[System.NonSerialized]public PlayDirection playDirection = PlayDirection.Forward;
@@ -62,6 +67,9 @@ namespace Mobcast.Coffee.Transition
 				m_Transform = target.GetComponent<Transform>();
 				m_CanvasGroup = target.GetComponent<CanvasGroup>();
 				m_Image = target.GetComponent<Image>();
+				m_Text = target.GetComponent<Text>();
+				m_TMP = target.GetComponent<TextMeshPro>();
+				m_TMP_U = target.GetComponent<TextMeshProUGUI>();
 			}
 			if (!m_Backuped)
 			{
@@ -96,6 +104,13 @@ namespace Mobcast.Coffee.Transition
 
 			if (m_Image)
 				imageFillAmount = m_Image.fillAmount;
+
+			if (m_Text)
+				calculation = Convert.ToInt64(m_Text.text);
+			else if (m_TMP)
+				calculation = Convert.ToInt64(m_TMP.text);
+			else if (m_TMP_U)
+				calculation = Convert.ToInt64(m_TMP_U.text);
 		}
 
 		/// <summary>
@@ -276,6 +291,26 @@ namespace Mobcast.Coffee.Transition
 							m_Image.fillAmount = from + rate * (to - from);
 						}
 						break;
+					case UITweenData.PropertyType.Calculation:
+						if (m_Text)
+						{
+							var from = calculation;
+							var to = data.relative ? from + data.movement.x : data.movement.x;
+							m_Text.text = Convert.ToString(Math.Truncate(from + rate * (to - from)));
+						}
+						else if (m_TMP)
+						{
+							var from = calculation;
+							var to = data.relative ? from + data.movement.x : data.movement.x;
+                            m_TMP.text = Convert.ToString(Math.Truncate(from + rate * (to - from)));
+                        }
+                        else if (m_TMP_U)
+                        {
+                            var from = calculation;
+                            var to = data.relative ? from + data.movement.x : data.movement.x;
+                            m_TMP_U.text = Convert.ToString(Math.Truncate(from + rate * (to - from)));
+                        }
+                        break;
 				}
 			}
 		}
