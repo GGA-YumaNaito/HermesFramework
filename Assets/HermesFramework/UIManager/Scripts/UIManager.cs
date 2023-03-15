@@ -170,6 +170,85 @@ namespace Hermes.UI
         }
 
         /// <summary>
+        /// ReloadSceneAsync
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>UniTask</returns>
+        public async UniTask ReloadSceneAsync(CancellationToken cancellationToken = default)
+        {
+            // バリアON
+            barrier.SetActive(true);
+            // Screen
+            // 現在の最新がダイアログだったら削除する
+            if (CurrentView is Dialog)
+            {
+                // なぜかダイアログから他のシーンに遷移する時に画面がチラつくからBGをOFFにする
+                dialogBG.SetActive(false);
+                var stackType = new Stack<Type>();
+                var stackOptions = new Stack<object>();
+                var count = this.stackType.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    stackName.Pop();
+                    stackType.Push(this.stackType.Pop());
+                    stackOptions.Push(this.stackOptions.Pop());
+                    var t = stackType.Peek();
+                    if (t.IsSubclassOf(typeof(Screen)))
+                        break;
+                    CurrentView = (ViewBase)FindObjectOfType(t);
+                    OnUnloadDialog(CurrentView, false, cancellationToken).Forget();
+                }
+                count = stackType.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    StackPush(stackType.Pop(), stackOptions.Pop());
+                }
+                // ダイアログが全て消えるまで待機
+                for (int i = 0; i < this.stackType.Count; i++)
+                {
+                    stackName.Pop();
+                    stackType.Push(this.stackType.Pop());
+                    stackOptions.Push(this.stackOptions.Pop());
+                    var t = stackType.Peek();
+                    if (t.IsSubclassOf(typeof(Screen)))
+                        break;
+                    CurrentView = (ViewBase)FindObjectOfType(t);
+                    await UniTask.WaitUntil(() => CurrentView == null, cancellationToken: cancellationToken);
+                }
+                count = stackType.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    if (!stackType.Peek().IsSubclassOf(typeof(Screen)))
+                        continue;
+                    StackPush(stackType.Pop(), stackOptions.Pop());
+                }
+            }
+            Type type = CurrentScene.GetType();
+            // まだCurrentSceneがなかったらUnloadはしない
+            if (CurrentScene != null)
+            {
+                await OnUnloadScreen(CurrentScene, cancellationToken);
+            }
+            // シーンロード
+            await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+
+            CurrentScene = FindObjectOfType(type) as Screen;
+            CurrentView = CurrentScene;
+
+            if (CurrentView == null)
+                throw new Exception($"{type.Name} is Null");
+
+            // Initialize & Load
+            CurrentView.Initialize();
+            await CurrentView.OnLoad(stackOptions.Peek());
+            await CurrentView.OnEnableAnimation();
+            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+
+            // バリアOFF
+            barrier.SetActive(false);
+        }
+
+        /// <summary>
         /// 前画面表示
         /// </summary>
         /// <param name="cancellationToken"></param>

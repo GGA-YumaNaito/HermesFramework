@@ -34,5 +34,10 @@ namespace Hermes.UI.Sample
         {
             UIManager.Instance.ClearStackLeaveOne();
         }
+
+        public async void OnClickReloadSceneButton()
+        {
+            await UIManager.Instance.ReloadSceneAsync();
+        }
     }
 }
