@@ -296,19 +296,19 @@ namespace Mobcast.Coffee.Transition
 						{
 							var from = calculation;
 							var to = data.relative ? from + data.movement.x : data.movement.x;
-							m_Text.text = Convert.ToString(Math.Truncate(from + rate * (to - from)));
+							m_Text.text = Convert.ToString(Math.Truncate(from + (double)rate * (to - from)));
 						}
 						else if (m_TMP)
 						{
 							var from = calculation;
 							var to = data.relative ? from + data.movement.x : data.movement.x;
-                            m_TMP.text = Convert.ToString(Math.Truncate(from + rate * (to - from)));
+                            m_TMP.text = Convert.ToString(Math.Truncate(from + (double)rate * (to - from)));
                         }
                         else if (m_TMP_U)
                         {
                             var from = calculation;
                             var to = data.relative ? from + data.movement.x : data.movement.x;
-                            m_TMP_U.text = Convert.ToString(Math.Truncate(from + rate * (to - from)));
+                            m_TMP_U.text = Convert.ToString(Math.Truncate(from + (double)rate * (to - from)));
                         }
                         break;
 				}
