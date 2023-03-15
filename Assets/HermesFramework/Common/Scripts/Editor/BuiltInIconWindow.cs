@@ -308,7 +308,7 @@ public class BuiltInIconWindow : EditorWindow
 
     private Vector2 m_scrollPos;
 
-    [MenuItem("Window/Built-in Icon")]
+    [MenuItem("Hermes/Built-in Icon")]
     private static void Init()
     {
         GetWindow<BuiltInIconWindow>();

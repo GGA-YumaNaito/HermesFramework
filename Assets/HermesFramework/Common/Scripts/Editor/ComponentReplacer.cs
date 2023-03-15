@@ -19,8 +19,8 @@ public class ComponentReplacer : EditorWindow
     private string fromTypeString = $"{DefaultFromType.FullName}, {DefaultFromType.Assembly.GetName().Name}";
     private string toTypeString = $"{DefaultToType.FullName}, {DefaultToType.Assembly.GetName().Name}";
 
-    // メニューのWindowにComponentReplacerという項目を追加。
-    [MenuItem("Window/ComponentReplacer")]
+    // メニューのHermesにComponentReplacerという項目を追加。
+    [MenuItem("Hermes/ComponentReplacer")]
     static void Open()
     {
         var window = GetWindow<ComponentReplacer>("Component Replacer");
