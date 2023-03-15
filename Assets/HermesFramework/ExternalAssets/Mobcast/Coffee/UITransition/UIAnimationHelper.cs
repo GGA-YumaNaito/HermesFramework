@@ -106,7 +106,7 @@ namespace Mobcast.Coffee.Transition
 				imageFillAmount = m_Image.fillAmount;
 
 			if (m_Text)
-				calculation = Convert.ToInt64(m_Text.text);
+                calculation = Convert.ToInt64(m_Text.text);
 			else if (m_TMP)
 				calculation = Convert.ToInt64(m_TMP.text);
 			else if (m_TMP_U)
@@ -137,10 +137,17 @@ namespace Mobcast.Coffee.Transition
 
 			if (m_Image)
 				m_Image.fillAmount = imageFillAmount;
-		}
+
+            if (m_Text)
+                m_Text.text = Convert.ToString(calculation);
+            else if (m_TMP)
+                m_TMP.SetText(Convert.ToString(calculation));
+            else if (m_TMP_U)
+                m_TMP_U.SetText(Convert.ToString(calculation));
+        }
 
 
-		public void Update(MonoBehaviour target, UITweenData[] datas, bool ignoreTimeScale, bool evaluateReverse, bool onceOnly)
+        public void Update(MonoBehaviour target, UITweenData[] datas, bool ignoreTimeScale, bool evaluateReverse, bool onceOnly)
 		{
 			Cache(target);
 
@@ -295,20 +302,20 @@ namespace Mobcast.Coffee.Transition
 						if (m_Text)
 						{
 							var from = calculation;
-							var to = data.relative ? from + data.movement.x : data.movement.x;
+                            double to = data.relative ? from + data.movement.x : data.movement.x;
 							m_Text.text = Convert.ToString(Math.Truncate(from + (double)rate * (to - from)));
 						}
 						else if (m_TMP)
 						{
 							var from = calculation;
-							var to = data.relative ? from + data.movement.x : data.movement.x;
-                            m_TMP.text = Convert.ToString(Math.Truncate(from + (double)rate * (to - from)));
+                            double to = data.relative ? from + data.movement.x : data.movement.x;
+							m_TMP.SetText(Convert.ToString(Math.Truncate(from + (double)rate * (to - from))));
                         }
                         else if (m_TMP_U)
                         {
                             var from = calculation;
-                            var to = data.relative ? from + data.movement.x : data.movement.x;
-                            m_TMP_U.text = Convert.ToString(Math.Truncate(from + (double)rate * (to - from)));
+                            double to = data.relative ? from + data.movement.x : data.movement.x;
+							m_TMP_U.SetText(Convert.ToString(Math.Truncate(from + (double)rate * (to - from))));
                         }
                         break;
 				}
