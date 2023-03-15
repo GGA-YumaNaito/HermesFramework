@@ -75,6 +75,9 @@ namespace Hermes.UI
 
             if (transition)
             {
+                gameObject.SetActive(false);
+                await UniTask.NextFrame();
+                gameObject.SetActive(true);
                 await UniTask.WaitUntil(() => !transition.isShow);
                 transition.Show();
                 await UniTask.WaitUntil(() => !transition.isPlaying);
