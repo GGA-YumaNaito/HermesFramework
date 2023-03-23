@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Hermes.Master
 {
@@ -17,24 +18,34 @@ namespace Hermes.Master
         /// <summary>マスターが読み込み完了しているか</summary>
         public bool IsLoaded { get; private set; } = false;
 
+        /// <summary>マスターHandle</summary>
+        AsyncOperationHandle<System.Collections.Generic.IList<Object>> handle;
+
         /// <summary>
         /// マスター読み込みメソッド
         /// </summary>
         /// <returns>UniTask</returns>
         public async UniTask Load()
         {
-            IsLoaded = false;
+            // ロード済み
+            if (IsLoaded)
+                return;
 
-            var masterList = await Addressables.LoadAssetsAsync<UnityEngine.Object>(masterLabel, null);
+            handle = Addressables.LoadAssetsAsync<UnityEngine.Object>(masterLabel, null);
+            await handle.ToUniTask();
+            var masterList = handle.Result;
+            System.Type type;
+            System.Reflection.MethodInfo addListToRuntimeMasterInfo;
+            object list;
 
             foreach (var master in masterList)
             {
                 // タイプ取得
-                var type = master.GetType();
+                type = master.GetType();
                 // メソッド取得(継承元で定義されたメソッドは持って来れないらしいので、BaseTypeから持ってきてる)
-                var addListToRuntimeMasterInfo = type.BaseType.GetMethod("AddListToRuntimeMaster", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                addListToRuntimeMasterInfo = type.BaseType.GetMethod("AddListToRuntimeMaster", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
                 // リスト取得
-                var list = type.InvokeMember(
+                list = type.InvokeMember(
                     "List",
                     System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.GetField,
                     null,
@@ -50,6 +61,37 @@ namespace Hermes.Master
 
             // 読み込み完了
             IsLoaded = true;
+        }
+
+        /// <summary>
+        /// マスター削除メソッド
+        /// </summary>
+        public void Clear()
+        {
+            // ロードしていなかったら
+            if (!IsLoaded)
+                return;
+
+            var masterList = handle.Result;
+            System.Type type;
+            System.Reflection.MethodInfo clearRuntimeMasterInfo;
+
+            foreach (var master in masterList)
+            {
+                // タイプ取得
+                type = master.GetType();
+                // メソッド取得(継承元で定義されたメソッドは持って来れないらしいので、BaseTypeから持ってきてる)
+                clearRuntimeMasterInfo = type.BaseType.GetMethod("ClearRuntimeMaster", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                // メソッド実行
+                clearRuntimeMasterInfo.Invoke(null, null);
+#if DEBUG_LOG
+                Log.ObjectDumpLog.DebugLog(master);
+#endif
+            }
+
+            // リリース
+            Addressables.Release(handle);
+            IsLoaded = false;
         }
     }
 }
