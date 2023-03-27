@@ -8,21 +8,23 @@ using UnityEngine;
 namespace Hermes.Master
 {
     /// <summary>
-    /// MasterDataBaseのリストを持っている。
-    /// ScriptableObject型で保存。
-    /// ランタイム時の管理も行うクラス
+    /// MasterDataBaseのリストを持っている
+    /// <para>ScriptableObject型で保存</para>
+    /// <para>ランタイム時の管理も行うクラス</para>
     /// </summary>
+    /// <typeparam name="T1">MasterDataBase</typeparam>
+    /// <typeparam name="T2">MasterAssetBase</typeparam>
     [System.Serializable]
     public abstract class MasterAssetBase<T1, T2> : ScriptableObject
         where T1 : MasterDataBase, new()
         where T2 : MasterAssetBase<T1, T2>
     {
-        // スプレッドシートのナンバー.
+        /// <summary>スプレッドシートのナンバー</summary>
         public abstract int MasterSetNumber { get; }
 
         /// <summary>
         /// ランタイム時用のインスタンス
-        /// 各継承先ではこのインスタンス経由でListにアクセスする
+        /// <para>各継承先ではこのインスタンス経由でListにアクセスする</para>
         /// </summary>
         /// <value>The instance.</value>
         public static T2 Instance
@@ -39,7 +41,7 @@ namespace Hermes.Master
         static T2 m_RuntimeInstance;
 
         /// <summary>
-        /// マスターデータのリスト。
+        /// マスターデータのリスト
         /// </summary>
         [SerializeField]
         public List<T1> List = new List<T1>();

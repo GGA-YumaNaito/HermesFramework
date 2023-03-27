@@ -13,6 +13,9 @@ namespace Hermes.Master
         /// <summary>ID.</summary>
         public int Id = 0;
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public MasterDataBase()
         {
             OnDeserialize();

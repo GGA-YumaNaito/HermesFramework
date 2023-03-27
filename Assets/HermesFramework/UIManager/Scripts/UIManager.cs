@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 namespace Hermes.UI
 {
     /// <summary>
-    /// UIManager
+    /// Screen, Dialog, SubSceneをロード、アンロードするクラス
     /// </summary>
     public class UIManager : SingletonMonoBehaviour<UIManager>
     {
@@ -49,9 +49,9 @@ namespace Hermes.UI
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="options"></param>
-        /// <param name="cancellationToken"></param>
+        /// <typeparam name="T">ViewBase</typeparam>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
@@ -170,9 +170,9 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ReloadSceneAsync
+        /// シーン(Screen)をリロードするAsyncメソッド
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask ReloadSceneAsync(CancellationToken cancellationToken = default)
         {
@@ -251,9 +251,9 @@ namespace Hermes.UI
         /// <summary>
         /// 前画面表示
         /// </summary>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        public async UniTask BackAsync(CancellationToken cancellationToken)
+        public async UniTask BackAsync(CancellationToken cancellationToken = default)
         {
             barrier.SetActive(true);
             if (CurrentView != null && !CurrentView.IsBack)
@@ -279,8 +279,8 @@ namespace Hermes.UI
         /// <summary>
         /// 前画面表示処理
         /// </summary>
-        /// <param name="isScreen"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="isScreen">Screenならtrue</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         async UniTask BackProcess(bool isScreen, CancellationToken cancellationToken)
         {
@@ -345,8 +345,8 @@ namespace Hermes.UI
         /// <summary>
         /// スクリーン削除
         /// </summary>
-        /// <param name="viewBase"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="viewBase">ViewBase</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         async UniTask OnUnloadScreen(ViewBase viewBase, CancellationToken cancellationToken)
         {
@@ -359,11 +359,11 @@ namespace Hermes.UI
         /// <summary>
         /// ダイアログ削除
         /// </summary>
-        /// <param name="viewBase"></param>
-        /// <param name="isBack"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="viewBase">ViewBase</param>
+        /// <param name="isBack">前画面に戻る処理ならtrue</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        async UniTask OnUnloadDialog(ViewBase viewBase, bool isBack, CancellationToken cancellationToken)
+        async UniTask OnUnloadDialog(ViewBase viewBase, bool isBack, CancellationToken cancellationToken = default)
         {
             if (isBack)
                 await viewBase.OnDisableAnimation();
@@ -382,9 +382,9 @@ namespace Hermes.UI
         /// <summary>
         /// SubSceneのLoadAsync
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="options"></param>
-        /// <param name="cancellationToken"></param>
+        /// <typeparam name="T">SubScene</typeparam>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask SubSceneLoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : SubScene
         {
@@ -395,9 +395,9 @@ namespace Hermes.UI
         /// SubSceneのLoadAsync
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="sceneName"></param>
-        /// <param name="options"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="sceneName">シーン名</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask SubSceneLoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
         {
@@ -428,8 +428,8 @@ namespace Hermes.UI
         /// <summary>
         /// SubSceneのUnloadAsync
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="cancellationToken"></param>
+        /// <typeparam name="T">SubScene</typeparam>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask SubSceneUnloadAsync<T>(CancellationToken cancellationToken = default) where T : SubScene
         {
@@ -439,8 +439,8 @@ namespace Hermes.UI
         /// <summary>
         /// SubSceneのUnloadAsync
         /// </summary>
-        /// <param name="sceneName"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="sceneName">シーン名</param>
+        /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask SubSceneUnloadAsync(string sceneName, CancellationToken cancellationToken = default)
         {
@@ -494,6 +494,7 @@ namespace Hermes.UI
         /// </summary>
         public void ClearStack()
         {
+            stackName.Clear();
             stackType.Clear();
             stackOptions.Clear();
         }
@@ -507,6 +508,7 @@ namespace Hermes.UI
             var count = stackType.Count - 1;
             for (int i = 0; i < count; i++)
             {
+                stackName.Pop();
                 stackType.Pop();
                 stackOptions.Pop();
             }

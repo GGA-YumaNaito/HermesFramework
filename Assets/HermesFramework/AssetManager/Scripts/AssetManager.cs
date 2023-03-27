@@ -9,7 +9,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 namespace Hermes.Asset
 {
     /// <summary>
-    /// AssetManager
+    /// AddressableをLoad、Releaseするクラス
     /// </summary>
     public class AssetManager : SingletonMonoBehaviour<AssetManager>
     {
@@ -19,13 +19,13 @@ namespace Hermes.Asset
         static Dictionary<string, AsyncOperationHandle<UnityEngine.Object>> asyncOperationHandleList = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>>();
 
         /// <summary>
-        /// Load
+        /// ロードメソッド
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="onLoaded"></param>
-        /// <param name="releaseTarget"></param>
-        /// <param name="token"></param>
+        /// <param name="key">Addressable Name</param>
+        /// <param name="onLoaded">ロードが完了した時にデータが返ってくる</param>
+        /// <param name="releaseTarget">指定したオブジェクトが破壊された時にAddressableをReleaseする</param>
+        /// <param name="token">CancellationToken</param>
         public static async void Load<T>(string key, Action<T> onLoaded, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             var ob = await LoadAsync<T>(key, releaseTarget, token);
@@ -33,13 +33,13 @@ namespace Hermes.Asset
         }
 
         /// <summary>
-        /// LoadAsync
+        /// ロードが完了した時にデータが返ってくるAsyncメソッド
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="releaseTarget"></param>
-        /// <param name="token"></param>
-        /// <returns>UniTask<T></returns>
+        /// <param name="key">Addressable Name</param>
+        /// <param name="releaseTarget">指定したオブジェクトが破壊された時にAddressableをReleaseする</param>
+        /// <param name="token">CancellationToken</param>
+        /// <returns>UniTask<T>(データ)</returns>
         public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             if (asyncOperationHandleList.ContainsKey(key))
@@ -60,9 +60,9 @@ namespace Hermes.Asset
         }
 
         /// <summary>
-        /// Release
+        /// AddressablesのHandleを指定してReleaseする
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">Addressable Name</param>
         public static void Release(string key)
         {
             if (asyncOperationHandleList.ContainsKey(key))
@@ -74,7 +74,7 @@ namespace Hermes.Asset
         }
 
         /// <summary>
-        /// ReleaseAll
+        /// AddressablesのHandleを全てReleaseする
         /// </summary>
         public static void ReleaseAll()
         {
@@ -84,12 +84,12 @@ namespace Hermes.Asset
         }
 
         /// <summary>
-        /// Convert
+        /// 変換メソッド
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns>T</returns>
-        public static object Convert<T>(UnityEngine.Object obj) where T : UnityEngine.Object
+        static object Convert<T>(UnityEngine.Object obj) where T : UnityEngine.Object
         {
             // Texture2D
             if (obj is Texture2D)
@@ -110,7 +110,7 @@ namespace Hermes.Asset
         }
 
         /// <summary>
-        /// OnDestroy
+        /// OnDestroy時にReleaseAll()を呼ぶ
         /// </summary>
         void OnDestroy()
         {

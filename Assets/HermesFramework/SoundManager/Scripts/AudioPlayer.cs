@@ -9,7 +9,7 @@ using UnityEngine.AddressableAssets;
 namespace Hermes.Sound
 {
     /// <summary>
-    /// AudioPlayer
+    /// Voice, SE, BGMの基底クラス
     /// </summary>
     public abstract class AudioPlayer : MonoBehaviour
     {

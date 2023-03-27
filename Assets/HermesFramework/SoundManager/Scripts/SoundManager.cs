@@ -3,7 +3,7 @@
 namespace Hermes.Sound
 {
     /// <summary>
-    /// SoundManager
+    /// Voice, SE, BGMを管理するクラス
     /// </summary>
     public class SoundManager : SingletonMonoBehaviour<SoundManager>
 	{

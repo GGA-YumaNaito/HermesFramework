@@ -8,9 +8,12 @@ using System.Linq;
 
 namespace Hermes.Master
 {
+    /// <summary>
+    /// CSVからローカルマスター(ScriptableObject)を作成するツール
+    /// <para>メニューのHermes/LocalMasterImportToolを選択</para>>
+    /// </summary>
     public class LocalMasterImportTool : EditorWindow
     {
-
         private const string csvPath = "Master/Csv";
         private const string assetPath = "Assets/Resources/Master";
 
