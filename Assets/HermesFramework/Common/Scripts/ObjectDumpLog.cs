@@ -146,7 +146,7 @@ namespace Hermes.Log
             else if (type == typeof(bool))
             {
                 // bool.
-                m_StringBuilder.Append(Convert.ToString(data) == "TRUE" ? true : false);
+                m_StringBuilder.Append(string.Equals(Convert.ToString(data), "TRUE", StringComparison.OrdinalIgnoreCase));
             }
             else
             {
