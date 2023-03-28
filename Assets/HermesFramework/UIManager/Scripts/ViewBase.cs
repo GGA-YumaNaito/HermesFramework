@@ -45,34 +45,35 @@ namespace Hermes.UI
         /// <summary>
         /// ロード処理
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">オプション</param>
         /// <returns>UniTask</returns>
-        public virtual async UniTask OnLoad(object options) { await UniTask.CompletedTask; }
+        public virtual UniTask OnLoad(object options) { return UniTask.CompletedTask; }
 
         /// <summary>
         /// アンロード処理
         /// </summary>
         /// <returns>UniTask</returns>
-        public virtual async UniTask OnUnload() { await UniTask.CompletedTask; }
+        public virtual UniTask OnUnload() { return UniTask.CompletedTask; }
 
         /// <summary>
-        /// StatusをDisplayに変更
+        /// 表示
         /// </summary>
-        void DoStatusDisplay() => SetStatus(eStatus.Display);
+        /// <returns>UniTask</returns>
+        public async UniTask OnDisplay()
+        {
+            SetStatus(eStatus.Enable);
 
-        /// <summary>
-        /// StatusをEndに変更
-        /// </summary>
-        void DoStatusEnd() => SetStatus(eStatus.End);
+            await OnEnableAnimation();
+
+            SetStatus(eStatus.Display);
+        }
 
         /// <summary>
         /// 出現アニメーション
         /// </summary>
         /// <returns>UniTask</returns>
-        public virtual async UniTask OnEnableAnimation()
+        protected virtual async UniTask OnEnableAnimation()
         {
-            SetStatus(eStatus.Enable);
-
             if (transition)
             {
                 gameObject.SetActive(false);
@@ -82,34 +83,47 @@ namespace Hermes.UI
                 transition.Show();
                 await UniTask.WaitUntil(() => !transition.isPlaying);
             }
+        }
 
-            DoStatusDisplay();
+        /// <summary>
+        /// 終了
+        /// </summary>
+        /// <returns>UniTask</returns>
+        public async UniTask OnEnd()
+        {
+            SetStatus(eStatus.Disable);
+
+            await OnDisableAnimation();
+
+            SetStatus(eStatus.End);
         }
 
         /// <summary>
         /// 退出アニメーション
         /// </summary>
         /// <returns>UniTask</returns>
-        public virtual async UniTask OnDisableAnimation()
+        protected virtual async UniTask OnDisableAnimation()
         {
-            SetStatus(eStatus.Disable);
-
             if (transition)
             {
                 transition.Hide();
                 await UniTask.WaitUntil(() => !transition.isPlaying);
             }
-
-            DoStatusEnd();
         }
 
         /// <summary>
         /// 画面の状態更新
         /// </summary>
         /// <param name="status"></param>
-        protected void SetStatus(eStatus status)
+        void SetStatus(eStatus status)
         {
             this.status.Value = status;
         }
+
+        /// <summary>
+        /// IsBackがfalseの時、UIManagerのBackAsyncが呼ばれた時に代わりに行う処理
+        /// </summary>
+        /// <returns>UniTask</returns>
+        public virtual UniTask ActionInsteadOfBack() { return UniTask.CompletedTask; }
     }
 }

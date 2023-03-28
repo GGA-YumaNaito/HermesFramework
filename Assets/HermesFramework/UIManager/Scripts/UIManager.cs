@@ -162,7 +162,7 @@ namespace Hermes.UI
             // Initialize & Load
             CurrentView.Initialize();
             await CurrentView.OnLoad(options);
-            await CurrentView.OnEnableAnimation();
+            await CurrentView.OnDisplay();
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
@@ -241,7 +241,7 @@ namespace Hermes.UI
             // Initialize & Load
             CurrentView.Initialize();
             await CurrentView.OnLoad(stackOptions.Peek());
-            await CurrentView.OnEnableAnimation();
+            await CurrentView.OnDisplay();
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
@@ -258,8 +258,10 @@ namespace Hermes.UI
             barrier.SetActive(true);
             if (CurrentView != null && !CurrentView.IsBack)
             {
-                // TODO:前の画面に戻れない時の処理
-
+                // 前の画面に戻れない時の処理
+                await CurrentView.ActionInsteadOfBack();
+                barrier.SetActive(false);
+                return;
             }
             if (stackType.Count > 1)
             {
@@ -268,7 +270,12 @@ namespace Hermes.UI
             }
             else
             {
-                // TODO:スタックが無かったらゲーム終了
+                // スタックが無かったらゲーム終了
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+#else
+                Application.Quit();
+#endif
             }
             // ダイアログが無かったらバリアをOFFにする
             dialogBG.SetActive(CurrentView is Dialog);
@@ -338,7 +345,7 @@ namespace Hermes.UI
 
             CurrentView.Initialize();
             await CurrentView.OnLoad(options);
-            await CurrentView.OnEnableAnimation();
+            await CurrentView.OnDisplay();
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
         }
 
@@ -350,7 +357,7 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         async UniTask OnUnloadScreen(ViewBase viewBase, CancellationToken cancellationToken)
         {
-            await viewBase.OnDisableAnimation();
+            await viewBase.OnEnd();
             await viewBase.OnUnload();
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
             await SceneManager.UnloadSceneAsync(viewBase.GetType().Name).ToUniTask(cancellationToken: cancellationToken);
@@ -366,7 +373,7 @@ namespace Hermes.UI
         async UniTask OnUnloadDialog(ViewBase viewBase, bool isBack, CancellationToken cancellationToken = default)
         {
             if (isBack)
-                await viewBase.OnDisableAnimation();
+                await viewBase.OnEnd();
             await viewBase.OnUnload();
             if (isBack)
                 await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
@@ -418,7 +425,7 @@ namespace Hermes.UI
             // Initialize & Load
             screen.Initialize();
             await screen.OnLoad(options);
-            await screen.OnEnableAnimation();
+            await screen.OnDisplay();
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
@@ -451,7 +458,7 @@ namespace Hermes.UI
             {
                 if (subSceneInstanceList[i].Key == sceneName)
                 {
-                    await SubSceneList[i].OnDisableAnimation();
+                    await SubSceneList[i].OnEnd();
                     await SubSceneList[i].OnUnload();
                     await UniTask.WaitUntil(() => SubSceneList[i].Status.Value == eStatus.End, cancellationToken: cancellationToken);
 
