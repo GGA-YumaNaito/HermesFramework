@@ -14,32 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   List:
   - Id: 1
+    IsRelease: 1
     WorldName: WORLD_NAME_1
-    IsRelease: 1
   - Id: 2
+    IsRelease: 1
     WorldName: WORLD_NAME_2
-    IsRelease: 1
   - Id: 3
-    WorldName: WORLD_NAME_3
     IsRelease: 1
+    WorldName: WORLD_NAME_3
   - Id: 4
+    IsRelease: 0
     WorldName: WORLD_NAME_4
-    IsRelease: 0
   - Id: 5
+    IsRelease: 0
     WorldName: WORLD_NAME_5
-    IsRelease: 0
   - Id: 6
+    IsRelease: 0
     WorldName: WORLD_NAME_6
-    IsRelease: 0
   - Id: 7
+    IsRelease: 0
     WorldName: WORLD_NAME_7
-    IsRelease: 0
   - Id: 8
+    IsRelease: 0
     WorldName: WORLD_NAME_8
-    IsRelease: 0
   - Id: 9
+    IsRelease: 0
     WorldName: WORLD_NAME_9
-    IsRelease: 0
   - Id: 10
-    WorldName: WORLD_NAME_10
     IsRelease: 0
+    WorldName: WORLD_NAME_10

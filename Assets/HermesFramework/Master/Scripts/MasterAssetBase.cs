@@ -56,7 +56,7 @@ namespace Hermes.Master
         {
             foreach (T1 data in datas)
             {
-                if (data != null)
+                if (data != null && data.IsRelease)
                 {
                     data.OnDeserialize();
                     AddRuntimeMaster(data);

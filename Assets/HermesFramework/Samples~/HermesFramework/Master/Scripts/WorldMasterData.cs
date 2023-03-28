@@ -8,6 +8,5 @@ namespace Hermes.Master
     public class WorldMasterData : MasterDataBase
     {
         public string WorldName;
-        public bool IsRelease;
     }
 }

@@ -12,6 +12,8 @@ namespace Hermes.Master
     {
         /// <summary>ID.</summary>
         public int Id = 0;
+        /// <summary>公開フラグ</summary>
+        public bool IsRelease = false;
 
         /// <summary>
         /// コンストラクタ
