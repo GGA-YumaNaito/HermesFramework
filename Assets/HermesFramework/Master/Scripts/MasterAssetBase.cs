@@ -85,7 +85,7 @@ namespace Hermes.Master
             var i = BinarySearch(id);
             if (i < 0)
             {
-#if !DEBUG_LOG
+#if DEBUG_LOG
                 Debug.LogError($"GetDataFromId : id = {id} is nothing.");
 #endif
                 return null;
