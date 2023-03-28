@@ -14,8 +14,8 @@ namespace Hermes.Master
     /// </summary>
     public class LocalMasterImportTool : EditorWindow
     {
-        private const string csvPath = "Master/Csv";
-        private const string assetPath = "Assets/Resources/Master";
+        private string csvPath = "Master/Csv";
+        private string assetPath = "Assets/Master";
 
         private string selectMaster;
         private int selectMasterNum;
@@ -40,6 +40,12 @@ namespace Hermes.Master
 
             selectMasterNum = EditorGUILayout.Popup("SelectMaster", selectMasterNum, masterList.ToArray());
             selectMaster = masterList[selectMasterNum];
+
+            GUILayout.Space(10f);
+            csvPath = EditorGUILayout.TextField("CsvPath", csvPath);
+
+            GUILayout.Space(10f);
+            assetPath = EditorGUILayout.TextField("AssetPath", assetPath);
 
             GUILayout.Space(10f);
             if (GUILayout.Button("リフレッシュ"))
@@ -73,7 +79,7 @@ namespace Hermes.Master
         /// </summary>
         string GetCsvPath(string masterCsvPath)
         {
-            return string.Format("{0}/{1}", LocalMasterImportTool.csvPath, masterCsvPath);
+            return string.Format("{0}/{1}", csvPath, masterCsvPath);
         }
 
         /// <summary>
@@ -83,7 +89,7 @@ namespace Hermes.Master
         /// <param name="masterAssetPath">Master asset path.</param>
         string GetAssetPath(string masterAssetPath)
         {
-            return string.Format("{0}/{1}", LocalMasterImportTool.assetPath, masterAssetPath);
+            return string.Format("{0}/{1}", assetPath, masterAssetPath);
         }
 
         /// <summary>
