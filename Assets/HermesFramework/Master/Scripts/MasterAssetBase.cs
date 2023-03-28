@@ -46,6 +46,53 @@ namespace Hermes.Master
         [SerializeField]
         public List<T1> List = new List<T1>();
 
+        /// <summary>
+        /// 二分探索
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>index</returns>
+        int BinarySearch(int id)
+        {
+            var min = 0;
+            var max = List.Count - 1;
+            var mid = 0;
+            while (min <= max)
+            {
+                mid = min + (max - min) / 2;
+                switch (id.CompareTo(List[mid].Id))
+                {
+                    case 1:
+                        min = mid + 1;
+                        break;
+                    case -1:
+                        max = mid - 1;
+                        break;
+                    case 0:
+                        return mid;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Idからデータを取得
+        /// <para>idが一致しなかった場合null</para>
+        /// </summary>
+        /// <param name="id">検索するId</param>
+        /// <returns>データ or null</returns>
+        public T1 GetDataFromId(int id)
+        {
+            var i = BinarySearch(id);
+            if (i < 0)
+            {
+#if !DEBUG_LOG
+                Debug.LogError($"GetDataFromId : id = {id} is nothing.");
+#endif
+                return null;
+            }
+            return List[i];
+        }
+
         // ====== ランタイム時用関数 =====
 
         /// <summary>
