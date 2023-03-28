@@ -140,7 +140,7 @@ namespace Hermes.Master
         private void UpdateMaster(string masterName)
         {
             Type t = GetTypeByClassName(masterName);
-            object master = Activator.CreateInstance(t);
+            object master = ScriptableObject.CreateInstance(t);
 
             string path = GetCsvPath($"{masterName}.csv");
             string assetPath = GetAssetPath($"{masterName}.asset");
