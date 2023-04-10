@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Hermes.Asset;
@@ -45,6 +46,30 @@ namespace Hermes.UI
         Stack<Type> stackType = new Stack<Type>();
         /// <summary>遷移StackOptions</summary>
         Stack<object> stackOptions = new Stack<object>();
+
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// </summary>
+        /// <param name="viewName">View名</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync(string viewName, object options = null, CancellationToken cancellationToken = default)
+        {
+            var viewType = Type.GetType(viewName);
+            object uniTask = this.GetType()
+                .GetMethod(
+                    "LoadAsync",
+                    BindingFlags.Public | BindingFlags.Instance,
+                    null,
+                    new Type[] { typeof(object), typeof(CancellationToken) },
+                    null
+                )
+                .MakeGenericMethod(viewType)
+                .Invoke(this, new object[] { options, cancellationToken });
+            await (UniTask)uniTask;
+        }
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync
@@ -469,6 +494,53 @@ namespace Hermes.UI
                     return;
                 }
             }
+
+            // バリアOFF
+            barrier.SetActive(false);
+        }
+
+        /// <summary>
+        /// 全てアンロード
+        /// </summary>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask AllUnloadAsync(CancellationToken cancellationToken = default)
+        {
+
+            // バリアON
+            barrier.SetActive(true);
+
+            // サブシーン
+            for (int i = 0; i < SubSceneList.Count; i++)
+            {
+                await SubSceneList[i].OnUnload();
+
+                // シーンアンロード
+                await Addressables.UnloadSceneAsync(subSceneInstanceList[i].Value).ToUniTask(cancellationToken: cancellationToken);
+                SubSceneList.RemoveAt(i);
+                subSceneInstanceList.RemoveAt(i);
+            }
+
+            // ダイアログ
+            var count = this.stackType.Count;
+            for (int i = 0; i < count; i++)
+            {
+                stackName.Pop();
+                stackOptions.Pop();
+                var t = stackType.Pop();
+                if (t.IsSubclassOf(typeof(Screen)))
+                    break;
+                OnUnloadDialog((ViewBase)FindObjectOfType(t), false, cancellationToken).Forget();
+            }
+            dialogBG.SetActive(false);
+
+            // シーン
+            await OnUnloadScreen(CurrentScene, cancellationToken);
+
+            CurrentScene = null;
+            CurrentView = null;
+
+            ClearStack();
 
             // バリアOFF
             barrier.SetActive(false);
