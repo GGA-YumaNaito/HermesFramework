@@ -235,6 +235,7 @@ MonoBehaviour:
   image_key: shinwa_hermes
   partParent: {fileID: 989332577}
   part_key: AssetManagerPartSample
+  part_image_key: food_protein_bar
   partList: []
 --- !u!223 &671562429
 Canvas:
