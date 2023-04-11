@@ -1,21 +1,30 @@
-using UnityEngine;
-using Hermes.UI;
-using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Hermes.UI;
+using UnityEngine;
+using UnityEngine.U2D;
 
 namespace Hermes.Asset
 {
     public class AssetManagerSample : MonoBehaviour
     {
+        [SerializeField] string atlas_key;
         [SerializeField] UIImage image;
         [SerializeField] string image_key;
         [SerializeField] Transform partParent;
         [SerializeField] string part_key;
+        [SerializeField] string part_image_key;
         [SerializeField] List<GameObject> partList;
+
+        SpriteAtlas spriteAtlas;
 
         void Start()
         {
-            AssetManager.Load<Sprite>(image_key, (x) => image.sprite = x, image.gameObject, this.GetCancellationTokenOnDestroy());
+            AssetManager.Load<SpriteAtlas>(atlas_key, (x) =>
+                {
+                    spriteAtlas = x;
+                    image.sprite = spriteAtlas.GetSprite(image_key);
+                }, gameObject);
         }
 
         public void OnClickCreateButton()
@@ -23,7 +32,9 @@ namespace Hermes.Asset
             AssetManager.Load<GameObject>(part_key, (x) =>
             {
                 // Instantiate
-                partList.Add(Instantiate(x, partParent));
+                var part = Instantiate(x, partParent);
+                part.GetComponent<UIImage>().sprite = spriteAtlas.GetSprite(part_image_key);
+                partList.Add(part);
             }, partParent.gameObject, this.GetCancellationTokenOnDestroy());
         }
 
