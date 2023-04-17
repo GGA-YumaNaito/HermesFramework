@@ -47,6 +47,17 @@ namespace Hermes.UI
         /// <summary>遷移StackOptions</summary>
         Stack<object> stackOptions = new Stack<object>();
 
+        /// <summary>
+        /// 駆動
+        /// </summary>
+        async void Update()
+        {
+            // Backキー押下
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                await BackAsync();
+            }
+        }
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
