@@ -14,7 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TableCollectionName: TextData
   m_TableCollectionNameGuidString: 427b352e8bc134fdeac25e8bc33931de
-  m_Entries: []
+  m_Entries:
+  - m_Id: 1
+    m_Key: STAGE_NAME_1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2
+    m_Key: STAGE_NAME_2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3
+    m_Key: STAGE_NAME_3
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
