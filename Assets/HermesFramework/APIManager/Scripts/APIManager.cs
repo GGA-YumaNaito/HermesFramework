@@ -19,20 +19,18 @@ namespace Hermes.API
         [SerializeField] string baseUrl = "https://www.";
         /// <summary>タイムアウト.</summary>
         [SerializeField] private int timeout = 10;
-        /// <summary>進捗待ち時間.</summary>
-        [SerializeField] private float m_ProgressWaitTime = 3f;
         /// <summary>リトライ最大回数.</summary>
         [SerializeField] private int maxRetryNum = 3;
         /// <summary>リトライ回数.</summary>
         private int retryNum = 0;
         /// <summary>溜まっているキューがリクエスト可能か.</summary>
-        [SerializeField] private bool m_IsRequestQueue = true;
+        [SerializeField] private bool isRequestQueue = true;
         /// <summary>TypeQueue.</summary>
-        [SerializeField] private Queue<Type> m_TypeQueue = new Queue<Type>();
+        [SerializeField] private Queue<Type> typeQueue = new Queue<Type>();
         /// <summary>シーケンスID.</summary>
-        private static ulong m_SequenceId = 0;
+        private static ulong sequenceId = 0;
         /// <summary>リセットフラグ.</summary>
-        private bool m_IsReset = false;
+        private bool isReset = false;
         /// <summary>起動シーン名</summary>
         [SerializeField] string launchName = "LaunchScene";
 
@@ -110,23 +108,23 @@ namespace Hermes.API
             if (isQueue && Instance.retryNum <= 0)
             {
                 // リセットフラグ解除.
-                Instance.m_IsReset = false;
+                Instance.isReset = false;
                 // キューにためる.
-                Instance.m_TypeQueue.Enqueue(typeof(T));
+                Instance.typeQueue.Enqueue(typeof(T));
                 // 自分の番まで処理中断.
                 while (true)
                 {
                     await UniTask.Yield();
-                    if (Instance.m_IsRequestQueue)
+                    if (Instance.isRequestQueue)
                     {
-                        if (Instance.m_TypeQueue.Peek() == typeof(T))
+                        if (Instance.typeQueue.Peek() == typeof(T))
                         {
-                            if (Instance.m_IsReset)
+                            if (Instance.isReset)
                             {
-                                Instance.m_TypeQueue.Dequeue();
+                                Instance.typeQueue.Dequeue();
                                 return;
                             }
-                            Instance.m_IsRequestQueue = false;
+                            Instance.isRequestQueue = false;
                             break;
                         }
                     }
@@ -173,11 +171,11 @@ namespace Hermes.API
             // キューにためる場合.
             if (isQueue && Instance.retryNum <= 0)
             {
-                if (Instance.m_TypeQueue.Count > 0 && Instance.m_TypeQueue.Peek() == typeof(T))
+                if (Instance.typeQueue.Count > 0 && Instance.typeQueue.Peek() == typeof(T))
                 {
                     // リクエスト再開.
-                    Instance.m_IsRequestQueue = true;
-                    Instance.m_TypeQueue.Dequeue();
+                    Instance.isRequestQueue = true;
+                    Instance.typeQueue.Dequeue();
                 }
             }
         }
@@ -246,7 +244,7 @@ namespace Hermes.API
                         onSuccess?.Invoke(request, data);
                         Instance.retryNum = 0;
                         // リセットフラグ起動.
-                        Instance.m_IsReset = true;
+                        Instance.isReset = true;
                     }
                 }
             }
@@ -314,7 +312,7 @@ namespace Hermes.API
                             onError?.Invoke(request);
                         Instance.retryNum = 0;
                         // リセットフラグ起動.
-                        Instance.m_IsReset = true;
+                        Instance.isReset = true;
                         // 全てアンロード.
                         await UIManager.Instance.AllUnloadAsync();
                         // タイトルシーン.
@@ -331,7 +329,7 @@ namespace Hermes.API
 #endif
                     Instance.retryNum = 0;
                     // リセットフラグ起動.
-                    Instance.m_IsReset = true;
+                    Instance.isReset = true;
                     // TODO: 共通の汎用ダイアログを作るか否か
                     // ダイアログ.
                     //Dialog dialog = null;

@@ -27,9 +27,9 @@ namespace Hermes.Localize
         Locale selectedLocale = null;
 
         /// <summary>現在のコード</summary>
-        public string SelectedCode { get { return selectedLocale.Formatter.ToString(); } }
+        public string SelectedCode { get => selectedLocale.Formatter.ToString(); }
         /// <summary>コードリスト</summary>
-        public List<string> CodeList { get { return LocalizationSettings.AvailableLocales.Locales.Select(x => x.Formatter.ToString()).ToList(); } }
+        public List<string> CodeList { get => LocalizationSettings.AvailableLocales.Locales.Select(x => x.Formatter.ToString()).ToList(); }
 
         /// <summary>
         /// Start

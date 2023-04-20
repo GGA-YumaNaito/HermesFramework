@@ -14,9 +14,9 @@ namespace Hermes.API
         /// <summary>ErrorCode</summary>
         public eAPIErrorCode ErrorCode;
         /// <summary>API</summary>
-        protected abstract string _api { get; }
+        protected abstract string api { get; }
         /// <summary>Postで通信するならtrue</summary>
-        protected abstract bool _isPost { get; }
+        protected abstract bool isPost { get; }
 
         /// <summary>
         /// API
@@ -25,7 +25,7 @@ namespace Hermes.API
         {
             get
             {
-                return _api + QueryParams;
+                return api + QueryParams;
             }
         }
 
@@ -36,7 +36,7 @@ namespace Hermes.API
         {
             get
             {
-                return _isPost;
+                return isPost;
             }
         }
 
