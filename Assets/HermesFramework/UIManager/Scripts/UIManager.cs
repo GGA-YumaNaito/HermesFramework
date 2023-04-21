@@ -208,23 +208,14 @@ namespace Hermes.UI
             // 現在の最新がダイアログだったら削除する
             if (CurrentView is Dialog)
             {
-                var stackType = new Stack<Type>();
-                var stackOptions = new Stack<object>();
-                var count = this.stackType.Count;
+                var count = stackType.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    stackName.Pop();
-                    stackType.Push(this.stackType.Pop());
-                    stackOptions.Push(this.stackOptions.Pop());
                     var t = stackType.Peek();
                     if (t.IsSubclassOf(typeof(Screen)))
                         break;
+                    StackPop();
                     dialogList.Add((ViewBase)FindObjectOfType(t));
-                }
-                count = stackType.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    StackPush(stackType.Pop(), stackOptions.Pop());
                 }
             }
             Type type = CurrentScene.GetType();
