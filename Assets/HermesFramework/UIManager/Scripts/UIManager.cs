@@ -65,6 +65,7 @@ namespace Hermes.UI
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// <para>別アセンブリのViewはロード出来ない</para>
         /// </summary>
         /// <param name="viewName">View名</param>
         /// <param name="options">オプション</param>
@@ -73,7 +74,19 @@ namespace Hermes.UI
         public async UniTask LoadAsync(string viewName, object options = null, CancellationToken cancellationToken = default)
         {
             var viewType = Type.GetType(viewName);
-            object uniTask = this.GetType()
+            await LoadAsync(viewType, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync(Viewタイプから呼び出し)
+        /// </summary>
+        /// <param name="viewName">View名</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync(Type viewType, object options = null, CancellationToken cancellationToken = default)
+        {
+            var uniTask = this.GetType()
                 .GetMethod(
                     "LoadAsync",
                     BindingFlags.Public | BindingFlags.Instance,
@@ -95,6 +108,19 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
+            await LoadAsync<T>(false, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync
+        /// </summary>
+        /// <typeparam name="T">ViewBase</typeparam>
+        /// <param name="isOpenDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync<T>(bool isOpenDialog, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        {
             var type = typeof(T);
             // 同じ画面なら表示しない
             if (CurrentScene != null && type == CurrentScene.GetType())
@@ -102,54 +128,76 @@ namespace Hermes.UI
 
             // バリアON
             barrier.SetActive(true);
-            // 既に存在していたらStackから外していく
-            Action<Type> StackPopAction = type =>
-            {
-                if (!stackType.Contains(type))
-                    return;
-                var count = stackType.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    stackName.Pop();
-                    var t = stackType.Pop();
-                    stackOptions.Pop();
-                    if (t == type)
-                        break;
-                }
-            };
+
+            // ロードダイアログリスト
+            var loadDialogList = new List<KeyValuePair<Type, object>>();
 
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
             {
-                var dialogList = new List<ViewBase>();
+                var unloadDialogList = new List<ViewBase>();
                 // 現在の最新がダイアログだったら削除する
                 if (CurrentView is Dialog)
                 {
                     var stackType = new Stack<Type>();
-                    var stackOptions = new Stack<object>();
                     var count = this.stackType.Count;
                     for (int i = 0; i < count; i++)
                     {
-                        stackName.Pop();
                         stackType.Push(this.stackType.Pop());
-                        stackOptions.Push(this.stackOptions.Pop());
                         var t = stackType.Peek();
                         if (t.IsSubclassOf(typeof(Screen)))
                             break;
-                        dialogList.Add((ViewBase)FindObjectOfType(t));
+                        unloadDialogList.Add((ViewBase)FindObjectOfType(t));
                     }
                     count = stackType.Count;
                     for (int i = 0; i < count; i++)
+                        this.stackType.Push(stackType.Pop());
+                }
+                // 既にシーンが存在した時
+                if (stackType.Contains(type))
+                {
+                    // 遷移先のシーンが存在している時に出ていたダイアログをロード
+                    if (isOpenDialog)
                     {
-                        StackPush(stackType.Pop(), stackOptions.Pop());
+                        var stackType = new Stack<Type>();
+                        var stackOptions = new Stack<object>();
+                        var count = this.stackType.Count;
+                        for (int i = 0; i < count; i++)
+                        {
+                            stackName.Pop();
+                            var t = this.stackType.Pop();
+                            var o = this.stackOptions.Pop();
+                            if (t == type)
+                                break;
+                            stackType.Push(t);
+                            stackOptions.Push(o);
+                        }
+                        count = stackType.Count;
+                        for (int i = 0; i < count; i++)
+                        {
+                            if (stackType.Peek().IsSubclassOf(typeof(Screen)))
+                                break;
+                            loadDialogList.Add(new KeyValuePair<Type, object>(stackType.Pop(), stackOptions.Pop()));
+                        }
+                    }
+                    // Stackから外していく
+                    else
+                    {
+                        var count = stackType.Count;
+                        for (int i = 0; i < count; i++)
+                        {
+                            stackName.Pop();
+                            var t = stackType.Pop();
+                            stackOptions.Pop();
+                            if (t == type)
+                                break;
+                        }
                     }
                 }
-                // 既にシーンが存在したら
-                StackPopAction(type);
                 // まだCurrentSceneがなかったらUnloadはしない
                 if (CurrentScene != null)
                 {
-                    await OnUnloadScreen(CurrentScene, dialogList, cancellationToken);
+                    await OnUnloadScreen(CurrentScene, unloadDialogList, cancellationToken);
                 }
                 // シーンロード
                 await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
@@ -161,8 +209,6 @@ namespace Hermes.UI
             else
             {
                 dialogBG.SetActive(true);
-                // 既にダイアログが存在したら
-                //StackPopAction(type); // TODO: 今は外しておく
 
                 // ロードアセット
                 var dialog = await AssetManager.LoadAsync<GameObject>(type.Name, CurrentView.gameObject, cancellationToken);
@@ -183,12 +229,14 @@ namespace Hermes.UI
             CurrentView.Initialize();
             await CurrentView.OnLoad(options);
             if (CurrentView is Screen)
-            {
                 // シーン遷移退出アニメーション
                 await OnDisableSceneTransition();
-            }
             await CurrentView.OnDisplay();
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+
+            // ダイアログがあったらロード
+            foreach (var dialog in loadDialogList)
+                await LoadAsync(dialog.Key, dialog.Value, cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
