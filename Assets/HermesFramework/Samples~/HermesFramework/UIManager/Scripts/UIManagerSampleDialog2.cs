@@ -23,7 +23,7 @@ namespace Hermes.UI.Sample
         }
         public async void OnClickSample1()
         {
-            await UIManager.Instance.LoadAsync<UIManagerSample1>(new UIManagerSample1.Options() { sumpleText = "UIManagerSample1" });
+            await UIManager.Instance.LoadAsync<UIManagerSample1>(true, new UIManagerSample1.Options() { sumpleText = "UIManagerSample1" });
         }
 
         public async void OnClickSample2()
