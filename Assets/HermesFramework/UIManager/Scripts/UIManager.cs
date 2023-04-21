@@ -57,7 +57,7 @@ namespace Hermes.UI
         async void Update()
         {
             // Backキー押下
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (!barrier.activeSelf && Input.GetKeyDown(KeyCode.Escape))
             {
                 await BackAsync();
             }
