@@ -66,6 +66,8 @@ namespace Hermes.UI
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
         /// <para>別アセンブリのViewはロード出来ない</para>
+        /// <para>別アセンブリの場合、完全修飾で指定しなければいけない</para>
+        /// <para>例) Hermes.UI.Sample.UISampleScene, Assembly-CSharp</para>
         /// </summary>
         /// <param name="viewName">View名</param>
         /// <param name="options">オプション</param>
@@ -73,29 +75,58 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync(string viewName, object options = null, CancellationToken cancellationToken = default)
         {
+            await LoadAsync(viewName, false, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// <para>別アセンブリのViewはロード出来ない</para>
+        /// <para>別アセンブリの場合、完全修飾で指定しなければいけない</para>
+        /// <para>例) Hermes.UI.Sample.UISampleScene, Assembly-CSharp</para>
+        /// </summary>
+        /// <param name="viewName">View名</param>
+        /// <param name="resumeDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync(string viewName, bool resumeDialog, object options = null, CancellationToken cancellationToken = default)
+        {
             var viewType = Type.GetType(viewName);
-            await LoadAsync(viewType, options, cancellationToken);
+            await LoadAsync(viewType, resumeDialog, options, cancellationToken);
         }
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync(Viewタイプから呼び出し)
         /// </summary>
-        /// <param name="viewName">View名</param>
+        /// <param name="viewType">Viewタイプ</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync(Type viewType, object options = null, CancellationToken cancellationToken = default)
+        {
+            await LoadAsync(viewType, false, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync(Viewタイプから呼び出し)
+        /// </summary>
+        /// <param name="viewType">View</param>
+        /// <param name="resumeDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync(Type viewType, bool resumeDialog, object options = null, CancellationToken cancellationToken = default)
         {
             var uniTask = this.GetType()
                 .GetMethod(
                     "LoadAsync",
                     BindingFlags.Public | BindingFlags.Instance,
                     null,
-                    new Type[] { typeof(object), typeof(CancellationToken) },
+                    new Type[] { typeof(bool), typeof(object), typeof(CancellationToken) },
                     null
                 )
                 .MakeGenericMethod(viewType)
-                .Invoke(this, new object[] { options, cancellationToken });
+                .Invoke(this, new object[] { resumeDialog, options, cancellationToken });
             await (UniTask)uniTask;
         }
 
@@ -115,11 +146,11 @@ namespace Hermes.UI
         /// ViewBaseを継承したクラスのLoadAsync
         /// </summary>
         /// <typeparam name="T">ViewBase</typeparam>
-        /// <param name="isOpenDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
+        /// <param name="resumeDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        public async UniTask LoadAsync<T>(bool isOpenDialog, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        public async UniTask LoadAsync<T>(bool resumeDialog, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
             var type = typeof(T);
             // 同じ画面なら表示しない
@@ -157,7 +188,7 @@ namespace Hermes.UI
                 if (stackType.Contains(type))
                 {
                     // 遷移先のシーンが存在している時に出ていたダイアログをロード
-                    if (isOpenDialog)
+                    if (resumeDialog)
                     {
                         var stackType = new Stack<Type>();
                         var stackOptions = new Stack<object>();
