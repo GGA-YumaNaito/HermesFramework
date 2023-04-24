@@ -32,7 +32,7 @@ namespace Hermes.API
         /// <summary>リセットフラグ.</summary>
         private bool isReset = false;
         /// <summary>起動シーン名</summary>
-        [SerializeField] string launchName = "LaunchScene";
+        [SerializeField] string launchName = "Launch.LaunchScene, Assembly-CSharp";
 
         // TODO:シーケンスIDをどう扱うかを考える
 
