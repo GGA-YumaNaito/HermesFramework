@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Hermes.Localize;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -17,6 +18,49 @@ namespace Hermes.Asset
 
         /// <summary>AsyncOperationHandleList</summary>
         static Dictionary<string, AsyncOperationHandle<UnityEngine.Object>> asyncOperationHandleList = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>>();
+
+        /// <summary>初期化完了しているか</summary>
+        public bool IsInitializad { get; private set; } = false;
+
+        /// <summary>
+        /// Start
+        /// </summary>
+        async void Start()
+        {
+            // 初期化
+            await Addressables.InitializeAsync();
+
+            // カタログアップデート
+            await UpdateCatalogs();
+
+            // 初期化完了
+            IsInitializad = true;
+        }
+
+        /// <summary>
+        /// カタログアップデート
+        /// </summary>
+        /// <returns></returns>
+        public async UniTask UpdateCatalogs()
+        {
+            // 変更されたカタログのロケータID一覧を取得
+            var checkUpdatesHandle = Addressables.CheckForCatalogUpdates(false);
+            await checkUpdatesHandle.Task;
+            var updates = checkUpdatesHandle.Result;
+            Addressables.Release(checkUpdatesHandle);
+            if (updates.Count >= 1)
+            {
+                // カタログを更新する
+                // 引数を指定しない（catalogをnullに指定する）とすべてのカタログを更新
+                await Addressables.UpdateCatalogs();
+
+                //// 特定のカタログだけフィルタリングして渡すこともできる
+                //await Addressables.UpdateCatalogs(updates);
+
+                // LocalizeManagerを再初期化
+                await LocalizeManager.Instance.Reinitialize();
+            }
+        }
 
         /// <summary>
         /// ロードメソッド
@@ -42,6 +86,9 @@ namespace Hermes.Asset
         /// <returns>UniTask<T>(データ)</returns>
         public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
+            // 初期化が完了するまで待機
+            await UniTask.WaitUntil(() => AssetManager.Instance.IsInitializad);
+
             if (asyncOperationHandleList.ContainsKey(key))
             {
                 await asyncOperationHandleList[key].ToUniTask(cancellationToken: token);

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Hermes.Asset;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -36,6 +37,8 @@ namespace Hermes.Localize
         /// </summary>
         async void Start()
         {
+            // AssetManager の初期化が完了するまで待機
+            await UniTask.WaitUntil(() => AssetManager.Instance.IsInitializad);
             // Localization の初期化が完了するまで待機
             await LocalizationSettings.InitializationOperation.Task;
 
