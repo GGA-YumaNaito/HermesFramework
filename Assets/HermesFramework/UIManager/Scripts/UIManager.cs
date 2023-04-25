@@ -153,9 +153,6 @@ namespace Hermes.UI
         public async UniTask LoadAsync<T>(bool resumeDialog, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
             var type = typeof(T);
-            // 同じ画面なら表示しない
-            if (CurrentScene != null && type == CurrentScene.GetType())
-                return;
 
             // バリアON
             barrier.SetActive(true);
