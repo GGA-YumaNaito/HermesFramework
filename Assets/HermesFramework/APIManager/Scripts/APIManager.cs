@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Cysharp.Threading.Tasks;
+using Hermes.UI;
 using UnityEngine;
 using UnityEngine.Networking;
-using Hermes.UI;
 
 namespace Hermes.API
 {
@@ -282,26 +282,24 @@ namespace Hermes.API
                 if (Instance.retryNum <= Instance.maxRetryNum)
                 {
                     Instance.retryNum++;
-                    // TODO: 共通の汎用ダイアログを作るか否か
                     // ダイアログ.
-                    //Dialog dialog = null;
-                    //if (isFailed)
-                    //{
-                    //    var json = GzipBase64.Decompress(request.downloadHandler.text);
-                    //    var data = JsonUtility.FromJson<T2>(json);
-                    //    dialog = DialogServer.Create("APIエラー", "接続が正常に行われておりません。", data.ErrorCode.Label(), true);
-                    //}
-                    //else
-                    //    dialog = DialogServer.Create("HTTPエラー", "接続が正常に行われておりません。", request.error, true);
-                    //var dialog = UI.UIManager.Instance.LoadAsync<Dialog>();
-                    //await UniTask.WaitUntil(() => dialog.StateWait());
-                    //if (dialog.state == DialogServer.State.Retry)
-                    //{
-                    //    // リトライ.
-                    //    await UIManager.Instance.BackAsync();
-                    //    await PostSendWebRequest<T, T2>(postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
-                    //}
-                    //else
+                    ErrorDialog dialog = null;
+                    if (isFailed)
+                    {
+                        var json = GzipBase64.Decompress(request.downloadHandler.text);
+                        var data = JsonUtility.FromJson<T2>(json);
+                        dialog = await ErrorDialog.Create("APIエラー", "接続が正常に行われておりません。", data.ErrorCode.Label(), true);
+                    }
+                    else
+                        dialog = await ErrorDialog.Create("HTTPエラー", "接続が正常に行われておりません。", request.error, true);
+                    await UniTask.WaitUntil(() => dialog.ClickStateWait());
+                    if (dialog.ClickState == ErrorDialog.eClickState.Retry)
+                    {
+                        // リトライ.
+                        await UIManager.Instance.BackAsync();
+                        await PostSendWebRequest<T, T2>(postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                    }
+                    else
                     {
                         // タイトルシーンに戻る.
                         // 失敗コールバックを実行.
@@ -332,17 +330,16 @@ namespace Hermes.API
                     Instance.isReset = true;
                     // TODO: 共通の汎用ダイアログを作るか否か
                     // ダイアログ.
-                    //Dialog dialog = null;
-                    //if (isFailed)
-                    //{
-                    //    var json = GzipBase64.Decompress(request.downloadHandler.text);
-                    //    var data = JsonUtility.FromJson<T2>(json);
-                    //    dialog = DialogServer.Create(title: "タイトルに戻ります", error: data.ErrorCode.Label(), isRetry: false);
-                    //}
-                    //else
-                    //    dialog = DialogServer.Create(title: "タイトルに戻ります", error: request.error, isRetry: false);
-                    //var dialog = UIManager.Instance.LoadAsync<Dialog>();
-                    //await UniTask.WaitUntil(() => dialog.StateWait());
+                    ErrorDialog dialog = null;
+                    if (isFailed)
+                    {
+                        var json = GzipBase64.Decompress(request.downloadHandler.text);
+                        var data = JsonUtility.FromJson<T2>(json);
+                        dialog = await ErrorDialog.Create(title: "タイトルに戻ります", error: data.ErrorCode.Label(), isRetry: false);
+                    }
+                    else
+                        dialog = await ErrorDialog.Create(title: "タイトルに戻ります", error: request.error, isRetry: false);
+                    await UniTask.WaitWhile(() => dialog.ClickStateWait());
                     // 失敗コールバックを実行.
                     if (isFailed)
                         onFailed?.Invoke(request);
