@@ -41,6 +41,11 @@
             "path": "Samples~/HermesFramework/AssetManager"
         },
         {
+            "displayName": "APIManagerSample",
+            "description": "APIManager Sample.",
+            "path": "Samples~/HermesFramework/APIManager"
+        },
+        {
             "displayName": "CompositeToggleSample",
             "description": "CompositeToggle Sample.",
             "path": "Samples~/ExternalAssets/Mobcast/Coffee/CompositeToggle"

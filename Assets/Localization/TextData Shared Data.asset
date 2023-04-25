@@ -27,6 +27,14 @@ MonoBehaviour:
     m_Key: STAGE_NAME_3
     m_Metadata:
       m_Items: []
+  - m_Id: 2212235756691456
+    m_Key: CLOSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2212694533857280
+    m_Key: RETRY
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

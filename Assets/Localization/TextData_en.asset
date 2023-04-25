@@ -30,6 +30,14 @@ MonoBehaviour:
     m_Localized: Shibuya Area C
     m_Metadata:
       m_Items: []
+  - m_Id: 2212235756691456
+    m_Localized: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2212694533857280
+    m_Localized: Retry
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
