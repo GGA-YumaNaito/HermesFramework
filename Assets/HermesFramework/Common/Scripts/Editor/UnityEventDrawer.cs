@@ -316,10 +316,10 @@ public class UnityEventDrawer : PropertyDrawer
 
         #region Original Code
 
-        var type = Type.GetType(prop.FindPropertyRelative("m_TypeName").stringValue, false);
-        if (type == null)
-            return new UnityEvent();
-        return Activator.CreateInstance(type) as UnityEventBase;
+        //var type = Type.GetType(prop.FindPropertyRelative("m_TypeName").stringValue, false);
+        //if (type == null)
+        //    return new UnityEvent();
+        //return Activator.CreateInstance(type) as UnityEventBase;
 
         #endregion
     }
