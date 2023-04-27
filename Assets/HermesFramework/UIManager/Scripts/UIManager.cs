@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
+using Hermes.UI.UIManagerParts;
 
 namespace Hermes.UI
 {
@@ -39,12 +40,8 @@ namespace Hermes.UI
         /// <summary>シーン遷移アニメーション</summary>
         [SerializeField] UITransition sceneTransition;
 
-        /// <summary>SubSceneList</summary>
-        [SerializeField] List<SubScene> subSceneList = new List<SubScene>();
-        /// <summary>SubSceneList</summary>
-        public List<SubScene> SubSceneList { get { return subSceneList; } private set { subSceneList = value; } }
-        /// <summary>SubSceneInstanceList</summary>
-        List<KeyValuePair<string, SceneInstance>> subSceneInstanceList = new List<KeyValuePair<string, SceneInstance>>();
+        /// <summary>SubScene</summary>
+        [SerializeField] UIManagerSubScene subScene = new UIManagerSubScene();
 
         /// <summary>遷移StackName</summary>
         [SerializeField] List<string> stackName = new List<string>();
@@ -613,24 +610,7 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            var type = typeof(T);
-            // シーンロード
-            var instance = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
-            var screen = GameObject.Find(sceneName).GetComponent(type) as SubScene;
-
-            if (screen == null)
-            {
-                barrier.SetActive(false);
-                throw new Exception($"{sceneName} is Null");
-            }
-
-            SubSceneList.Add(screen);
-            subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(sceneName, instance));
-
-            // Initialize & Load
-            screen.Initialize();
-            await screen.OnLoad(options);
-            await screen.OnDisplay();
+            await subScene.LoadAsync<T>(sceneName, options, cancellationToken);
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
@@ -659,21 +639,7 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            for (int i = 0; i < SubSceneList.Count; i++)
-            {
-                if (subSceneInstanceList[i].Key == sceneName)
-                {
-                    await SubSceneList[i].OnEnd();
-                    await SubSceneList[i].OnUnload();
-                    await UniTask.WaitUntil(() => SubSceneList[i].Status.Value == eStatus.End, cancellationToken: cancellationToken);
-
-                    // シーンアンロード
-                    await Addressables.UnloadSceneAsync(subSceneInstanceList[i].Value).ToUniTask(cancellationToken: cancellationToken);
-                    SubSceneList.RemoveAt(i);
-                    subSceneInstanceList.RemoveAt(i);
-                    break;
-                }
-            }
+            await subScene.UnloadAsync(sceneName, cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
@@ -690,15 +656,7 @@ namespace Hermes.UI
             barrier.SetActive(true);
 
             // サブシーン
-            for (int i = 0; i < SubSceneList.Count; i++)
-            {
-                await SubSceneList[i].OnUnload();
-
-                // シーンアンロード
-                await Addressables.UnloadSceneAsync(subSceneInstanceList[i].Value).ToUniTask(cancellationToken: cancellationToken);
-                SubSceneList.RemoveAt(i);
-                subSceneInstanceList.RemoveAt(i);
-            }
+            await subScene.AllUnloadAsync(cancellationToken);
 
             // ダイアログ
             var count = this.stackType.Count;
