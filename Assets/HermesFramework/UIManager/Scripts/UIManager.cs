@@ -619,7 +619,10 @@ namespace Hermes.UI
             var screen = GameObject.Find(sceneName).GetComponent(type) as SubScene;
 
             if (screen == null)
+            {
+                barrier.SetActive(false);
                 throw new Exception($"{sceneName} is Null");
+            }
 
             SubSceneList.Add(screen);
             subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(sceneName, instance));
@@ -668,7 +671,7 @@ namespace Hermes.UI
                     await Addressables.UnloadSceneAsync(subSceneInstanceList[i].Value).ToUniTask(cancellationToken: cancellationToken);
                     SubSceneList.RemoveAt(i);
                     subSceneInstanceList.RemoveAt(i);
-                    return;
+                    break;
                 }
             }
 
