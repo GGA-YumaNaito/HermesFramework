@@ -28,24 +28,25 @@ namespace Hermes.UI.UIManagerParts
         /// <param name="sceneName">シーン名</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>UniTask</returns>
-        public async UniTask LoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
+        /// <returns>UniTask<SubScene></returns>
+        public async UniTask<SubScene> LoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
         {
             var type = typeof(T);
             // シーンロード
             var instance = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
-            var screen = GameObject.Find(sceneName).GetComponent(type) as SubScene;
+            var subScene = GameObject.Find(sceneName).GetComponent(type) as SubScene;
 
-            if (screen == null)
+            if (subScene == null)
                 throw new Exception($"{sceneName} is Null");
 
-            SubSceneList.Add(screen);
+            SubSceneList.Add(subScene);
             subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(sceneName, instance));
 
             // Initialize & Load
-            screen.Initialize();
-            await screen.OnLoad(options);
-            await screen.OnDisplay();
+            subScene.Initialize();
+            await subScene.OnLoad(options);
+            await subScene.OnDisplay();
+            return subScene;
         }
 
         /// <summary>

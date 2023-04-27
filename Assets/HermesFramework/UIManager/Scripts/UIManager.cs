@@ -604,17 +604,18 @@ namespace Hermes.UI
         /// <param name="sceneName">シーン名</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>UniTask</returns>
-        public async UniTask SubSceneLoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
+        /// <returns>UniTask<SubScene></returns>
+        public async UniTask<SubScene> SubSceneLoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
         {
             // バリアON
             barrier.SetActive(true);
 
-            await subScene.LoadAsync<T>(sceneName, options, cancellationToken);
+            var scene = await subScene.LoadAsync<T>(sceneName, options, cancellationToken);
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
+            return scene;
         }
 
         /// <summary>
