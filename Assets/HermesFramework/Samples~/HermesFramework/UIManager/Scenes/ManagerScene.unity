@@ -473,10 +473,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentView: {fileID: 0}
-  currentScene: {fileID: 0}
-  currentSceneName: 
   barrier: {fileID: 2135259757}
-  sceneTransition: {fileID: 696068992}
+  uiScreen:
+    currentScreen: {fileID: 0}
+    currentScreenName: 
+    sceneTransition: {fileID: 696068992}
   uiDialog:
     dialogBG: {fileID: 1694997847}
     dialogRoot: {fileID: 1894077993}
