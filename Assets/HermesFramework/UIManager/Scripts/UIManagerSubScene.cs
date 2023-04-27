@@ -12,6 +12,7 @@ namespace Hermes.UI.UIManagerParts
     /// <summary>
     /// UIManager SubScene
     /// </summary>
+    [Serializable]
     public class UIManagerSubScene
     {
         /// <summary>SubSceneList</summary>
