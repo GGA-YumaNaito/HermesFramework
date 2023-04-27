@@ -34,12 +34,14 @@ namespace Hermes.UI
         /// </summary>
         public void Initialize()
         {
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             Status
             .Subscribe(value =>
             {
                 Debug.Log($"{base.name} : status = {status.Value}");
             })
             .AddTo(gameObject);
+#endif
         }
 
         /// <summary>
