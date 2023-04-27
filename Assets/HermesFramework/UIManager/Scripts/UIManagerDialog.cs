@@ -105,7 +105,6 @@ namespace Hermes.UI.UIManagerParts
             return CurrentDialog;
         }
 
-
         /// <summary>
         /// UnloadAsync
         /// </summary>
