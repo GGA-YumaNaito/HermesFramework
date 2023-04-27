@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -28,6 +28,8 @@ namespace Hermes.UI
         [SerializeField] Screen currentScene;
         /// <summary>現在のScene</summary>
         public Screen CurrentScene { get { return currentScene; } private set { currentScene = value; } }
+        /// <summary>現在のScene名</summary>
+        [SerializeField] string currentSceneName;
         /// <summary>バリア</summary>
         [SerializeField] GameObject barrier;
         /// <summary>ダイアログ用BG</summary>
@@ -64,35 +66,35 @@ namespace Hermes.UI
         }
 
         /// <summary>
-        /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// ViewBaseを継承したクラスのLoadAsync(Viewタイプから呼び出し)
         /// <para>別アセンブリのViewはロード出来ない</para>
         /// <para>別アセンブリの場合、完全修飾で指定しなければいけない</para>
         /// <para>例) Hermes.UI.Sample.UISampleScene, Assembly-CSharp</para>
         /// </summary>
-        /// <param name="viewName">View名</param>
+        /// <param name="viewType">Viewタイプ</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        public async UniTask LoadAsync(string viewName, object options = null, CancellationToken cancellationToken = default)
+        public async UniTask LoadAsync(string viewType, object options = null, CancellationToken cancellationToken = default)
         {
-            await LoadAsync(viewName, false, options, cancellationToken);
+            await LoadAsync(viewType, false, options, cancellationToken);
         }
 
         /// <summary>
-        /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// ViewBaseを継承したクラスのLoadAsync(Viewタイプから呼び出し)
         /// <para>別アセンブリのViewはロード出来ない</para>
         /// <para>別アセンブリの場合、完全修飾で指定しなければいけない</para>
         /// <para>例) Hermes.UI.Sample.UISampleScene, Assembly-CSharp</para>
         /// </summary>
-        /// <param name="viewName">View名</param>
+        /// <param name="viewType">Viewタイプ</param>
         /// <param name="resumeDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        public async UniTask LoadAsync(string viewName, bool resumeDialog, object options = null, CancellationToken cancellationToken = default)
+        public async UniTask LoadAsync(string viewType, bool resumeDialog, object options = null, CancellationToken cancellationToken = default)
         {
-            var viewType = Type.GetType(viewName);
-            await LoadAsync(viewType, resumeDialog, options, cancellationToken);
+            var type = Type.GetType(viewType);
+            await LoadAsync(type.Name, type, resumeDialog, options, cancellationToken);
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync(Type viewType, object options = null, CancellationToken cancellationToken = default)
         {
-            await LoadAsync(viewType, false, options, cancellationToken);
+            await LoadAsync(viewType.Name, viewType, false, options, cancellationToken);
         }
 
         /// <summary>
@@ -117,17 +119,50 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync(Type viewType, bool resumeDialog, object options = null, CancellationToken cancellationToken = default)
         {
-            var uniTask = this.GetType()
-                .GetMethod(
-                    "LoadAsync",
-                    BindingFlags.Public | BindingFlags.Instance,
-                    null,
-                    new Type[] { typeof(bool), typeof(object), typeof(CancellationToken) },
-                    null
-                )
-                .MakeGenericMethod(viewType)
-                .Invoke(this, new object[] { resumeDialog, options, cancellationToken });
-            await (UniTask)uniTask;
+            await LoadAsync(viewType.Name, viewType, resumeDialog, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// </summary>
+        /// <param name="viewName">View名</param>
+        /// <param name="viewType">View</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync(string viewName, Type viewType, object options = null, CancellationToken cancellationToken = default)
+        {
+            await LoadAsync(viewName, viewType, false, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync(View名から呼び出し)
+        /// </summary>
+        /// <param name="viewName">View名</param>
+        /// <param name="viewType">View</param>
+        /// <param name="resumeDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync(string viewName, Type viewType, bool resumeDialog, object options = null, CancellationToken cancellationToken = default)
+        {
+            var methods = this.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(x => x.Name == "LoadAsync" && x.IsGenericMethod);
+            foreach (var method in methods)
+            {
+                var parameters = method.GetParameters();
+                if (parameters.Length == 4 &&
+                    parameters[0].ParameterType == typeof(string) &&
+                    parameters[1].ParameterType == typeof(bool) &&
+                    parameters[2].ParameterType == typeof(object) &&
+                    parameters[3].ParameterType == typeof(CancellationToken))
+                {
+                    var uniTask = method
+                        .MakeGenericMethod(viewType)
+                        .Invoke(this, new object[] { viewName, resumeDialog, options, cancellationToken });
+                    await (UniTask)uniTask;
+                    return;
+                }
+            }
         }
 
         /// <summary>
@@ -139,7 +174,20 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync<T>(object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
-            await LoadAsync<T>(false, options, cancellationToken);
+            await LoadAsync<T>(typeof(T).Name, false, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync
+        /// </summary>
+        /// <typeparam name="T">ViewBase</typeparam>
+        /// <param name="viewName">View名</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync<T>(string viewName, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        {
+            await LoadAsync<T>(viewName, false, options, cancellationToken);
         }
 
         /// <summary>
@@ -152,13 +200,36 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask LoadAsync<T>(bool resumeDialog, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
+            await LoadAsync<T>(typeof(T).Name, resumeDialog, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// ViewBaseを継承したクラスのLoadAsync
+        /// </summary>
+        /// <typeparam name="T">ViewBase</typeparam>
+        /// <param name="viewName">View名</param>
+        /// <param name="resumeDialog">遷移先のシーンが存在している時に出ていたダイアログをロードするフラグ</param>
+        /// <param name="options">オプション</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>UniTask</returns>
+        public async UniTask LoadAsync<T>(string viewName, bool resumeDialog, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        {
             var type = typeof(T);
+
+            // Screenがない時にDialogだったらエラー
+            if (CurrentScene == null && type.IsSubclassOf(typeof(Dialog)))
+            {
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
+                Debug.LogError("The scene does not yet exist, but it is trying to load the dialog.");
+#endif
+                return;
+            }
 
             // バリアON
             barrier.SetActive(true);
 
             // ロードダイアログリスト
-            var loadDialogList = new List<KeyValuePair<Type, object>>();
+            var loadDialogList = new List<KeyValuePair<string, KeyValuePair<Type, object>>>();
 
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
@@ -168,18 +239,23 @@ namespace Hermes.UI
                 if (CurrentView is Dialog)
                 {
                     var stackType = new Stack<Type>();
+                    var stackName = new Stack<string>();
                     var count = this.stackType.Count;
                     for (int i = 0; i < count; i++)
                     {
                         stackType.Push(this.stackType.Pop());
+                        stackName.Push(this.stackName.Pop());
                         var t = stackType.Peek();
                         if (t.IsSubclassOf(typeof(Screen)))
                             break;
-                        unloadDialogList.Add((ViewBase)FindObjectOfType(t));
+                        unloadDialogList.Add((ViewBase)dialogRoot.Find(stackName.Peek()).GetComponent(t));
                     }
                     count = stackType.Count;
                     for (int i = 0; i < count; i++)
+                    {
                         this.stackType.Push(stackType.Pop());
+                        this.stackName.Push(stackName.Pop());
+                    }
                 }
                 // 既にシーンが存在した時
                 if (stackType.Contains(type))
@@ -188,16 +264,18 @@ namespace Hermes.UI
                     if (resumeDialog)
                     {
                         var stackType = new Stack<Type>();
+                        var stackName = new Stack<string>();
                         var stackOptions = new Stack<object>();
                         var count = this.stackType.Count;
                         for (int i = 0; i < count; i++)
                         {
-                            stackName.Pop();
                             var t = this.stackType.Pop();
+                            var n = this.stackName.Pop();
                             var o = this.stackOptions.Pop();
                             if (t == type)
                                 break;
                             stackType.Push(t);
+                            stackName.Push(n);
                             stackOptions.Push(o);
                         }
                         count = stackType.Count;
@@ -205,7 +283,7 @@ namespace Hermes.UI
                         {
                             if (stackType.Peek().IsSubclassOf(typeof(Screen)))
                                 break;
-                            loadDialogList.Add(new KeyValuePair<Type, object>(stackType.Pop(), stackOptions.Pop()));
+                            loadDialogList.Add(new KeyValuePair<string, KeyValuePair<Type, object>>(stackName.Pop(), new KeyValuePair<Type, object>(stackType.Pop(), stackOptions.Pop())));
                         }
                     }
                     // Stackから外していく
@@ -225,13 +303,14 @@ namespace Hermes.UI
                 // まだCurrentSceneがなかったらUnloadはしない
                 if (CurrentScene != null)
                 {
-                    await OnUnloadScreen(CurrentScene, unloadDialogList, cancellationToken);
+                    await OnUnloadScreen(currentSceneName, CurrentScene, unloadDialogList, cancellationToken);
                 }
                 // シーンロード
-                await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+                await SceneManager.LoadSceneAsync(viewName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
                 
-                CurrentScene = FindObjectOfType<T>() as Screen;
+                CurrentScene = GameObject.Find(viewName).GetComponent<T>() as Screen;
                 CurrentView = CurrentScene;
+                currentSceneName = viewName;
             }
             // Dialog
             else
@@ -239,19 +318,20 @@ namespace Hermes.UI
                 dialogBG.SetActive(true);
 
                 // ロードアセット
-                var dialog = await AssetManager.LoadAsync<GameObject>(type.Name, CurrentView.gameObject, cancellationToken);
+                var dialog = await AssetManager.LoadAsync<GameObject>(viewName, CurrentView.gameObject, cancellationToken);
 
                 // DialogBGの位置を上げる
                 dialogBG.transform.SetAsLastSibling();
 
                 // Instantiate
                 CurrentView = Instantiate(dialog, dialogRoot).GetComponent<T>();
+                CurrentView.name = viewName;
             }
 
-            StackPush(type, options);
+            StackPush(viewName, type, options);
 
             if (CurrentView == null)
-                throw new Exception($"{typeof(T).Name} is Null");
+                throw new Exception($"{viewName} is Null");
 
             // Initialize & Load
             CurrentView.Initialize();
@@ -264,7 +344,7 @@ namespace Hermes.UI
 
             // ダイアログがあったらロード
             foreach (var dialog in loadDialogList)
-                await LoadAsync(dialog.Key, dialog.Value, cancellationToken);
+                await LoadAsync(dialog.Key, dialog.Value.Key, false, dialog.Value.Value, cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
@@ -294,20 +374,21 @@ namespace Hermes.UI
                     dialogList.Add((ViewBase)FindObjectOfType(t));
                 }
             }
-            Type type = CurrentScene.GetType();
+            var type = CurrentScene.GetType();
+            var name = stackName.Peek();
             // まだCurrentSceneがなかったらUnloadはしない
             if (CurrentScene != null)
             {
-                await OnUnloadScreen(CurrentScene, dialogList, cancellationToken);
+                await OnUnloadScreen(name, CurrentScene, dialogList, cancellationToken);
             }
             // シーンロード
-            await SceneManager.LoadSceneAsync(type.Name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+            await SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
 
-            CurrentScene = FindObjectOfType(type) as Screen;
+            CurrentScene = GameObject.Find(name).GetComponent(type) as Screen;
             CurrentView = CurrentScene;
 
             if (CurrentView == null)
-                throw new Exception($"{type.Name} is Null");
+                throw new Exception($"{name} is Null");
 
             // Initialize & Load
             CurrentView.Initialize();
@@ -338,8 +419,10 @@ namespace Hermes.UI
             }
             if (stackType.Count > 1)
             {
-                StackPop();
-                await BackProcess(CurrentView is Screen, cancellationToken);
+                var viewName = stackName.Pop();
+                stackType.Pop();
+                stackOptions.Pop();
+                await BackProcess(viewName, CurrentView is Screen, cancellationToken);
             }
             else
             {
@@ -359,23 +442,26 @@ namespace Hermes.UI
         /// <summary>
         /// 前画面表示処理
         /// </summary>
+        /// <param name="viewName">ViewName</param>
         /// <param name="isScreen">Screenならtrue</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        async UniTask BackProcess(bool isScreen, CancellationToken cancellationToken)
+        async UniTask BackProcess(string viewName, bool isScreen, CancellationToken cancellationToken)
         {
             var name = stackName.Peek();
             var type = stackType.Peek();
             var options = stackOptions.Peek();
+            Debug.Log($"BackProcess : viewName = {viewName} : name = {name}");
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
             {
                 if (isScreen)
                 {
-                    await OnUnloadScreen(CurrentScene, cancellationToken);
+                    await OnUnloadScreen(viewName, CurrentScene, cancellationToken);
                     await SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
-                    CurrentScene = FindObjectOfType(type) as Screen;
+                    CurrentScene = GameObject.Find(name).GetComponent(type) as Screen;
                     CurrentView = CurrentScene;
+                    currentSceneName = name;
                 }
                 else
                 {
@@ -392,10 +478,10 @@ namespace Hermes.UI
                     // stackを一時的に抜いておく
                     StackPop();
 
-                    await BackProcess(true, cancellationToken);
+                    await BackProcess(viewName, true, cancellationToken);
 
                     // stackを戻す
-                    StackPush(type, options);
+                    StackPush(name, type, options);
 
                     // ロードアセット
                     var dialog = await AssetManager.LoadAsync<GameObject>(name, CurrentView.gameObject, cancellationToken);
@@ -408,6 +494,7 @@ namespace Hermes.UI
 
                     // Instantiate
                     CurrentView = (ViewBase)Instantiate(dialog, dialogRoot).GetComponent(type);
+                    CurrentView.name = name;
                 }
                 else
                 {
@@ -431,27 +518,30 @@ namespace Hermes.UI
         /// <summary>
         /// スクリーン削除
         /// </summary>
+        /// <param name="viewName">ViewName</param>
         /// <param name="viewBase">ViewBase</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        async UniTask OnUnloadScreen(ViewBase viewBase, CancellationToken cancellationToken)
+        async UniTask OnUnloadScreen(string viewName, ViewBase viewBase, CancellationToken cancellationToken)
         {
             await viewBase.OnEnd();
             // シーン遷移出現アニメーション
             await OnEnableSceneTransition();
             await viewBase.OnUnload();
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
-            await SceneManager.UnloadSceneAsync(viewBase.GetType().Name).ToUniTask(cancellationToken: cancellationToken);
+            Debug.Log($"OnUnloadScreen : {viewName}");
+            await SceneManager.UnloadSceneAsync(viewName).ToUniTask(cancellationToken: cancellationToken);
         }
 
         /// <summary>
         /// スクリーン削除
         /// </summary>
+        /// <param name="viewName">ViewName</param>
         /// <param name="viewBase">ViewBase</param>
         /// <param name="dialogList">DialogList</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        async UniTask OnUnloadScreen(ViewBase viewBase, List<ViewBase> dialogList, CancellationToken cancellationToken)
+        async UniTask OnUnloadScreen(string viewName, ViewBase viewBase, List<ViewBase> dialogList, CancellationToken cancellationToken)
         {
             await viewBase.OnEnd();
             // シーン遷移出現アニメーション
@@ -471,7 +561,8 @@ namespace Hermes.UI
                 dialogBG.SetActive(false);
             }
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
-            await SceneManager.UnloadSceneAsync(viewBase.GetType().Name).ToUniTask(cancellationToken: cancellationToken);
+            Debug.Log($"OnUnloadScreen : {viewName}");
+            await SceneManager.UnloadSceneAsync(viewName).ToUniTask(cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -525,10 +616,10 @@ namespace Hermes.UI
             var type = typeof(T);
             // シーンロード
             var instance = await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
-            var screen = FindObjectOfType(type) as SubScene;
+            var screen = GameObject.Find(sceneName).GetComponent(type) as SubScene;
 
             if (screen == null)
-                throw new Exception($"{typeof(T).Name} is Null");
+                throw new Exception($"{sceneName} is Null");
 
             SubSceneList.Add(screen);
             subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(sceneName, instance));
@@ -610,20 +701,21 @@ namespace Hermes.UI
             var count = this.stackType.Count;
             for (int i = 0; i < count; i++)
             {
-                stackName.Pop();
-                stackOptions.Pop();
-                var t = stackType.Pop();
+                var t = stackType.Peek();
                 if (t.IsSubclassOf(typeof(Screen)))
                     break;
-                OnUnloadDialog((ViewBase)FindObjectOfType(t), false, cancellationToken).Forget();
+                var n = stackName.Peek();
+                StackPop();
+                OnUnloadDialog((ViewBase)dialogRoot.Find(n).GetComponent(t), false, cancellationToken).Forget();
             }
             dialogBG.SetActive(false);
 
             // シーン
-            await OnUnloadScreen(CurrentScene, cancellationToken);
+            await OnUnloadScreen(stackName.Peek(), CurrentScene, cancellationToken);
 
             CurrentScene = null;
             CurrentView = null;
+            currentSceneName = null;
 
             ClearStack();
 
@@ -644,11 +736,12 @@ namespace Hermes.UI
         /// <summary>
         /// Stack push
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="options"></param>
-        void StackPush(Type type, object options)
+        /// <param name="name">Name</param>
+        /// <param name="type">Type</param>
+        /// <param name="options">Options</param>
+        void StackPush(string name, Type type, object options)
         {
-            stackName.Push(type.Name);
+            stackName.Push(name);
             stackType.Push(type);
             stackOptions.Push(options);
         }
