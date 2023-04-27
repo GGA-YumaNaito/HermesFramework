@@ -33,15 +33,13 @@ namespace Hermes.UI
         [SerializeField] string currentSceneName;
         /// <summary>バリア</summary>
         [SerializeField] GameObject barrier;
-        /// <summary>ダイアログ用BG</summary>
-        [SerializeField] GameObject dialogBG;
-        /// <summary>ダイアログRoot</summary>
-        [SerializeField] Transform dialogRoot;
         /// <summary>シーン遷移アニメーション</summary>
         [SerializeField] UITransition sceneTransition;
 
-        /// <summary>SubScene</summary>
-        [SerializeField] UIManagerSubScene subScene = new UIManagerSubScene();
+        /// <summary>UIDialog</summary>
+        [SerializeField] UIManagerDialog uiDialog = new UIManagerDialog();
+        /// <summary>UISubScene</summary>
+        [SerializeField] UIManagerSubScene uiSubScene = new UIManagerSubScene();
 
         /// <summary>遷移StackName</summary>
         [SerializeField] List<string> stackName = new List<string>();
@@ -225,35 +223,12 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            // ロードダイアログリスト
-            var loadDialogList = new List<KeyValuePair<string, KeyValuePair<Type, object>>>();
-
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
             {
-                var unloadDialogList = new List<ViewBase>();
-                // 現在の最新がダイアログだったら削除する
-                if (CurrentView is Dialog)
-                {
-                    var stackType = new Stack<Type>();
-                    var stackName = new Stack<string>();
-                    var count = this.stackType.Count;
-                    for (int i = 0; i < count; i++)
-                    {
-                        stackType.Push(this.stackType.Pop());
-                        stackName.Push(this.stackName.Pop());
-                        var t = stackType.Peek();
-                        if (t.IsSubclassOf(typeof(Screen)))
-                            break;
-                        unloadDialogList.Add((ViewBase)dialogRoot.Find(stackName.Peek()).GetComponent(t));
-                    }
-                    count = stackType.Count;
-                    for (int i = 0; i < count; i++)
-                    {
-                        this.stackType.Push(stackType.Pop());
-                        this.stackName.Push(stackName.Pop());
-                    }
-                }
+                // ロードダイアログリスト
+                var loadDialogList = new List<KeyValuePair<string, KeyValuePair<Type, object>>>();
+
                 // 既にシーンが存在した時
                 if (stackType.Contains(type))
                 {
@@ -300,7 +275,8 @@ namespace Hermes.UI
                 // まだCurrentSceneがなかったらUnloadはしない
                 if (CurrentScene != null)
                 {
-                    await OnUnloadScreen(currentSceneName, CurrentScene, unloadDialogList, cancellationToken);
+                    await OnUnloadScreen(currentSceneName, CurrentScene, cancellationToken);
+                    await uiDialog.AllUnloadAsync(cancellationToken);
                 }
                 // シーンロード
                 await SceneManager.LoadSceneAsync(viewName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
@@ -308,40 +284,30 @@ namespace Hermes.UI
                 CurrentScene = GameObject.Find(viewName).GetComponent<T>() as Screen;
                 CurrentView = CurrentScene;
                 currentSceneName = viewName;
+
+                if (CurrentView == null)
+                    throw new Exception($"{viewName} is Null");
+
+                // Initialize & Load
+                CurrentView.Initialize();
+                await CurrentView.OnLoad(options);
+                if (CurrentView is Screen)
+                    // シーン遷移退出アニメーション
+                    await OnDisableSceneTransition();
+                await CurrentView.OnDisplay();
+                await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+
+                // ダイアログがあったらロード
+                foreach (var dialog in loadDialogList)
+                    await LoadAsync(dialog.Key, dialog.Value.Key, false, dialog.Value.Value, cancellationToken);
             }
             // Dialog
             else
             {
-                dialogBG.SetActive(true);
-
-                // ロードアセット
-                var dialog = await AssetManager.LoadAsync<GameObject>(viewName, CurrentView.gameObject, cancellationToken);
-
-                // DialogBGの位置を上げる
-                dialogBG.transform.SetAsLastSibling();
-
-                // Instantiate
-                CurrentView = Instantiate(dialog, dialogRoot).GetComponent<T>();
-                CurrentView.name = viewName;
+                CurrentView = await uiDialog.LoadAsync<T>(viewName, CurrentView.gameObject, options, cancellationToken);
             }
 
             StackPush(viewName, type, options);
-
-            if (CurrentView == null)
-                throw new Exception($"{viewName} is Null");
-
-            // Initialize & Load
-            CurrentView.Initialize();
-            await CurrentView.OnLoad(options);
-            if (CurrentView is Screen)
-                // シーン遷移退出アニメーション
-                await OnDisableSceneTransition();
-            await CurrentView.OnDisplay();
-            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
-
-            // ダイアログがあったらロード
-            foreach (var dialog in loadDialogList)
-                await LoadAsync(dialog.Key, dialog.Value.Key, false, dialog.Value.Value, cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
@@ -356,8 +322,6 @@ namespace Hermes.UI
         {
             // バリアON
             barrier.SetActive(true);
-            // Screen
-            var dialogList = new List<ViewBase>();
             // 現在の最新がダイアログだったら削除する
             if (CurrentView is Dialog)
             {
@@ -367,8 +331,8 @@ namespace Hermes.UI
                     var t = stackType.Peek();
                     if (t.IsSubclassOf(typeof(Screen)))
                         break;
+                    var n = stackName.Peek();
                     StackPop();
-                    dialogList.Add((ViewBase)FindObjectOfType(t));
                 }
             }
             var type = CurrentScene.GetType();
@@ -376,7 +340,8 @@ namespace Hermes.UI
             // まだCurrentSceneがなかったらUnloadはしない
             if (CurrentScene != null)
             {
-                await OnUnloadScreen(name, CurrentScene, dialogList, cancellationToken);
+                await OnUnloadScreen(name, CurrentScene, cancellationToken);
+                await uiDialog.AllUnloadAsync(cancellationToken);
             }
             // シーンロード
             await SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
@@ -430,8 +395,6 @@ namespace Hermes.UI
                 Application.Quit();
 #endif
             }
-            // ダイアログが無かったらバリアをOFFにする
-            dialogBG.SetActive(CurrentView is Dialog);
 
             barrier.SetActive(false);
         }
@@ -448,7 +411,9 @@ namespace Hermes.UI
             var name = stackName.Peek();
             var type = stackType.Peek();
             var options = stackOptions.Peek();
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             Debug.Log($"BackProcess : viewName = {viewName} : name = {name}");
+#endif
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
             {
@@ -462,8 +427,8 @@ namespace Hermes.UI
                 }
                 else
                 {
-                    await OnUnloadDialog(CurrentView, true, cancellationToken);
-                    CurrentView = (ViewBase)FindObjectOfType(type);
+                    await uiDialog.UnloadAsync(true, cancellationToken);
+                    CurrentView = (ViewBase)GameObject.Find(name).GetComponent(type);
                     return;
                 }
             }
@@ -480,23 +445,14 @@ namespace Hermes.UI
                     // stackを戻す
                     StackPush(name, type, options);
 
-                    // ロードアセット
-                    var dialog = await AssetManager.LoadAsync<GameObject>(name, CurrentView.gameObject, cancellationToken);
-
-                    // DialogBGをON
-                    dialogBG.SetActive(true);
-
-                    // DialogBGの位置を上げる
-                    dialogBG.transform.SetAsLastSibling();
-
                     // Instantiate
-                    CurrentView = (ViewBase)Instantiate(dialog, dialogRoot).GetComponent(type);
-                    CurrentView.name = name;
+                    CurrentView = await uiDialog.LoadAsync(name, type, CurrentView.gameObject, options, cancellationToken);
+                    return;
                 }
                 else
                 {
-                    await OnUnloadDialog(CurrentView, true, cancellationToken);
-                    CurrentView = (ViewBase)FindObjectOfType(type);
+                    await uiDialog.UnloadAsync(true, cancellationToken);
+                    CurrentView = (ViewBase)GameObject.Find(name).GetComponent(type);
                     return;
                 }
             }
@@ -526,63 +482,10 @@ namespace Hermes.UI
             await OnEnableSceneTransition();
             await viewBase.OnUnload();
             await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             Debug.Log($"OnUnloadScreen : {viewName}");
+#endif
             await SceneManager.UnloadSceneAsync(viewName).ToUniTask(cancellationToken: cancellationToken);
-        }
-
-        /// <summary>
-        /// スクリーン削除
-        /// </summary>
-        /// <param name="viewName">ViewName</param>
-        /// <param name="viewBase">ViewBase</param>
-        /// <param name="dialogList">DialogList</param>
-        /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>UniTask</returns>
-        async UniTask OnUnloadScreen(string viewName, ViewBase viewBase, List<ViewBase> dialogList, CancellationToken cancellationToken)
-        {
-            await viewBase.OnEnd();
-            // シーン遷移出現アニメーション
-            await OnEnableSceneTransition();
-            await viewBase.OnUnload();
-            if (dialogList != null && dialogList.Count > 0)
-            {
-                foreach (var dialog in dialogList)
-                {
-                    await dialog.OnUnload();
-                    Destroy(dialog.gameObject);
-                }
-                foreach (var dialog in dialogList)
-                {
-                    await UniTask.WaitUntil(() => dialog == null, cancellationToken: cancellationToken);
-                }
-                dialogBG.SetActive(false);
-            }
-            await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
-            Debug.Log($"OnUnloadScreen : {viewName}");
-            await SceneManager.UnloadSceneAsync(viewName).ToUniTask(cancellationToken: cancellationToken);
-        }
-
-        /// <summary>
-        /// ダイアログ削除
-        /// </summary>
-        /// <param name="viewBase">ViewBase</param>
-        /// <param name="isBack">前画面に戻る処理ならtrue</param>
-        /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>UniTask</returns>
-        async UniTask OnUnloadDialog(ViewBase viewBase, bool isBack, CancellationToken cancellationToken = default)
-        {
-            if (isBack)
-                await viewBase.OnEnd();
-            await viewBase.OnUnload();
-            if (isBack)
-                await UniTask.WaitUntil(() => viewBase.Status.Value == eStatus.End, cancellationToken: cancellationToken);
-            Destroy(viewBase.gameObject);
-            if (isBack)
-            {
-                // DialogBGの位置を下げる
-                var dialogBGTransform = dialogBG.transform;
-                dialogBGTransform.SetSiblingIndex(dialogBGTransform.GetSiblingIndex() - 1);
-            }
         }
 
         /// <summary>
@@ -610,7 +513,7 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            var scene = await subScene.LoadAsync<T>(sceneName, options, cancellationToken);
+            var scene = await uiSubScene.LoadAsync<T>(sceneName, options, cancellationToken);
             await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
@@ -640,7 +543,7 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            await subScene.UnloadAsync(sceneName, cancellationToken);
+            await uiSubScene.UnloadAsync(sceneName, cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
@@ -657,20 +560,10 @@ namespace Hermes.UI
             barrier.SetActive(true);
 
             // サブシーン
-            await subScene.AllUnloadAsync(cancellationToken);
+            await uiSubScene.AllUnloadAsync(cancellationToken);
 
             // ダイアログ
-            var count = this.stackType.Count;
-            for (int i = 0; i < count; i++)
-            {
-                var t = stackType.Peek();
-                if (t.IsSubclassOf(typeof(Screen)))
-                    break;
-                var n = stackName.Peek();
-                StackPop();
-                OnUnloadDialog((ViewBase)dialogRoot.Find(n).GetComponent(t), false, cancellationToken).Forget();
-            }
-            dialogBG.SetActive(false);
+            await uiDialog.AllUnloadAsync(cancellationToken);
 
             // シーン
             await OnUnloadScreen(stackName.Peek(), CurrentScene, cancellationToken);
