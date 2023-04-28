@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Samples/HermesFramework/UIManager/Scenes/UIManagerSample3.unity
     guid: 89339681c22db4d66849f59744d2231c
+  - enabled: 1
+    path: Assets/Samples/HermesFramework/UIManager/Scenes/UIManagerSampleOther1.unity
+    guid: 85c640b5b53d44df98b238fb6359d6d0
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 6d63631d0d8e90346bec98381c1cf613, type: 2}
     com.unity.localization.settings: {fileID: 11400000, guid: 95d04639b6cb14111a75869bd726a255, type: 2}
