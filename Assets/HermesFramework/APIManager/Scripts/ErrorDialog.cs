@@ -89,35 +89,22 @@ namespace Hermes.API
         public override UniTask OnLoad(object options)
         {
             this.options = options as Options;
-            SetOrInactive(titleText, this.options.Title);
-            SetOrInactive(bodyText, this.options.Body);
-            SetOrInactive(errorText, this.options.Error);
+            titleText.SetTextLocalizeOrInactive(this.options.Title);
+            bodyText.SetTextLocalizeOrInactive(this.options.Body);
+            errorText.SetTextLocalizeOrInactive(this.options.Error);
             retryButton.SetActive(this.options.IsRetry);
             if (this.options.IsRetry)
             {
-                buttonText1.text = LocalizeManager.Instance.GetValue(retryButtonTextKey);
-                buttonText2.text = LocalizeManager.Instance.GetValue(titleButtonTextKey);
+                buttonText1.SetTextLocalize(retryButtonTextKey);
+                buttonText2.SetTextLocalize(titleButtonTextKey);
             }
             else
             {
-                buttonText1.text = LocalizeManager.Instance.GetValue(titleButtonTextKey);
+                buttonText1.SetTextLocalize(titleButtonTextKey);
                 buttonText2.gameObject.SetActive(false);
             }
             ClickState = eClickState.Wait;
             return base.OnLoad(options);
-        }
-
-        /// <summary>
-        /// 値があったらテキストを設定し、なかったら非活性にする
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="value"></param>
-        void SetOrInactive(TextMeshProUGUI text, string value)
-        {
-            if (value.IsNullOrEmpty())
-                text.gameObject.SetActive(false);
-            else
-                text.text = LocalizeManager.Instance.GetValue(value);
         }
 
         /// <summary>
