@@ -38,6 +38,11 @@ namespace Hermes.UI
         /// <summary>遷移StackOptions</summary>
         Stack<object> stackOptions = new Stack<object>();
 
+        /// <summary>LocalizeKey ゲーム終了タイトルテキスト</summary>
+        [SerializeField] string quitTitleKey = "QUIT_TITLE";
+        /// <summary>LocalizeKey ゲーム終了本文テキスト</summary>
+        [SerializeField] string quitBodyKey = "QUIT_BODY";
+
         /// <summary>
         /// 駆動
         /// </summary>
@@ -348,12 +353,22 @@ namespace Hermes.UI
             }
             else
             {
-                // スタックが無かったらゲーム終了
+                // スタックが無かったらダイアログ表示
+                await LoadAsync<CommonDialog>(new CommonDialog.Options()
+                {
+                    Title = quitTitleKey,
+                    Body = quitBodyKey,
+                    ButtonType = CommonDialog.eButtonType.YesOrNo,
+                    OnClickAction = () =>
+                    {
+                        // ゲーム終了
 #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
+                        UnityEditor.EditorApplication.isPlaying = false;
 #else
-                Application.Quit();
+                        Application.Quit();
 #endif
+                    }
+                });
             }
 
             barrier.SetActive(false);
