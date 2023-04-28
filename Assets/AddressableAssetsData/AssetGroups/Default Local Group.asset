@@ -86,6 +86,10 @@ MonoBehaviour:
     m_Address: ErrorDialog
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 7217e4c6598e5429c9dae49f040c6d5a
+    m_Address: CommonDialog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1cd4bf7deae1cdd4ea4ef1d5b0e55302, type: 2}
   m_SchemaSet:
