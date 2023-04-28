@@ -35,6 +35,26 @@ MonoBehaviour:
     m_Key: RETRY
     m_Metadata:
       m_Items: []
+  - m_Id: 3280036634288128
+    m_Key: QUIT_TITLE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3280067131072512
+    m_Key: QUIT_BODY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3280644535738368
+    m_Key: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3280667407278080
+    m_Key: YES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3280678920642560
+    m_Key: NO
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
