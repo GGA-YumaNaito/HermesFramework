@@ -3,6 +3,8 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mobcast.Coffee.Transition;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 namespace Hermes.UI.UIManagerParts
@@ -21,6 +23,9 @@ namespace Hermes.UI.UIManagerParts
         [SerializeField] string currentScreenName;
         /// <summary>シーン遷移アニメーション</summary>
         [SerializeField] UITransition sceneTransition;
+
+        /// <summary>SceneInstance</summary>
+        SceneInstance sceneInstance;
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync
@@ -47,8 +52,7 @@ namespace Hermes.UI.UIManagerParts
         public async UniTask<ViewBase> LoadAsync(string viewName, Type type, object options = null, CancellationToken cancellationToken = default)
         {
             // シーンロード
-            await SceneManager.LoadSceneAsync(viewName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
-            //var instance = await Addressables.LoadSceneAsync(viewName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
+            sceneInstance = await Addressables.LoadSceneAsync(viewName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
 
             CurrentScreen = (ViewBase)GameObject.Find(viewName).GetComponent(type);
             currentScreenName = viewName;
@@ -74,12 +78,15 @@ namespace Hermes.UI.UIManagerParts
         /// <returns>UniTask</returns>
         public async UniTask UnloadAsync(CancellationToken cancellationToken)
         {
+            if (CurrentScreen == null)
+                throw new Exception("CurrentScreen is Null");
+
             await CurrentScreen.OnEnd();
             // シーン遷移出現アニメーション
             await OnEnableSceneTransition();
             await CurrentScreen.OnUnload();
             await UniTask.WaitUntil(() => CurrentScreen.Status.Value == eStatus.End, cancellationToken: cancellationToken);
-            await SceneManager.UnloadSceneAsync(currentScreenName).ToUniTask(cancellationToken: cancellationToken);
+            await Addressables.UnloadSceneAsync(sceneInstance).ToUniTask(cancellationToken: cancellationToken);
 
             CurrentScreen = null;
             currentScreenName = null;
