@@ -336,7 +336,6 @@ namespace Hermes.API
                     Instance.retryNum = 0;
                     // リセットフラグ起動.
                     Instance.isReset = true;
-                    // TODO: 共通の汎用ダイアログを作るか否か
                     // ダイアログ.
                     ErrorDialog dialog = null;
                     if (isFailed)
