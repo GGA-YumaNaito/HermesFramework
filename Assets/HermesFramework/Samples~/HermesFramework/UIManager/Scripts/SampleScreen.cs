@@ -5,6 +5,8 @@ namespace Hermes.UI.Sample
 {
     public class SampleScreen : MonoBehaviour
     {
+        [SerializeField] string otherScreenName;
+
         public async void OnClickSample1()
         {
             await UIManager.Instance.LoadAsync<UIManagerSample1>(new UIManagerSample1.Options() { sumpleText = "UIManagerSample1" }, this.GetCancellationTokenOnDestroy());
@@ -38,6 +40,14 @@ namespace Hermes.UI.Sample
         public async void OnClickReloadSceneButton()
         {
             await UIManager.Instance.ReloadSceneAsync();
+        }
+
+        public async void OnClickSampleOther()
+        {
+            if (otherScreenName.IsNullOrEmpty())
+                await UIManager.Instance.LoadAsync<UIManagerSampleOther>(new UIManagerSampleOther.Options() { sumpleText = "UIManagerSampleOther" }, this.GetCancellationTokenOnDestroy());
+            else
+                await UIManager.Instance.LoadAsync<UIManagerSampleOther>(otherScreenName, new UIManagerSampleOther.Options() { sumpleText = $"UIManagerSampleOther : {otherScreenName}" }, this.GetCancellationTokenOnDestroy());
         }
     }
 }
