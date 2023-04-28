@@ -31,8 +31,16 @@ namespace Hermes.API
         private static ulong sequenceId = 0;
         /// <summary>リセットフラグ.</summary>
         private bool isReset = false;
-        /// <summary>起動シーン名</summary>
-        [SerializeField] string launchName = "Launch.LaunchScene, Assembly-CSharp";
+        /// <summary>タイトルシーン名</summary>
+        [SerializeField] string titleName = "Title.TitleScene, Assembly-CSharp";
+        /// <summary>LocalizeKey API error時のタイトル</summary>
+        [SerializeField] string errorTitleAPIKey = "TITLE_API_ERROR";
+        /// <summary>LocalizeKey HTTP error時のタイトル</summary>
+        [SerializeField] string errorTitleHttpKey = "TITLE_HTTP_ERROR";
+        /// <summary>LocalizeKey error時の本文</summary>
+        [SerializeField] string errorBodyKey = "ERROR_BODY";
+        /// <summary>LocalizeKey タイトルに戻る</summary>
+        [SerializeField] string backToTitleKey = "BACK_TO_TITLE";
 
         // TODO:シーケンスIDをどう扱うかを考える
 
@@ -288,10 +296,10 @@ namespace Hermes.API
                     {
                         var json = GzipBase64.Decompress(request.downloadHandler.text);
                         var data = JsonUtility.FromJson<T2>(json);
-                        dialog = await ErrorDialog.Create("APIエラー", "接続が正常に行われておりません。", data.ErrorCode.Label(), true);
+                        dialog = await ErrorDialog.Create(Instance.errorTitleAPIKey, Instance.errorBodyKey, data.ErrorCode.Label(), true);
                     }
                     else
-                        dialog = await ErrorDialog.Create("HTTPエラー", "接続が正常に行われておりません。", request.error, true);
+                        dialog = await ErrorDialog.Create(Instance.errorTitleHttpKey, Instance.errorBodyKey, request.error, true);
                     await UniTask.WaitUntil(() => dialog.ClickStateWait());
                     if (dialog.ClickState == ErrorDialog.eClickState.Retry)
                     {
@@ -314,7 +322,7 @@ namespace Hermes.API
                         // 全てアンロード.
                         await UIManager.Instance.AllUnloadAsync();
                         // タイトルシーン.
-                        await UIManager.Instance.LoadAsync(Instance.launchName);
+                        await UIManager.Instance.LoadAsync(Instance.titleName);
                     }
                 }
                 else
@@ -335,10 +343,10 @@ namespace Hermes.API
                     {
                         var json = GzipBase64.Decompress(request.downloadHandler.text);
                         var data = JsonUtility.FromJson<T2>(json);
-                        dialog = await ErrorDialog.Create(title: "タイトルに戻ります", error: data.ErrorCode.Label(), isRetry: false);
+                        dialog = await ErrorDialog.Create(title: Instance.backToTitleKey, error: data.ErrorCode.Label(), isRetry: false);
                     }
                     else
-                        dialog = await ErrorDialog.Create(title: "タイトルに戻ります", error: request.error, isRetry: false);
+                        dialog = await ErrorDialog.Create(title: Instance.backToTitleKey, error: request.error, isRetry: false);
                     await UniTask.WaitWhile(() => dialog.ClickStateWait());
                     // 失敗コールバックを実行.
                     if (isFailed)
@@ -351,7 +359,7 @@ namespace Hermes.API
                     // 全てアンロード.
                     await UIManager.Instance.AllUnloadAsync();
                     // タイトルシーン.
-                    await UIManager.Instance.LoadAsync(Instance.launchName);
+                    await UIManager.Instance.LoadAsync(Instance.titleName);
                 }
             }
             else
