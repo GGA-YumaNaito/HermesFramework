@@ -18,7 +18,7 @@ namespace Hermes.Prefs
         /// </summary>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
-        public static void Set(string key, object value)
+        public void Set(string key, object value)
         {
             if (value == null)
                 return;
@@ -32,7 +32,7 @@ namespace Hermes.Prefs
         /// <typeparam name="T">T</typeparam>
         /// <param name="key">Key</param>
         /// <returns>Value</returns>
-        public static T Load<T>(string key)
+        public T Load<T>(string key)
         {
             var json = PlayerPrefs.GetString(key, string.Empty);
             return JsonUtility.FromJson<T>(json);
@@ -41,7 +41,7 @@ namespace Hermes.Prefs
         /// <summary>
         /// 保存
         /// </summary>
-        public static void Save()
+        public void Save()
         {
             PlayerPrefs.Save();
         }
@@ -50,7 +50,7 @@ namespace Hermes.Prefs
         /// 存在していたら削除
         /// </summary>
         /// <param name="key">Key</param>
-        public static void DeleteKey(string key)
+        public void DeleteKey(string key)
         {
             if (!PlayerPrefs.HasKey(key))
                 return;
@@ -60,7 +60,7 @@ namespace Hermes.Prefs
         /// <summary>
         /// 全削除
         /// </summary>
-        public static void DeleteAll()
+        public void DeleteAll()
         {
             PlayerPrefs.DeleteAll();
         }
