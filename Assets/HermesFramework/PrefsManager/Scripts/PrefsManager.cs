@@ -27,7 +27,7 @@ namespace Hermes.Prefs
         }
 
         /// <summary>
-        /// 値があったら取得、無かったらnull
+        /// 存在していたら取得、無かったらnull
         /// </summary>
         /// <typeparam name="T">T</typeparam>
         /// <param name="key">Key</param>
@@ -47,11 +47,13 @@ namespace Hermes.Prefs
         }
 
         /// <summary>
-        /// Keyを削除
+        /// 存在していたら削除
         /// </summary>
         /// <param name="key">Key</param>
         public static void DeleteKey(string key)
         {
+            if (!PlayerPrefs.HasKey(key))
+                return;
             PlayerPrefs.DeleteKey(key);
         }
 
