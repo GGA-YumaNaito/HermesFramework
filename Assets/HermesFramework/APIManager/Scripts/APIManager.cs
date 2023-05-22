@@ -230,7 +230,7 @@ namespace Hermes.API
                 // 通信失敗
                 if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    await PostSendWebRequestError<T, T2>(false, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                    await PostSendWebRequestError(false, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
                 }
                 // 通信成功
                 else
@@ -240,7 +240,7 @@ namespace Hermes.API
                     var data = JsonUtility.FromJson<T2>(json);
                     if (data.ErrorCode > eAPIErrorCode.None)
                     {
-                        await PostSendWebRequestError<T, T2>(true, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                        await PostSendWebRequestError(true, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
                     }
                     // APIが成功だったら
                     else
@@ -305,7 +305,7 @@ namespace Hermes.API
                     {
                         // リトライ.
                         await UIManager.Instance.BackAsync();
-                        await PostSendWebRequest<T, T2>(postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                        await PostSendWebRequest(postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
                     }
                     else
                     {
