@@ -163,7 +163,6 @@ namespace Hermes.UI.Editor
 
         // 作成するスクリプトファイル：Template
         private static readonly string Template = @"using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace #TEMPLATENAME#
 {
