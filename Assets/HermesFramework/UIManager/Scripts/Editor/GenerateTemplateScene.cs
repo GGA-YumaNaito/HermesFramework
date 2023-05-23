@@ -172,7 +172,7 @@ namespace #TEMPLATENAME#
     /// </summary>
     public class #TEMPLATENAME#Scene : Hermes.UI.Screen
     {
-        public override bool IsBack { get; protected set; } = false;
+        public override bool IsBack { get; protected set; } = true;
 
         /// <summary>オプション</summary>
         public class Options
