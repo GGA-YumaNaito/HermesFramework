@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d34d64b62f8cb4c13aefa23753e6fb1a, type: 3}
+  m_Name: AreaMaster
+  m_EditorClassIdentifier: 
+  List:
+  - Id: 1
+    IsRelease: 1
+    AreaName: AREA_NAME_1
+    WorldId: 1
+  - Id: 2
+    IsRelease: 1
+    AreaName: AREA_NAME_2
+    WorldId: 1
+  - Id: 3
+    IsRelease: 1
+    AreaName: AREA_NAME_3
+    WorldId: 1
+  - Id: 4
+    IsRelease: 1
+    AreaName: AREA_NAME_4
+    WorldId: 2
+  - Id: 5
+    IsRelease: 1
+    AreaName: AREA_NAME_5
+    WorldId: 2
+  - Id: 6
+    IsRelease: 1
+    AreaName: AREA_NAME_6
+    WorldId: 2
+  - Id: 7
+    IsRelease: 1
+    AreaName: AREA_NAME_7
+    WorldId: 3
+  - Id: 8
+    IsRelease: 1
+    AreaName: AREA_NAME_8
+    WorldId: 3
+  - Id: 9
+    IsRelease: 1
+    AreaName: AREA_NAME_9
+    WorldId: 3
+  - Id: 10
+    IsRelease: 0
+    AreaName: AREA_NAME_10
+    WorldId: 4
