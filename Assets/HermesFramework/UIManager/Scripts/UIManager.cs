@@ -489,6 +489,21 @@ namespace Hermes.UI
         }
 
         /// <summary>
+        /// SubSceneが既に呼び出されているか
+        /// </summary>
+        /// <typeparam name="T">SubScene</typeparam>
+        /// <returns>SubSceneを持っていたらtrue, 持っていなかったらfalse</returns>
+        public bool HasSubScene<T>() where T : SubScene
+        {
+            foreach (var subScene in uiSubScene.SubSceneList)
+            {
+                if (typeof(T) == subScene.GetType())
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// 全てアンロード
         /// </summary>
         /// <param name="cancellationToken">CancellationToken</param>
@@ -557,6 +572,23 @@ namespace Hermes.UI
             var count = stackType.Count - 1;
             for (int i = 0; i < count; i++)
             {
+                stackName.Pop();
+                stackType.Pop();
+                stackOptions.Pop();
+            }
+        }
+
+        /// <summary>
+        /// 指定したシーンまでのスタックをクリアする
+        /// </summary>
+        public void ClearStackSpecifiedView<T>() where T : ViewBase
+        {
+            var type = typeof(T);
+            var count = stackType.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (type == stackType.Peek())
+                    return;
                 stackName.Pop();
                 stackType.Pop();
                 stackOptions.Pop();
