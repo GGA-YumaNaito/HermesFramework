@@ -90,6 +90,30 @@ MonoBehaviour:
     m_Address: CommonDialog
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: b38922c9a0af24f6fae107ef99a6f3f2
+    m_Address: Banner_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a5e528b9bc33f44bd9bce3b9da75bc0a
+    m_Address: Banner_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 59e0f021e78b24568b1dd3a513f44d18
+    m_Address: Banner_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4c359aa29c33f4808865de88657715d9
+    m_Address: Banner_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2d3a6edb329d04db18fdb4eb20d8c5d9
+    m_Address: Banner_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ca6ceab2517884249b30ccb7b17cbea2
+    m_Address: bgm_title
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1cd4bf7deae1cdd4ea4ef1d5b0e55302, type: 2}
   m_SchemaSet:
