@@ -453,7 +453,7 @@ namespace Hermes.UI
             barrier.SetActive(true);
 
             var scene = await uiSubScene.LoadAsync<T>(sceneName, options, cancellationToken);
-            await UniTask.WaitUntil(() => CurrentView.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+            await UniTask.WaitUntil(() => scene.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
