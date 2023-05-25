@@ -15,6 +15,18 @@ EditorBuildSettings:
     path: Assets/Samples/Project/Home/Scenes/HomeScene.unity
     guid: 8b1b680f45d4f00428b09ef607111161
   - enabled: 1
+    path: Assets/Samples/Project/Shop/Scenes/ShopScene.unity
+    guid: 7f95a460a405d427fbfe140b6c6678c5
+  - enabled: 1
+    path: Assets/Samples/Project/Formation/Scenes/FormationScene.unity
+    guid: 0543827ec6ed743799444495d60b12bf
+  - enabled: 1
+    path: Assets/Samples/Project/Growth/Scenes/GrowthScene.unity
+    guid: e9ffacf3c32b342a497b92bd6368f00b
+  - enabled: 1
+    path: Assets/Samples/Project/Event/Scenes/EventScene.unity
+    guid: 34e9cbad109c64c15b86d7bef39d995a
+  - enabled: 1
     path: Assets/Samples/Project/Common/Scenes/ManagerScene.unity
     guid: 135d4e6537aab7641bf26434a3e23588
   - enabled: 1
