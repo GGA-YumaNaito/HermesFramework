@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using Hermes.UI;
+using Hermes.Localize;
 using Hermes.Prefs;
+using Hermes.UI;
 using Title;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,6 +19,9 @@ namespace Boot
         // Start is called before the first frame update
         async void Start()
         {
+            // ローカライズの初期化が終わるまで待機
+            await UniTask.WaitUntil(() => LocalizeManager.Instance.IsInitializad);
+
             // 起動したことがあるか
             var booted = PrefsManager.Instance.Load<bool>(bootedKey);
             if (booted)
