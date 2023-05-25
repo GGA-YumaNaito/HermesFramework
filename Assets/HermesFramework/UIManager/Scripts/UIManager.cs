@@ -275,6 +275,7 @@ namespace Hermes.UI
                     await uiDialog.AllUnloadAsync(cancellationToken);
                 }
                 // シーンロード
+                CurrentView = null;
                 CurrentView = await uiScreen.LoadAsync<T>(viewName, options, cancellationToken);
             }
             // Dialog
@@ -314,7 +315,6 @@ namespace Hermes.UI
                     StackPop();
                 }
             }
-            var type = stackType.Peek(); ;
             var name = stackName.Peek();
             // まだCurrentScreenがなかったらUnloadはしない
             if (uiScreen.CurrentScreen != null)
@@ -336,8 +336,10 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask BackAsync(CancellationToken cancellationToken = default)
         {
+            if (CurrentView == null || barrier.activeSelf)
+                return;
             barrier.SetActive(true);
-            if (CurrentView != null && !CurrentView.IsBack)
+            if (!CurrentView.IsBack)
             {
                 // 前の画面に戻れない時の処理
                 await CurrentView.ActionInsteadOfBack();
@@ -356,8 +358,8 @@ namespace Hermes.UI
                 // スタックが無かったらダイアログ表示
                 await LoadAsync<CommonDialog>(new CommonDialog.Options()
                 {
-                    Title = quitTitleKey,
-                    Body = quitBodyKey,
+                    TitleKey = quitTitleKey,
+                    BodyKey = quitBodyKey,
                     ButtonType = CommonDialog.eButtonType.YesOrNo,
                     OnClickAction = () =>
                     {
