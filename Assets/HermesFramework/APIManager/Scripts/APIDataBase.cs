@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Hermes.API
 {
@@ -11,6 +12,9 @@ namespace Hermes.API
     {
         /// <summary>Data</summary>
         public T Data;
+        [SerializeField] int id;
+        /// <summary>ID.</summary>
+        public int Id { get => id; }
         /// <summary>ErrorCode</summary>
         public eAPIErrorCode ErrorCode;
         /// <summary>API</summary>
