@@ -62,14 +62,16 @@ namespace Hermes.UI.UIManagerParts
             {
                 if (subSceneInstanceList[i].Key == sceneName)
                 {
-                    await SubSceneList[i].OnEnd();
-                    await SubSceneList[i].OnUnload();
-                    await UniTask.WaitUntil(() => SubSceneList[i].Status.Value == eStatus.End, cancellationToken: cancellationToken);
+                    var subScene = SubSceneList[i];
+                    var subSceneInstance = subSceneInstanceList[i];
+                    await subScene.OnEnd();
+                    await subScene.OnUnload();
+                    await UniTask.WaitUntil(() => subScene.Status.Value == eStatus.End, cancellationToken: cancellationToken);
 
                     // シーンアンロード
-                    await Addressables.UnloadSceneAsync(subSceneInstanceList[i].Value).ToUniTask(cancellationToken: cancellationToken);
-                    SubSceneList.RemoveAt(i);
-                    subSceneInstanceList.RemoveAt(i);
+                    await Addressables.UnloadSceneAsync(subSceneInstance.Value).ToUniTask(cancellationToken: cancellationToken);
+                    SubSceneList.Remove(subScene);
+                    subSceneInstanceList.Remove(subSceneInstance);
                     break;
                 }
             }
