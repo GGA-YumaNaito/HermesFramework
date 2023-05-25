@@ -47,8 +47,8 @@ namespace Hermes.API
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T">RequestData</typeparam>
+        /// <typeparam name="T2">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="onSuccess">成功コールバック</param>
         /// <param name="onFailed">失敗コールバック</param>
@@ -64,8 +64,8 @@ namespace Hermes.API
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T">RequestData</typeparam>
+        /// <typeparam name="T2">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
@@ -82,8 +82,8 @@ namespace Hermes.API
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T">RequestData</typeparam>
+        /// <typeparam name="T2">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
@@ -100,8 +100,8 @@ namespace Hermes.API
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T">RequestData</typeparam>
+        /// <typeparam name="T2">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
@@ -191,8 +191,8 @@ namespace Hermes.API
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T">RequestData</typeparam>
+        /// <typeparam name="T2">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
@@ -261,8 +261,8 @@ namespace Hermes.API
         /// <summary>
         /// POST通信失敗
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="T2"></typeparam>
+        /// <typeparam name="T">RequestData</typeparam>
+        /// <typeparam name="T2">ResponseData</typeparam>
         /// <param name="isFailed">APIで失敗.</param>
         /// <param name="request">リクエスト</param>
         /// <param name="url">URL</param>
@@ -376,7 +376,7 @@ namespace Hermes.API
         /// クエリパラメータ変換
         /// </summary>
         /// <param name="queryParams"></param>
-        /// <returns></returns>
+        /// <returns>クエリパラメータ</returns>
         static string QueryParamConvertDictionaryToString(Dictionary<string, object> queryParams)
         {
             if (queryParams == null || queryParams.Count == 0)
@@ -405,7 +405,7 @@ namespace Hermes.API
         /// クエリパラメータ変換
         /// </summary>
         /// <param name="queryParams"></param>
-        /// <returns></returns>
+        /// <returns>クエリパラメータ</returns>
         static string QueryParamConvertObjectArrayToString(object[] queryParams)
         {
             if (queryParams == null || queryParams.Length == 0)
