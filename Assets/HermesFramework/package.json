@@ -21,6 +21,11 @@
     "unity": "2021.3",
     "samples": [
         {
+            "displayName": "Project",
+            "description": "Project Sample.",
+            "path": "Samples~/Project"
+        },
+        {
             "displayName": "UIManagerSample",
             "description": "UIManager Sample.",
             "path": "Samples~/HermesFramework/UIManager"
