@@ -1,6 +1,4 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
+﻿using Cysharp.Threading.Tasks;
 using Mobcast.Coffee.Transition;
 using UniRx;
 using UnityEngine;
