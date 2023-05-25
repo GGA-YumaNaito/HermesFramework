@@ -36,10 +36,10 @@ namespace Hermes.UI
         /// </summary>
         public class Options
         {
-            /// <summary>Title</summary>
-            public string Title;
-            /// <summary>Body</summary>
-            public string Body;
+            /// <summary>TitleKey</summary>
+            public string TitleKey;
+            /// <summary>BodyKey</summary>
+            public string BodyKey;
             /// <summary>ボタンタイプ</summary>
             public eButtonType ButtonType;
             /// <summary>クリック時のアクション</summary>
@@ -71,13 +71,13 @@ namespace Hermes.UI
         /// <summary>
         /// 作成
         /// </summary>
-        /// <param name="title">タイトル</param>
-        /// <param name="body">本文</param>
+        /// <param name="titleKey">タイトルKey</param>
+        /// <param name="bodyKey">本文Key</param>
         /// <param name="buttonType">ボタンタイプ</param>
         /// <param name="onClickAction">クリック時のアクション</param>
-        public static async UniTask<CommonDialog> Create(string title = null, string body = null, eButtonType buttonType = eButtonType.OK, Action onClickAction = null)
+        public static async UniTask<CommonDialog> Create(string titleKey = null, string bodyKey = null, eButtonType buttonType = eButtonType.OK, Action onClickAction = null)
         {
-            await UIManager.Instance.LoadAsync<CommonDialog>(new Options() { Title = title, Body = body, ButtonType = buttonType });
+            await UIManager.Instance.LoadAsync<CommonDialog>(new Options() { TitleKey = titleKey, BodyKey = bodyKey, ButtonType = buttonType, OnClickAction = onClickAction });
             await UniTask.WaitUntil(() => UIManager.Instance.CurrentView.GetType() == typeof(CommonDialog));
             return (CommonDialog)UIManager.Instance.CurrentView;
         }
@@ -85,8 +85,8 @@ namespace Hermes.UI
         public override UniTask OnLoad(object options)
         {
             var op = options as Options;
-            titleText.SetTextLocalize(op.Title);
-            bodyText.SetTextLocalize(op.Body);
+            titleText.SetTextLocalize(op.TitleKey);
+            bodyText.SetTextLocalize(op.BodyKey);
             if (op.ButtonType == eButtonType.OK)
             {
                 buttonText1.SetTextLocalize(okButtonTextKey);
@@ -109,7 +109,8 @@ namespace Hermes.UI
         {
             if (((eClickState)state) == eClickState.OkOrYes)
                 onClickAction?.Invoke();
-            await UIManager.Instance.BackAsync();
+            else
+                await UIManager.Instance.BackAsync();
         }
     }
 }
