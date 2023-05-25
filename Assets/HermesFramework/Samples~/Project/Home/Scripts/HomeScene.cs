@@ -1,6 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Hermes.Localize;
-using Hermes.Master;
 using Hermes.UI;
 using UnityEngine;
 
@@ -16,6 +14,10 @@ namespace Home
 
         /// <summary>BGM Name</summary>
         [SerializeField] string bgmName = "";
+        /// <summary>タイトルに戻るのタイトルキー</summary>
+        [SerializeField] string backTitleTitleKey = "BACK_TITLE_TITLE";
+        /// <summary>タイトルに戻るの本文キー</summary>
+        [SerializeField] string backTitleBodyKey = "BACK_TITLE_BODY";
 
         /// <summary>オプション</summary>
         public class Options
@@ -38,6 +40,21 @@ namespace Home
                     UIManager.Instance.SubSceneLoadAsync<Footer.FooterScene>()
                 );
             }
+        }
+
+        public override async UniTask ActionInsteadOfBack()
+        {
+            await CommonDialog.Create(
+                backTitleTitleKey,
+                backTitleBodyKey,
+                CommonDialog.eButtonType.YesOrNo,
+                async () => {
+                    await UniTask.WhenAll(
+                        UIManager.Instance.LoadAsync<Title.TitleScene>(),
+                        UIManager.Instance.SubSceneUnloadAsync<Header.HeaderScene>(),
+                        UIManager.Instance.SubSceneUnloadAsync<Footer.FooterScene>()
+                    );
+                });
         }
     }
 }
