@@ -63,6 +63,10 @@ MonoBehaviour:
     m_Key: BACK_TITLE_BODY
     m_Metadata:
       m_Items: []
+  - m_Id: 13037874659188736
+    m_Key: TAP_TO_SCREEN
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
