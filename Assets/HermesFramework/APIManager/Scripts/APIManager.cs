@@ -342,10 +342,10 @@ namespace Hermes.API
                     {
                         var json = GzipBase64.Decompress(request.downloadHandler.text);
                         var data = JsonUtility.FromJson<T2>(json);
-                        dialog = await ErrorDialog.Create(title: Instance.backToTitleKey, error: data.ErrorCode.Label(), isRetry: false);
+                        dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: data.ErrorCode.Label(), isRetry: false);
                     }
                     else
-                        dialog = await ErrorDialog.Create(title: Instance.backToTitleKey, error: request.error, isRetry: false);
+                        dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: request.error, isRetry: false);
                     await UniTask.WaitWhile(() => dialog.ClickStateWait());
                     // 失敗コールバックを実行.
                     if (isFailed)

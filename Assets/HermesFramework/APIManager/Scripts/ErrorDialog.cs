@@ -41,10 +41,10 @@ namespace Hermes.API
         /// </summary>
         public class Options
         {
-            /// <summary>Title</summary>
-            public string Title;
-            /// <summary>Body</summary>
-            public string Body;
+            /// <summary>TitleKey</summary>
+            public string TitleKey;
+            /// <summary>BodyKey</summary>
+            public string BodyKey;
             /// <summary>Error</summary>
             public string Error;
             /// <summary>IsRetry</summary>
@@ -69,19 +69,17 @@ namespace Hermes.API
         /// <summary>
         /// 作成
         /// </summary>
-        /// <param name="title">タイトル</param>
-        /// <param name="body">本文</param>
+        /// <param name="titleKey">タイトルKey</param>
+        /// <param name="bodyKey">本文Key</param>
         /// <param name="error">エラー</param>
         /// <param name="isRetry">リトライ</param>
         public static async UniTask<ErrorDialog> Create(
-            string title = null,
-            string body = null,
+            string titleKey = null,
+            string bodyKey = null,
             string error = null,
-            bool isRetry = false,
-            string buttonText1 = null,
-            string buttonText2 = null)
+            bool isRetry = false)
         {
-            await UIManager.Instance.LoadAsync<ErrorDialog>(new Options() { Title = title, Body = body, Error = error, IsRetry = isRetry });
+            await UIManager.Instance.LoadAsync<ErrorDialog>(new Options() { TitleKey = titleKey, BodyKey = bodyKey, Error = error, IsRetry = isRetry });
             await UniTask.WaitUntil(() => UIManager.Instance.CurrentView.GetType() == typeof(ErrorDialog));
             return (ErrorDialog)UIManager.Instance.CurrentView;
         }
@@ -89,8 +87,8 @@ namespace Hermes.API
         public override UniTask OnLoad(object options)
         {
             this.options = options as Options;
-            titleText.SetTextLocalizeOrInactive(this.options.Title);
-            bodyText.SetTextLocalizeOrInactive(this.options.Body);
+            titleText.SetTextLocalizeOrInactive(this.options.TitleKey);
+            bodyText.SetTextLocalizeOrInactive(this.options.BodyKey);
             errorText.SetTextLocalizeOrInactive(this.options.Error);
             retryButton.SetActive(this.options.IsRetry);
             if (this.options.IsRetry)
@@ -114,9 +112,9 @@ namespace Hermes.API
         public void OnClickButton(int state)
         {
             if (options.IsRetry)
-                this.ClickState = (eClickState)state;
+                ClickState = (eClickState)state;
             else
-                this.ClickState = eClickState.End;
+                ClickState = eClickState.End;
         }
 
         /// <summary>
