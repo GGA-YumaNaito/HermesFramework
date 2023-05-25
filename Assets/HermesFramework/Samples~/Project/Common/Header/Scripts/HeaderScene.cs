@@ -7,8 +7,6 @@ namespace Header
     /// </summary>
     public class HeaderScene : Hermes.UI.SubScene
     {
-        public override bool IsBack { get; protected set; } = true;
-
         /// <summary>オプション</summary>
         public class Options
         {

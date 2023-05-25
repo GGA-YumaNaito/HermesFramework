@@ -7,8 +7,6 @@ namespace Footer
     /// </summary>
     public class FooterScene : SubScene
     {
-        public override bool IsBack { get; protected set; } = true;
-
         /// <summary>
         /// Click Number
         /// </summary>
