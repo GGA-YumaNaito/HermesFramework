@@ -38,19 +38,19 @@ namespace Footer
             switch ((eClickNumber)state)
             {
                 case eClickNumber.Shop:
-                    //await UIManager.Instance.LoadAsync<ShopScene>();
+                    await UIManager.Instance.LoadAsync<Shop.ShopScene>();
                     break;
                 case eClickNumber.Formation:
-                    //await UIManager.Instance.LoadAsync<FormationScene>();
+                    await UIManager.Instance.LoadAsync<Formation.FormationScene>();
                     break;
                 case eClickNumber.Home:
                     await UIManager.Instance.LoadAsync<Home.HomeScene>();
                     break;
                 case eClickNumber.Growth:
-                    //await UIManager.Instance.LoadAsync<GrowthScene>();
+                    await UIManager.Instance.LoadAsync<Growth.GrowthScene>();
                     break;
                 case eClickNumber.Event:
-                    //await UIManager.Instance.LoadAsync<EventScene>();
+                    await UIManager.Instance.LoadAsync<Event.EventScene>();
                     break;
             }
         }
