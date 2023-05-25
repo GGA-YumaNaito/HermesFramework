@@ -1,6 +1,4 @@
 ﻿using Hermes.UI;
-using Mobcast.Coffee.Toggles;
-using UnityEngine;
 
 namespace Footer
 {
@@ -32,10 +30,20 @@ namespace Footer
         /// ボタンのクリック制御
         /// </summary>
         [EnumAction(typeof(eClickNumber))]
-        public async void OnClickButton(int state)
+        public async void OnClickButton(int number)
         {
+            var currentViewType = UIManager.Instance.CurrentView.GetType();
+            var buttonType =
+                (eClickNumber)number == eClickNumber.Shop ? typeof(Shop.ShopScene) :
+                (eClickNumber)number == eClickNumber.Formation ? typeof(Formation.FormationScene) :
+                (eClickNumber)number == eClickNumber.Home ? typeof(Home.HomeScene) :
+                (eClickNumber)number == eClickNumber.Growth ? typeof(Growth.GrowthScene) :
+                (eClickNumber)number == eClickNumber.Event ? typeof(Event.EventScene) : null;
+            if (currentViewType == buttonType)
+                return;
+
             UIManager.Instance.ClearStackSpecifiedView<Home.HomeScene>();
-            switch ((eClickNumber)state)
+            switch ((eClickNumber)number)
             {
                 case eClickNumber.Shop:
                     await UIManager.Instance.LoadAsync<Shop.ShopScene>();
