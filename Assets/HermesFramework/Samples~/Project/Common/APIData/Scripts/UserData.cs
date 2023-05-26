@@ -23,7 +23,7 @@ namespace API
             /// <summary>
             /// コンストラクタ
             /// </summary>
-            Request()
+            public Request()
             {
             }
         }
