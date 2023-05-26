@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 102a42cd7470448e6a8cc89e773ed569, type: 3}
+  m_Script: {fileID: 11500000, guid: f0dfe9e16959744e889e3c5a1deb50a2, type: 3}
   m_Name: WorldMaster
   m_EditorClassIdentifier: 
   List:
