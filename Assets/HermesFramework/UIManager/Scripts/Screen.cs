@@ -24,6 +24,9 @@ namespace Hermes.UI
         /// <param name="camera">Camera</param>
         public void AddCameraStack(Camera camera)
         {
+            // カメラがnullだったらreturn
+            if (camera == null)
+                return;
             if (!cameraData)
                 cameraData = this.camera.GetUniversalAdditionalCameraData();
             // カメラが存在していたら、除外してから追加
@@ -38,6 +41,9 @@ namespace Hermes.UI
         /// <param name="camera">Camera</param>
         public void RemoveCameraStack(Camera camera)
         {
+            // カメラがnullだったらreturn
+            if (camera == null)
+                return;
             if (!cameraData)
                 cameraData = this.camera.GetUniversalAdditionalCameraData();
             cameraData.cameraStack.Remove(camera);
