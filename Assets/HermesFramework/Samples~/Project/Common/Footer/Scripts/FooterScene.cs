@@ -1,4 +1,6 @@
 ﻿using Hermes.UI;
+using Mobcast.Coffee.Toggles;
+using UnityEngine;
 
 namespace Footer
 {
@@ -7,11 +9,19 @@ namespace Footer
     /// </summary>
     public class FooterScene : SubScene
     {
+        /// <summary>CompositeToggle</summary>
+        [SerializeField] CompositeToggle compositeToggle = null;
+
+        /// <summary>フッターが選択されているか</summary>
+        bool isClickButton = false;
+
         /// <summary>
         /// Click Number
         /// </summary>
         public enum eClickNumber
         {
+            /// <summary>None</summary>
+            None = -1,
             /// <summary>Shop</summary>
             Shop,
             /// <summary>Formation</summary>
@@ -23,25 +33,50 @@ namespace Footer
             /// <summary>Event</summary>
             Event,
         }
-        
+
+        void Update()
+        {
+            if (isClickButton)
+                return;
+            if (UIManager.Instance == null || UIManager.Instance.CurrentView == null)
+                return;
+            // アイコンがズレていたら修正
+            var currentViewType = UIManager.Instance.CurrentView.GetType();
+            var buttonType =
+                currentViewType == typeof(Shop.ShopScene) ? eClickNumber.Shop :
+                currentViewType == typeof(Formation.FormationScene) ? eClickNumber.Formation :
+                currentViewType == typeof(Home.HomeScene) ? eClickNumber.Home :
+                currentViewType == typeof(Growth.GrowthScene) ? eClickNumber.Growth :
+                currentViewType == typeof(Event.EventScene) ? eClickNumber.Event : eClickNumber.None;
+            if (buttonType == eClickNumber.None || compositeToggle.indexValue == (int)buttonType)
+                return;
+            compositeToggle.indexValue = (int)buttonType;
+        }
+
         /// <summary>
         /// ボタンのクリック制御
         /// </summary>
         [EnumAction(typeof(eClickNumber))]
         public async void OnClickButton(int number)
         {
+            var clickNumber = (eClickNumber)number;
+
             var currentViewType = UIManager.Instance.CurrentView.GetType();
             var buttonType =
-                (eClickNumber)number == eClickNumber.Shop ? typeof(Shop.ShopScene) :
-                (eClickNumber)number == eClickNumber.Formation ? typeof(Formation.FormationScene) :
-                (eClickNumber)number == eClickNumber.Home ? typeof(Home.HomeScene) :
-                (eClickNumber)number == eClickNumber.Growth ? typeof(Growth.GrowthScene) :
-                (eClickNumber)number == eClickNumber.Event ? typeof(Event.EventScene) : null;
+                clickNumber == eClickNumber.Shop ? typeof(Shop.ShopScene) :
+                clickNumber == eClickNumber.Formation ? typeof(Formation.FormationScene) :
+                clickNumber == eClickNumber.Home ? typeof(Home.HomeScene) :
+                clickNumber == eClickNumber.Growth ? typeof(Growth.GrowthScene) :
+                clickNumber == eClickNumber.Event ? typeof(Event.EventScene) : null;
             if (currentViewType == buttonType)
                 return;
 
+            isClickButton = true;
+
+            compositeToggle.indexValue = number;
+
             UIManager.Instance.ClearStackSpecifiedView<Home.HomeScene>();
-            switch ((eClickNumber)number)
+            switch (clickNumber)
             {
                 case eClickNumber.Shop:
                     await UIManager.Instance.LoadAsync<Shop.ShopScene>();
@@ -59,6 +94,8 @@ namespace Footer
                     await UIManager.Instance.LoadAsync<Event.EventScene>();
                     break;
             }
+
+            isClickButton = false;
         }
     }
 }
