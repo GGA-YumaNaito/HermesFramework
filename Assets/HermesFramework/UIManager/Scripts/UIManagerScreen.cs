@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mobcast.Coffee.Transition;
@@ -16,9 +17,9 @@ namespace Hermes.UI.UIManagerParts
     public class UIManagerScreen
     {
         /// <summary>現在のスクリーン</summary>
-        [SerializeField] ViewBase currentScreen;
+        [SerializeField] Screen currentScreen;
         /// <summary>現在のスクリーン</summary>
-        public ViewBase CurrentScreen { get => currentScreen; private set => currentScreen = value; }
+        public Screen CurrentScreen { get => currentScreen; private set => currentScreen = value; }
         /// <summary>現在のScene名</summary>
         [SerializeField] string currentScreenName;
         /// <summary>シーン遷移アニメーション</summary>
@@ -31,34 +32,45 @@ namespace Hermes.UI.UIManagerParts
         /// ViewBaseを継承したクラスのLoadAsync
         /// </summary>
         /// <typeparam name="T">ViewBase</typeparam>
+        /// <param name="uiManagerCamera">UIManagerのカメラ</param>
+        /// <param name="subSceneList">SubSceneList</param>
         /// <param name="viewName">View名</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask<ViewBase></returns>
-        public async UniTask<ViewBase> LoadAsync<T>(string viewName, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
+        public async UniTask<ViewBase> LoadAsync<T>(Camera uiManagerCamera, List<SubScene> subSceneList, string viewName, object options = null, CancellationToken cancellationToken = default) where T : ViewBase
         {
-            return await LoadAsync(viewName, typeof(T), options, cancellationToken);
+            return await LoadAsync(uiManagerCamera, subSceneList, viewName, typeof(T), options, cancellationToken);
         }
 
         /// <summary>
         /// ViewBaseを継承したクラスのLoadAsync
         /// </summary>
         /// <typeparam name="T">ViewBase</typeparam>
+        /// <param name="uiManagerCamera">UIManagerのカメラ</param>
+        /// <param name="subSceneList">SubSceneList</param>
         /// <param name="viewName">View名</param>
         /// <param name="type">タイプ</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask<ViewBase></returns>
-        public async UniTask<ViewBase> LoadAsync(string viewName, Type type, object options = null, CancellationToken cancellationToken = default)
+        public async UniTask<ViewBase> LoadAsync(Camera uiManagerCamera, List<SubScene> subSceneList, string viewName, Type type, object options = null, CancellationToken cancellationToken = default)
         {
             // シーンロード
             sceneInstance = await Addressables.LoadSceneAsync(viewName, LoadSceneMode.Additive).ToUniTask(cancellationToken: cancellationToken);
 
-            CurrentScreen = (ViewBase)GameObject.Find(viewName).GetComponent(type);
+            CurrentScreen = (Screen)GameObject.Find(viewName).GetComponent(type);
             currentScreenName = viewName;
 
             if (CurrentScreen == null)
                 throw new Exception($"{viewName} is Null");
+
+            // カメラ追加
+            foreach (var subScene in subSceneList)
+            {
+                CurrentScreen.AddCameraStack(subScene.Camera);
+            }
+            CurrentScreen.AddCameraStack(uiManagerCamera);
 
             // Initialize & Load
             CurrentScreen.Initialize();

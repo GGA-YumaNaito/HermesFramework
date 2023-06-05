@@ -25,12 +25,14 @@ namespace Hermes.UI.UIManagerParts
         /// <summary>
         /// LoadAsync
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">SubScene</typeparam>
+        /// <param name="uiManagerCamera">UIManagerのカメラ</param>
+        /// <param name="screen">スクリーン</param>
         /// <param name="sceneName">シーン名</param>
         /// <param name="options">オプション</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask<SubScene></returns>
-        public async UniTask<SubScene> LoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
+        public async UniTask<SubScene> LoadAsync<T>(Camera uiManagerCamera, Screen screen, string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
         {
             var type = typeof(T);
             // シーンロード
@@ -43,6 +45,10 @@ namespace Hermes.UI.UIManagerParts
             SubSceneList.Add(subScene);
             subSceneInstanceList.Add(new KeyValuePair<string, SceneInstance>(sceneName, instance));
 
+            // カメラ追加
+            screen.AddCameraStack(subScene.Camera);
+            screen.AddCameraStack(uiManagerCamera);
+
             // Initialize & Load
             subScene.Initialize();
             await subScene.OnLoad(options);
@@ -53,10 +59,11 @@ namespace Hermes.UI.UIManagerParts
         /// <summary>
         /// UnloadAsync
         /// </summary>
+        /// <param name="screen">スクリーン</param>
         /// <param name="sceneName">シーン名</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>UniTask</returns>
-        public async UniTask UnloadAsync(string sceneName, CancellationToken cancellationToken = default)
+        public async UniTask UnloadAsync(Screen screen, string sceneName, CancellationToken cancellationToken = default)
         {
             for (int i = 0; i < SubSceneList.Count; i++)
             {
@@ -67,6 +74,9 @@ namespace Hermes.UI.UIManagerParts
                     await subScene.OnEnd();
                     await subScene.OnUnload();
                     await UniTask.WaitUntil(() => subScene.Status.Value == eStatus.End, cancellationToken: cancellationToken);
+
+                    // カメラ除外
+                    screen.RemoveCameraStack(subScene.Camera);
 
                     // シーンアンロード
                     await Addressables.UnloadSceneAsync(subSceneInstance.Value).ToUniTask(cancellationToken: cancellationToken);

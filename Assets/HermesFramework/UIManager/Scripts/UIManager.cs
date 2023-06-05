@@ -23,6 +23,8 @@ namespace Hermes.UI
         public ViewBase CurrentView { get { return currentView; } private set { currentView = value; } }
         /// <summary>バリア</summary>
         [SerializeField] GameObject barrier;
+        /// <summary>Camera</summary>
+        [SerializeField] new Camera camera = null;
 
         /// <summary>UIManagerScreen</summary>
         [SerializeField] UIManagerScreen uiScreen = new UIManagerScreen();
@@ -224,7 +226,6 @@ namespace Hermes.UI
             // Screen
             if (type.IsSubclassOf(typeof(Screen)))
             {
-
                 // 既にシーンが存在した時
                 if (stackType.Contains(type))
                 {
@@ -276,7 +277,7 @@ namespace Hermes.UI
                 }
                 // シーンロード
                 CurrentView = null;
-                CurrentView = await uiScreen.LoadAsync<T>(viewName, options, cancellationToken);
+                CurrentView = await uiScreen.LoadAsync<T>(camera, uiSubScene.SubSceneList, viewName, options, cancellationToken);
             }
             // Dialog
             else
@@ -323,7 +324,7 @@ namespace Hermes.UI
                 await uiDialog.AllUnloadAsync(cancellationToken);
             }
             // シーンロード
-            CurrentView = await uiScreen.LoadAsync(name, stackType.Peek(), stackOptions.Peek(), cancellationToken);
+            CurrentView = await uiScreen.LoadAsync(camera, uiSubScene.SubSceneList, name, stackType.Peek(), stackOptions.Peek(), cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);
@@ -397,7 +398,7 @@ namespace Hermes.UI
                 if (isScreen)
                 {
                     await uiScreen.UnloadAsync(cancellationToken);
-                    CurrentView = await uiScreen.LoadAsync(name, type, options, cancellationToken);
+                    CurrentView = await uiScreen.LoadAsync(camera, uiSubScene.SubSceneList, name, type, options, cancellationToken);
                 }
                 else
                 {
@@ -454,7 +455,7 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            var scene = await uiSubScene.LoadAsync<T>(sceneName, options, cancellationToken);
+            var scene = await uiSubScene.LoadAsync<T>(camera, uiScreen.CurrentScreen, sceneName, options, cancellationToken);
             await UniTask.WaitUntil(() => scene.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
@@ -484,7 +485,7 @@ namespace Hermes.UI
             // バリアON
             barrier.SetActive(true);
 
-            await uiSubScene.UnloadAsync(sceneName, cancellationToken);
+            await uiSubScene.UnloadAsync(uiScreen.CurrentScreen, sceneName, cancellationToken);
 
             // バリアOFF
             barrier.SetActive(false);

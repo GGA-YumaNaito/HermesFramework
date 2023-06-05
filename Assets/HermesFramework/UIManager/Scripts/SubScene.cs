@@ -1,4 +1,6 @@
-﻿namespace Hermes.UI
+﻿using UnityEngine;
+
+namespace Hermes.UI
 {
     /// <summary>
     /// SubScene画面
@@ -7,5 +9,10 @@
     {
         // SubSceneに戻りはない
         public override bool IsBack { get; protected set; } = false;
+
+        /// <summary>Camera</summary>
+        [SerializeField] new Camera camera = null;
+        /// <summary>Camera</summary>
+        public Camera Camera { get => camera; }
     }
 }
