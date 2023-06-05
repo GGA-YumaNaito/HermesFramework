@@ -31,12 +31,15 @@ namespace Hermes.Master
             if (IsLoaded)
                 return;
 
-            handle = Addressables.LoadAssetsAsync<UnityEngine.Object>(masterLabel, null);
-            await handle.ToUniTask();
+            handle = Addressables.LoadAssetsAsync<Object>(masterLabel, null);
+            await handle.Task;
             var masterList = handle.Result;
             System.Type type;
             System.Reflection.MethodInfo addListToRuntimeMasterInfo;
             object list;
+
+            if (masterList == null)
+                Debug.LogError($"masterList error!!!");
 
             foreach (var master in masterList)
             {
