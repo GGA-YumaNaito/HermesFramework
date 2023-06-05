@@ -2632,6 +2632,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transition: {fileID: 0}
+  camera: {fileID: 1714595272}
 --- !u!224 &1907946122
 RectTransform:
   m_ObjectHideFlags: 0
