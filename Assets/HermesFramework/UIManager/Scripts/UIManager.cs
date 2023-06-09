@@ -21,11 +21,11 @@ namespace Hermes.UI
         [SerializeField] ViewBase currentView;
         /// <summary>現在のView</summary>
         public ViewBase CurrentView { get { return currentView; } private set { currentView = value; } }
-        /// <summary>バリア</summary>
-        [SerializeField] GameObject barrier;
         /// <summary>Camera</summary>
         [SerializeField] new Camera camera = null;
 
+        /// <summary>UIManagerBarrier</summary>
+        [SerializeField] UIManagerBarrier uiBarrier;
         /// <summary>UIManagerScreen</summary>
         [SerializeField] UIManagerScreen uiScreen = new UIManagerScreen();
         /// <summary>UIManagerDialog</summary>
@@ -51,7 +51,7 @@ namespace Hermes.UI
         async void Update()
         {
             // Backキー押下
-            if (!barrier.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+            if (!uiBarrier.activeSelf && Input.GetKeyDown(KeyCode.Escape))
             {
                 await BackAsync();
             }
@@ -218,7 +218,7 @@ namespace Hermes.UI
             }
 
             // バリアON
-            barrier.SetActive(true);
+            uiBarrier.SetActive(true);
 
             // 再表示ダイアログリスト
             var resumeDialogList = new List<KeyValuePair<string, KeyValuePair<Type, object>>>();
@@ -292,7 +292,7 @@ namespace Hermes.UI
                 await LoadAsync(dialog.Key, dialog.Value.Key, false, dialog.Value.Value, cancellationToken);
 
             // バリアOFF
-            barrier.SetActive(false);
+            uiBarrier.SetActive(false);
         }
 
         /// <summary>
@@ -303,7 +303,7 @@ namespace Hermes.UI
         public async UniTask ReloadSceneAsync(CancellationToken cancellationToken = default)
         {
             // バリアON
-            barrier.SetActive(true);
+            uiBarrier.SetActive(true);
             // 現在の最新がダイアログだったら削除する
             if (CurrentView is Dialog)
             {
@@ -327,7 +327,7 @@ namespace Hermes.UI
             CurrentView = await uiScreen.LoadAsync(camera, uiSubScene.SubSceneList, name, stackType.Peek(), stackOptions.Peek(), cancellationToken);
 
             // バリアOFF
-            barrier.SetActive(false);
+            uiBarrier.SetActive(false);
         }
 
         /// <summary>
@@ -337,14 +337,14 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask BackAsync(CancellationToken cancellationToken = default)
         {
-            if (CurrentView == null || barrier.activeSelf)
+            if (CurrentView == null || uiBarrier.activeSelf)
                 return;
-            barrier.SetActive(true);
+            uiBarrier.SetActive(true);
             if (!CurrentView.IsBack)
             {
                 // 前の画面に戻れない時の処理
                 await CurrentView.ActionInsteadOfBack();
-                barrier.SetActive(false);
+                uiBarrier.SetActive(false);
                 return;
             }
             if (stackType.Count > 1)
@@ -374,7 +374,7 @@ namespace Hermes.UI
                 });
             }
 
-            barrier.SetActive(false);
+            uiBarrier.SetActive(false);
         }
 
         /// <summary>
@@ -453,13 +453,13 @@ namespace Hermes.UI
         public async UniTask<SubScene> SubSceneLoadAsync<T>(string sceneName, object options = null, CancellationToken cancellationToken = default) where T : SubScene
         {
             // バリアON
-            barrier.SetActive(true);
+            uiBarrier.SetActive(true);
 
             var scene = await uiSubScene.LoadAsync<T>(camera, uiScreen.CurrentScreen, sceneName, options, cancellationToken);
             await UniTask.WaitUntil(() => scene.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
 
             // バリアOFF
-            barrier.SetActive(false);
+            uiBarrier.SetActive(false);
             return scene;
         }
 
@@ -483,12 +483,12 @@ namespace Hermes.UI
         public async UniTask SubSceneUnloadAsync(string sceneName, CancellationToken cancellationToken = default)
         {
             // バリアON
-            barrier.SetActive(true);
+            uiBarrier.SetActive(true);
 
             await uiSubScene.UnloadAsync(uiScreen.CurrentScreen, sceneName, cancellationToken);
 
             // バリアOFF
-            barrier.SetActive(false);
+            uiBarrier.SetActive(false);
         }
 
         /// <summary>
@@ -514,7 +514,7 @@ namespace Hermes.UI
         public async UniTask AllUnloadAsync(CancellationToken cancellationToken = default)
         {
             // バリアON
-            barrier.SetActive(true);
+            uiBarrier.SetActive(true);
 
             // サブシーン
             await uiSubScene.AllUnloadAsync(cancellationToken);
@@ -530,7 +530,7 @@ namespace Hermes.UI
             ClearStack();
 
             // バリアOFF
-            barrier.SetActive(false);
+            uiBarrier.SetActive(false);
         }
 
         /// <summary>
@@ -605,6 +605,16 @@ namespace Hermes.UI
         public void SetSceneTransition(UITransition transition)
         {
             uiScreen.SetSceneTransition(transition);
+        }
+
+        /// <summary>
+        /// バリアをアクティブ、非アクティブ化する
+        /// <para>このメソッドでアクティブ化した場合、手動で非アクティブ化もしないといけない</para>
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetActiveBarrier(bool value)
+        {
+            uiBarrier.SetActive(value);
         }
     }
 }
