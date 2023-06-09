@@ -1,4 +1,5 @@
-﻿using Hermes.Localize;
+﻿using Cysharp.Threading.Tasks;
+using Hermes.Localize;
 using Hermes.Master;
 using Hermes.Sound;
 using Hermes.UI;
@@ -22,8 +23,11 @@ namespace Title
         {
         }
 
-        // Start is called before the first frame update
-        async void Start()
+        /// <summary>
+        /// ロード
+        /// </summary>
+        /// <param name="options"></param>
+        public override async UniTask OnLoad(object options)
         {
             // TODO:仮で現在の使用言語が英語だった場合、日本語にする
             if (LocalizeManager.Instance.SelectedCode == "en")
@@ -38,11 +42,17 @@ namespace Title
         /// </summary>
         public async void OnClickScreen()
         {
+            // バリアON
+            UIManager.Instance.SetActiveBarrier(true);
+
             // マスターロード
             await MasterManager.Instance.Load();
 
             // HomeScene呼び出し
             await UIManager.Instance.LoadAsync<HomeScene>(new HomeScene.Options() { });
+
+            // バリアOFF
+            UIManager.Instance.SetActiveBarrier(false);
         }
     }
 }
