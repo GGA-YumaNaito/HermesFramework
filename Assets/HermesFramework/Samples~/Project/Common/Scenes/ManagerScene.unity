@@ -621,8 +621,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentView: {fileID: 0}
-  barrier: {fileID: 2135259757}
   camera: {fileID: 770400071}
+  uiBarrier:
+    barrier: {fileID: 2135259757}
   uiScreen:
     currentScreen: {fileID: 0}
     currentScreenName: 
