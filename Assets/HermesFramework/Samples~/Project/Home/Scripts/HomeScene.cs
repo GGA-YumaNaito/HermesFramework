@@ -42,6 +42,18 @@ namespace Home
             }
         }
 
+        /// <summary>
+        /// アンロード
+        /// </summary>
+        /// <returns></returns>
+        public override async UniTask OnUnload()
+        {
+            await UniTask.WhenAll(
+                UIManager.Instance.SubSceneUnloadAsync<Header.HeaderScene>(),
+                UIManager.Instance.SubSceneUnloadAsync<Footer.FooterScene>()
+            );
+        }
+
         public override async UniTask ActionInsteadOfBack()
         {
             await CommonDialog.Create(
@@ -49,11 +61,7 @@ namespace Home
                 backTitleBodyKey,
                 CommonDialog.eButtonType.YesOrNo,
                 async () => {
-                    await UniTask.WhenAll(
-                        UIManager.Instance.LoadAsync<Title.TitleScene>(),
-                        UIManager.Instance.SubSceneUnloadAsync<Header.HeaderScene>(),
-                        UIManager.Instance.SubSceneUnloadAsync<Footer.FooterScene>()
-                    );
+                    await UIManager.Instance.LoadAsync<Title.TitleScene>();
                 });
         }
     }
