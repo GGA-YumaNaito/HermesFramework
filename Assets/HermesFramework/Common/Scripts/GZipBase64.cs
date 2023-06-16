@@ -8,7 +8,7 @@ namespace Hermes
     /// <summary>
     /// gzipとBase64を使った圧縮、解凍クラス
     /// </summary>
-    public class GzipBase64
+    public class GZipBase64
     {
         /// <summary>
         /// 圧縮

@@ -18,19 +18,19 @@ namespace Hermes.API
         /// <summary>接続先</summary>
         [SerializeField] string baseUrl = "https://www.";
         /// <summary>タイムアウト.</summary>
-        [SerializeField] private int timeout = 10;
+        [SerializeField] int timeout = 10;
         /// <summary>リトライ最大回数.</summary>
-        [SerializeField] private int maxRetryNum = 3;
+        [SerializeField] int maxRetryNum = 3;
         /// <summary>リトライ回数.</summary>
-        private int retryNum = 0;
+        int retryNum = 0;
         /// <summary>溜まっているキューがリクエスト可能か.</summary>
-        [SerializeField] private bool isRequestQueue = true;
+        [SerializeField] bool isRequestQueue = true;
         /// <summary>TypeQueue.</summary>
-        [SerializeField] private Queue<Type> typeQueue = new Queue<Type>();
+        [SerializeField] Queue<Type> typeQueue = new Queue<Type>();
         /// <summary>シーケンスID.</summary>
-        private static ulong sequenceId = 0;
+        static ulong sequenceId = 0;
         /// <summary>リセットフラグ.</summary>
-        private bool isReset = false;
+        bool isReset = false;
         /// <summary>タイトルシーン名</summary>
         [SerializeField] string titleName = "Title.TitleScene, Assembly-CSharp";
         /// <summary>LocalizeKey API error時のタイトル</summary>
@@ -41,6 +41,9 @@ namespace Hermes.API
         [SerializeField] string errorBodyKey = "ERROR_BODY";
         /// <summary>LocalizeKey タイトルに戻る</summary>
         [SerializeField] string backToTitleKey = "BACK_TO_TITLE";
+
+        /// <summary>暗号化の共有キー(非公開)</summary>
+        static readonly string key = "abcdefghijklmnop";
 
         // TODO:シーケンスIDをどう扱うかを考える
 
@@ -158,8 +161,7 @@ namespace Hermes.API
                         onFailed?.Invoke(null);
                     else
                     {
-                        var json = GzipBase64.Decompress(request.downloadHandler.text);
-                        var data = JsonUtility.FromJson<T2>(json);
+                        var data = GetResponseData<T2>(request);
                         data.SetHeaders(request.GetResponseHeaders());
                         onFailed?.Invoke(data);
                     }
@@ -209,11 +211,11 @@ namespace Hermes.API
 
             using (var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
             {
-#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
-                Debug.Log("postData = " + JsonUtility.ToJson(postData));
-#endif
-                var gzip = GzipBase64.Compress(JsonUtility.ToJson(postData));
-                byte[] bytes = Encoding.UTF8.GetBytes(gzip);
+                byte[] bytes;
+                // 初期化ベクトル(公開)
+                var iv = Guid.NewGuid().ToString("N").Substring(0, 16);
+
+                bytes = GetRequestData(postData, iv);
 
                 request.uploadHandler = new UploadHandlerRaw(bytes);
                 request.downloadHandler = new DownloadHandlerBuffer();
@@ -221,6 +223,7 @@ namespace Hermes.API
                 request.SetRequestHeader("Content-Type", "application/json");
                 //request.SetRequestHeader("accept-encoding", "gzip");
                 //request.SetRequestHeader("user-agent", "gzip");
+                request.SetRequestHeader("iv", iv);
 
                 // start and wait
                 var ao = request.SendWebRequest();
@@ -236,8 +239,7 @@ namespace Hermes.API
                 else
                 {
                     // 通信は成功したが、APIが失敗していたら
-                    var json = GzipBase64.Decompress(request.downloadHandler.text);
-                    var data = JsonUtility.FromJson<T2>(json);
+                    var data = GetResponseData<T2>(request);
                     if (data.ErrorCode > eAPIErrorCode.None)
                     {
                         await PostSendWebRequestError(true, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
@@ -294,8 +296,7 @@ namespace Hermes.API
                     ErrorDialog dialog = null;
                     if (isFailed)
                     {
-                        var json = GzipBase64.Decompress(request.downloadHandler.text);
-                        var data = JsonUtility.FromJson<T2>(json);
+                        var data = GetResponseData<T2>(request);
                         dialog = await ErrorDialog.Create(Instance.errorTitleAPIKey, Instance.errorBodyKey, data.ErrorCode.Label(), true);
                     }
                     else
@@ -340,8 +341,7 @@ namespace Hermes.API
                     ErrorDialog dialog = null;
                     if (isFailed)
                     {
-                        var json = GzipBase64.Decompress(request.downloadHandler.text);
-                        var data = JsonUtility.FromJson<T2>(json);
+                        var data = GetResponseData<T2>(request);
                         dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: data.ErrorCode.Label(), isRetry: false);
                     }
                     else
@@ -426,6 +426,48 @@ namespace Hermes.API
                 i++;
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// リクエストデータ取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="postData"></param>
+        /// <param name="iv"></param>
+        /// <returns>リクエストデータ</returns>
+        static byte[] GetRequestData<T>(T postData, string iv) where T : class
+        {
+            // 1. Class Instance -> Json
+            var json = JsonUtility.ToJson(postData);
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
+            Debug.Log("postData = " + JsonUtility.ToJson(postData));
+#endif
+            // 2. Json -> Gzip
+            var gzip = GZipBase64.Compress(json);
+
+            // 3. GZip -> AES
+            // 暗号化
+            var aes = AES128Base64.Encode(gzip, key, iv);
+
+            // 4. AES -> Binary
+            return Encoding.UTF8.GetBytes(aes);
+        }
+
+        /// <summary>
+        /// レスポンスデータ取得
+        /// </summary>
+        /// <typeparam name="T">ResponseData</typeparam>
+        /// <param name="src">文字列</param>
+        /// <param name="iv">初期化ベクトル(公開)</param>
+        /// <returns>レスポンスデータ</returns>
+        static T GetResponseData<T>(UnityWebRequest request) where T : APIDataBase<T>
+        {
+            // 1. AES -> GZip
+            var aes = AES128Base64.Decode(request.downloadHandler.text, key, request.GetResponseHeader("iv"));
+            // 2. GZip -> Json
+            var json = GZipBase64.Decompress(aes);
+            // 3. Json -> Class Instance
+            return JsonUtility.FromJson<T>(json);
         }
     }
 }
