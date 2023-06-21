@@ -967,7 +967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e984347a5b0664191bc511b68ca1a22b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseUrl: https://www.
+  baseUrl: http://localhost:8000/
   timeout: 10
   maxRetryNum: 3
   isRequestQueue: 1
