@@ -10,7 +10,7 @@ namespace API
     [Serializable]
     public class UserData : APIDataBase<UserData>, ISerializationCallbackReceiver
     {
-        protected override string api => "user";
+        protected override string api => "user/data";
 
         protected override bool isPost => true;
 

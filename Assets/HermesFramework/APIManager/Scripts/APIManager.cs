@@ -206,6 +206,16 @@ namespace Hermes.API
         static async UniTask PostSendWebRequest<T, T2>(T postData, string queryParams, Action<UnityWebRequest, T2> onSuccess = null, Action<UnityWebRequest> onFailed = null, Action<UnityWebRequest> onError = null, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
         {
             var serverData = new T2();
+
+            // TODO: 今はPOSTでなかったら弾く
+            if (!serverData.IsPost)
+            {
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
+                Debug.LogError("Failed!! Not POST!!!");
+#endif
+                return;
+            }
+
             serverData.SetQueryParam(queryParams);
             var url = Instance.baseUrl + serverData.API;
 
