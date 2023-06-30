@@ -15,10 +15,12 @@ namespace Hermes.UI.Editor
     /// </summary>
     public class GenerateTemplateScene : EditorWindow
     {
-        static string currentPath { get; set; } = "Assets/Project";     // アクティブインスタンスのパス
-        static string currentName { get; set; } = "Template";     // アクティブインスタンスの名前（フォルダ名）
+        /// <summary>アクティブインスタンスのパス</summary>
+        static string currentPath { get; set; } = "Assets/Project";
+        /// <summary>アクティブインスタンスの名前（フォルダ名）</summary>
+        static string currentName { get; set; } = "Template";
 
-        [MenuItem("Hermes/GenerateTemplateScene")]
+        [MenuItem("Hermes/GenerateTemplate/GenerateTemplateScene")]
         private static void OpenWindow()
         {
             EditorWindow.GetWindow<GenerateTemplateScene>("GenerateTemplateScene");
@@ -60,7 +62,7 @@ namespace Hermes.UI.Editor
             GenerateScripts(currentName, Template);
         
             // 機能実行を記憶（クリップボードを利用）
-            GUIUtility.systemCopyBuffer = "OK@" + currentName;
+            GUIUtility.systemCopyBuffer = "GenerateTemplateScene@" + currentName;
         }
         
         /// <summary>
@@ -102,7 +104,7 @@ namespace Hermes.UI.Editor
         private static void SceneRenovation()
         {
             // 本スクリプトでのシーン作成を行った直後かどうかをチェック（クリップボード利用）
-            if (GUIUtility.systemCopyBuffer.Split('@')[0] != "OK") return;
+            if (GUIUtility.systemCopyBuffer.Split('@')[0] != "GenerateTemplateScene") return;
 
             // クリップボードから情報を取得
             currentName = GUIUtility.systemCopyBuffer.Split('@')[1];
@@ -162,7 +164,8 @@ namespace Hermes.UI.Editor
         }
 
         // 作成するスクリプトファイル：Template
-        private static readonly string Template = @"using Cysharp.Threading.Tasks;
+        private static readonly string Template =
+@"using Cysharp.Threading.Tasks;
 
 namespace #TEMPLATENAME#
 {
