@@ -50,7 +50,7 @@ namespace Hermes.Master
                 // リスト取得
                 list = type.InvokeMember(
                     "List",
-                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.GetField,
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.GetProperty,
                     null,
                     master,
                     null
