@@ -12,34 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0dfe9e16959744e889e3c5a1deb50a2, type: 3}
   m_Name: WorldMaster
   m_EditorClassIdentifier: 
-  List:
-  - Id: 1
-    IsRelease: 1
-    WorldName: WORLD_NAME_1
-  - Id: 2
-    IsRelease: 1
-    WorldName: WORLD_NAME_2
-  - Id: 3
-    IsRelease: 1
-    WorldName: WORLD_NAME_3
-  - Id: 4
-    IsRelease: 0
-    WorldName: WORLD_NAME_4
-  - Id: 5
-    IsRelease: 0
-    WorldName: WORLD_NAME_5
-  - Id: 6
-    IsRelease: 0
-    WorldName: WORLD_NAME_6
-  - Id: 7
-    IsRelease: 0
-    WorldName: WORLD_NAME_7
-  - Id: 8
-    IsRelease: 0
-    WorldName: WORLD_NAME_8
-  - Id: 9
-    IsRelease: 0
-    WorldName: WORLD_NAME_9
-  - Id: 10
-    IsRelease: 0
-    WorldName: WORLD_NAME_10
+  list:
+  - id: 1
+    world_name: WORLD_NAME_1
+  - id: 2
+    world_name: WORLD_NAME_2
+  - id: 3
+    world_name: WORLD_NAME_3

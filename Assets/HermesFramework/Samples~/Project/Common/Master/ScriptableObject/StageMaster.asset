@@ -12,84 +12,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94663d14ec0c64dcbb050337e9ec614c, type: 3}
   m_Name: StageMaster
   m_EditorClassIdentifier: 
-  List:
-  - Id: 1
-    IsRelease: 1
-    StageName: STAGE_NAME_1
-    AreaId: 1
-    Number: 0
-    StageType: 1
-    UseLifeNum: 5
-    ImageKey: StageImage1
-  - Id: 2
-    IsRelease: 1
-    StageName: STAGE_NAME_2
-    AreaId: 1
-    Number: 1
-    StageType: 2
-    UseLifeNum: 5
-    ImageKey: StageImage2
-  - Id: 3
-    IsRelease: 1
-    StageName: STAGE_NAME_3
-    AreaId: 1
-    Number: 2
-    StageType: 3
-    UseLifeNum: 5
-    ImageKey: StageImage3
-  - Id: 4
-    IsRelease: 1
-    StageName: STAGE_NAME_4
-    AreaId: 2
-    Number: 0
-    StageType: 1
-    UseLifeNum: 5
-    ImageKey: StageImage4
-  - Id: 5
-    IsRelease: 1
-    StageName: STAGE_NAME_5
-    AreaId: 2
-    Number: 1
-    StageType: 2
-    UseLifeNum: 5
-    ImageKey: StageImage5
-  - Id: 6
-    IsRelease: 1
-    StageName: STAGE_NAME_6
-    AreaId: 2
-    Number: 2
-    StageType: 3
-    UseLifeNum: 5
-    ImageKey: StageImage6
-  - Id: 7
-    IsRelease: 1
-    StageName: STAGE_NAME_7
-    AreaId: 3
-    Number: 0
-    StageType: 1
-    UseLifeNum: 5
-    ImageKey: StageImage7
-  - Id: 8
-    IsRelease: 1
-    StageName: STAGE_NAME_8
-    AreaId: 3
-    Number: 1
-    StageType: 2
-    UseLifeNum: 5
-    ImageKey: StageImage8
-  - Id: 9
-    IsRelease: 1
-    StageName: STAGE_NAME_9
-    AreaId: 3
-    Number: 2
-    StageType: 3
-    UseLifeNum: 5
-    ImageKey: StageImage9
-  - Id: 10
-    IsRelease: 0
-    StageName: STAGE_NAME_10
-    AreaId: 4
-    Number: 0
-    StageType: 1
-    UseLifeNum: 5
-    ImageKey: StageImage10
+  list:
+  - id: 1
+    stage_name: STAGE_NAME_1
+    area_id: 1
+    number: 0
+    stage_type: 1
+    use_life_num: 5
+    image_key: StageImage1
+  - id: 2
+    stage_name: STAGE_NAME_2
+    area_id: 1
+    number: 1
+    stage_type: 2
+    use_life_num: 5
+    image_key: StageImage2
+  - id: 3
+    stage_name: STAGE_NAME_3
+    area_id: 1
+    number: 2
+    stage_type: 3
+    use_life_num: 5
+    image_key: StageImage3
+  - id: 4
+    stage_name: STAGE_NAME_4
+    area_id: 2
+    number: 0
+    stage_type: 1
+    use_life_num: 5
+    image_key: StageImage4
+  - id: 5
+    stage_name: STAGE_NAME_5
+    area_id: 2
+    number: 1
+    stage_type: 2
+    use_life_num: 5
+    image_key: StageImage5
+  - id: 6
+    stage_name: STAGE_NAME_6
+    area_id: 2
+    number: 2
+    stage_type: 3
+    use_life_num: 5
+    image_key: StageImage6
+  - id: 7
+    stage_name: STAGE_NAME_7
+    area_id: 3
+    number: 0
+    stage_type: 1
+    use_life_num: 5
+    image_key: StageImage7
+  - id: 8
+    stage_name: STAGE_NAME_8
+    area_id: 3
+    number: 1
+    stage_type: 2
+    use_life_num: 5
+    image_key: StageImage8
+  - id: 9
+    stage_name: STAGE_NAME_9
+    area_id: 3
+    number: 2
+    stage_type: 3
+    use_life_num: 5
+    image_key: StageImage9

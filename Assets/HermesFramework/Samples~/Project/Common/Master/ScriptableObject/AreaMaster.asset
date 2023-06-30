@@ -12,44 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d34d64b62f8cb4c13aefa23753e6fb1a, type: 3}
   m_Name: AreaMaster
   m_EditorClassIdentifier: 
-  List:
-  - Id: 1
-    IsRelease: 1
-    AreaName: AREA_NAME_1
-    WorldId: 1
-  - Id: 2
-    IsRelease: 1
-    AreaName: AREA_NAME_2
-    WorldId: 1
-  - Id: 3
-    IsRelease: 1
-    AreaName: AREA_NAME_3
-    WorldId: 1
-  - Id: 4
-    IsRelease: 1
-    AreaName: AREA_NAME_4
-    WorldId: 2
-  - Id: 5
-    IsRelease: 1
-    AreaName: AREA_NAME_5
-    WorldId: 2
-  - Id: 6
-    IsRelease: 1
-    AreaName: AREA_NAME_6
-    WorldId: 2
-  - Id: 7
-    IsRelease: 1
-    AreaName: AREA_NAME_7
-    WorldId: 3
-  - Id: 8
-    IsRelease: 1
-    AreaName: AREA_NAME_8
-    WorldId: 3
-  - Id: 9
-    IsRelease: 1
-    AreaName: AREA_NAME_9
-    WorldId: 3
-  - Id: 10
-    IsRelease: 0
-    AreaName: AREA_NAME_10
-    WorldId: 4
+  list:
+  - id: 1
+    area_name: AREA_NAME_1
+    world_id: 1
+  - id: 2
+    area_name: AREA_NAME_2
+    world_id: 1
+  - id: 3
+    area_name: AREA_NAME_3
+    world_id: 1
+  - id: 4
+    area_name: AREA_NAME_4
+    world_id: 2
+  - id: 5
+    area_name: AREA_NAME_5
+    world_id: 2
+  - id: 6
+    area_name: AREA_NAME_6
+    world_id: 2
+  - id: 7
+    area_name: AREA_NAME_7
+    world_id: 3
+  - id: 8
+    area_name: AREA_NAME_8
+    world_id: 3
+  - id: 9
+    area_name: AREA_NAME_9
+    world_id: 3
