@@ -2,6 +2,8 @@
  * マスターデータの基底クラス群 
  * MasterDataBase：実際のデータを登録するクラス（名前とかコストとか）
 */
+using UnityEngine;
+
 namespace Hermes.Master
 {
     /// <summary>
@@ -10,10 +12,9 @@ namespace Hermes.Master
     [System.Serializable]
     public abstract class MasterDataBase
     {
-        /// <summary>ID.</summary>
-        public int Id = 0;
-        /// <summary>公開フラグ</summary>
-        public bool IsRelease = false;
+        [SerializeField] int id = 0;
+        /// <summary>ID</summary>
+        public int Id { get => id; }
 
         /// <summary>
         /// コンストラクタ

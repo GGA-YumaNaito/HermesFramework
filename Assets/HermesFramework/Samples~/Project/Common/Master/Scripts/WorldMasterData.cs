@@ -1,4 +1,5 @@
 ﻿using Hermes.Master;
+using UnityEngine;
 
 namespace Master
 {
@@ -8,7 +9,8 @@ namespace Master
     [System.Serializable]
     public class WorldMasterData : MasterDataBase
     {
+        [SerializeField] string world_name;
         /// <summary>名前</summary>
-        public string WorldName;
+        public string WorldName { get => world_name; }
     }
 }

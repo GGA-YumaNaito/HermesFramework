@@ -1,6 +1,6 @@
 /*
  * マスターデータの基底クラス群 
- * MasterAssetBase：MasterDataBaseのリストを持っていてを持っていてScriptableObject型で保存されるクラスで、ランタイム時の管理も行うクラス
+ * MasterAssetBase：MasterDataBaseのリストを持っていてScriptableObject型で保存されるクラスで、ランタイム時の管理も行うクラス
 */
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,11 +40,9 @@ namespace Hermes.Master
         }
         static T2 m_RuntimeInstance;
 
-        /// <summary>
-        /// マスターデータのリスト
-        /// </summary>
-        [SerializeField]
-        public List<T1> List = new List<T1>();
+        [SerializeField] List<T1> list = new();
+        /// <summary>マスターデータのリスト</summary>
+        public List<T1> List { get => list; private set { list = value; } }
 
         /// <summary>
         /// 二分探索
@@ -55,7 +53,7 @@ namespace Hermes.Master
         {
             var min = 0;
             var max = List.Count - 1;
-            var mid = 0;
+            int mid;
             while (min <= max)
             {
                 mid = min + (max - min) / 2;
@@ -103,7 +101,7 @@ namespace Hermes.Master
         {
             foreach (T1 data in datas)
             {
-                if (data != null && data.IsRelease)
+                if (data != null)
                 {
                     data.OnDeserialize();
                     AddRuntimeMaster(data);
