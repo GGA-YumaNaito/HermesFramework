@@ -8,7 +8,7 @@ namespace API
     /// ショップデータ
     /// </summary>
     [Serializable]
-    public class ShopData : APIDataBase<ShopData>, ISerializationCallbackReceiver
+    public class ShopData : APIData<ShopData>, ISerializationCallbackReceiver
     {
         protected override string api => "shop/list";
 

@@ -10,8 +10,6 @@ namespace Hermes.API
     [Serializable]
     public abstract class APIDataBase<T> where T : APIDataBase<T>
     {
-        /// <summary>Data</summary>
-        public T Data;
         [SerializeField] int id;
         /// <summary>ID.</summary>
         public int Id { get => id; }

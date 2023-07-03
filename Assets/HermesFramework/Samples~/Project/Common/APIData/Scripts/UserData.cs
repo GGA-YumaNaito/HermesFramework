@@ -8,7 +8,7 @@ namespace API
     /// ユーザーデータ
     /// </summary>
     [Serializable]
-    public class UserData : APIDataBase<UserData>, ISerializationCallbackReceiver
+    public class UserData : APIData<UserData>, ISerializationCallbackReceiver
     {
         protected override string api => "user/data";
 
