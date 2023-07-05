@@ -51,6 +51,11 @@
             "path": "Samples~/HermesFramework/APIManager"
         },
         {
+            "displayName": "CinemachineManagerSample",
+            "description": "CinemachineManager Sample.",
+            "path": "Samples~/HermesFramework/CinemachineManager"
+        },
+        {
             "displayName": "CompositeToggleSample",
             "description": "CompositeToggle Sample.",
             "path": "Samples~/ExternalAssets/Mobcast/Coffee/CompositeToggle"
