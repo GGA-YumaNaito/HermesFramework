@@ -15,6 +15,9 @@ namespace Hermes.UI
         /// <summary>Camera</summary>
         [SerializeField] new Camera camera = null;
 
+        /// <summary>Camera</summary>
+        protected Camera Camera { get => camera; }
+
         /// <summary>CameraData</summary>
         UniversalAdditionalCameraData cameraData = null;
 
