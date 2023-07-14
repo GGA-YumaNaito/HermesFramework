@@ -62,7 +62,7 @@ namespace Hermes.API.Sample
             assembly = Assembly.GetExecutingAssembly();
 
             types = assembly.GetTypes()
-                .Where(p => p.BaseType.GetGenericTypeDefinition() == typeof(APIData<>))
+                .Where(p => p.BaseType.IsGenericType && p.BaseType.GetGenericTypeDefinition() == typeof(APIData<>))
                 .OrderBy(o => o.Name)
                 .ToList();
 
