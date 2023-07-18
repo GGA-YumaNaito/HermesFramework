@@ -140,7 +140,10 @@ namespace Hermes.UI.Editor
             // RectTransform
             obj.AddComponent<RectTransform>();
             // Scriptをアタッチ
-            obj.AddComponentExt(currentName);
+            var screen = obj.AddComponentExt(currentName);
+            // カメラを設定
+            ((Screen)screen).SetCamera(camera);
+
             // Canvas
             var canvas = obj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
