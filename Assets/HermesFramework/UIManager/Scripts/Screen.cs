@@ -22,6 +22,15 @@ namespace Hermes.UI
         UniversalAdditionalCameraData cameraData = null;
 
         /// <summary>
+        /// カメラを設定する
+        /// </summary>
+        /// <param name="camera">Camera</param>
+        public void SetCamera(Camera camera)
+        {
+            this.camera = camera;
+        }
+
+        /// <summary>
         /// カメラのStackに追加する
         /// </summary>
         /// <param name="camera">Camera</param>
