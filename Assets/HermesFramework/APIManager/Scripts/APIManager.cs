@@ -27,8 +27,8 @@ namespace Hermes.API
         [SerializeField] bool isRequestQueue = true;
         /// <summary>TypeQueue.</summary>
         [SerializeField] Queue<Type> typeQueue = new Queue<Type>();
-        /// <summary>シーケンスID.</summary>
-        static ulong sequenceId = 0;
+        ///// <summary>シーケンスID.</summary>
+        //static ulong sequenceId = 0;
         /// <summary>リセットフラグ.</summary>
         bool isReset = false;
         /// <summary>タイトルシーン名</summary>
@@ -441,22 +441,21 @@ namespace Hermes.API
         /// <summary>
         /// リクエストデータ取得
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="postData"></param>
-        /// <param name="iv"></param>
+        /// <typeparam name="T">class</typeparam>
+        /// <param name="postData">ポストデータ</param>
+        /// <param name="iv">初期化ベクトル(公開)</param>
         /// <returns>リクエストデータ</returns>
         static byte[] GetRequestData<T>(T postData, string iv) where T : class
         {
             // 1. Class Instance -> Json
             var json = JsonUtility.ToJson(postData);
 #if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
-            Debug.Log("postData = " + JsonUtility.ToJson(postData));
+            Debug.Log($"postData = {json}");
 #endif
             // 2. Json -> Gzip
             var gzip = GZipBase64.Compress(json);
 
             // 3. GZip -> AES
-            // 暗号化
             var aes = AES128Base64.Encode(gzip, key, iv);
 
             // 4. AES -> Binary
@@ -467,17 +466,16 @@ namespace Hermes.API
         /// レスポンスデータ取得
         /// </summary>
         /// <typeparam name="T">ResponseData</typeparam>
-        /// <param name="src">文字列</param>
-        /// <param name="iv">初期化ベクトル(公開)</param>
+        /// <param name="request">UnityWebRequest</param>
         /// <returns>レスポンスデータ</returns>
         static T GetResponseData<T>(UnityWebRequest request) where T : APIDataBase<T>
         {
             // 1. AES -> GZip
             var aes = AES128Base64.Decode(request.downloadHandler.text, key, request.GetResponseHeader("iv"));
             // 2. GZip -> Json
-            var json = GZipBase64.Decompress(aes);
+            var gzip = GZipBase64.Decompress(aes);
             // 3. Json -> Class Instance
-            return JsonUtility.FromJson<T>(json);
+            return JsonUtility.FromJson<T>(gzip);
         }
     }
 }
