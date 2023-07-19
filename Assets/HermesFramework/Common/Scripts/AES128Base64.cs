@@ -5,7 +5,7 @@ using System.Text;
 namespace Hermes
 {
     /// <summary>
-    /// AESとBase64を使った暗号、復号クラス
+    /// AESとBase64を使った暗号化、復号クラス
     /// </summary>
     public class AES128Base64
     {
@@ -33,26 +33,26 @@ namespace Hermes
         }
 
         /// <summary>
-        /// AES128ビット(CBCモード)による復号化
+        /// AES128ビット(CBCモード)による復号
         /// <para>※このメソッドでは最大16byteの文字列(src)に対応</para>
         /// </summary>
         /// <param name="src">文字列</param>
         /// <param name="key">共有キー(非公開)</param>
         /// <param name="iv">初期化ベクトル(公開)</param>
-        /// <returns>復号化されたBase64String</returns>
+        /// <returns>復号されたBase64String</returns>
         public static string Decode(string src, string key, string iv)
         {
             // 文字列をバイト型配列へ
-            var input = Encoding.UTF8.GetBytes(src);
+            var input = Convert.FromBase64String(src);
 
             // AES作成
             var AES = CreateAES(key, iv);
 
-            // 復号化
+            // 復号
             var output = AES.CreateDecryptor().TransformFinalBlock(input, 0, input.Length);
 
             // Base64
-            return Convert.ToBase64String(output);
+            return Encoding.UTF8.GetString(output);
         }
 
         /// <summary>
