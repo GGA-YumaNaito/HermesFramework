@@ -160,7 +160,7 @@ namespace Hermes.Save
         /// オブジェクトの型変換
         /// <para>オブジェクトを指定された型に解釈する</para>
         /// </summary>
-        private object ConvertType(object data, Type type)
+        object ConvertType(object data, Type type)
         {
             if (type == typeof(int) || type.IsEnum)
             {
