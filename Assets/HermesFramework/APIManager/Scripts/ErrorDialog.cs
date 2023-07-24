@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Hermes.Localize;
 using Hermes.UI;
 using TMPro;
 using UnityEngine;
@@ -11,8 +10,6 @@ namespace Hermes.API
     /// </summary>
     public class ErrorDialog : Dialog
     {
-        public override bool IsBack { get; protected set; } = false;
-
         /// <summary>タイトル</summary>
         [SerializeField] TextMeshProUGUI titleText = null;
         /// <summary>本文</summary>
@@ -89,7 +86,7 @@ namespace Hermes.API
             this.options = options as Options;
             titleText.SetTextLocalizeOrInactive(this.options.TitleKey);
             bodyText.SetTextLocalizeOrInactive(this.options.BodyKey);
-            errorText.SetTextLocalizeOrInactive(this.options.Error);
+            errorText.text = this.options.Error;
             retryButton.SetActive(this.options.IsRetry);
             if (this.options.IsRetry)
             {
@@ -99,7 +96,6 @@ namespace Hermes.API
             else
             {
                 buttonText1.SetTextLocalize(titleButtonTextKey);
-                buttonText2.gameObject.SetActive(false);
             }
             ClickState = eClickState.Wait;
             return base.OnLoad(options);
