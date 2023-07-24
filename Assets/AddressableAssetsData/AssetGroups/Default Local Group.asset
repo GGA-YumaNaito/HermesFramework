@@ -92,11 +92,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a3938e42e16854994920199db89db5ab
-    m_Address: ErrorDialog
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bb7161e36c238482eb9fb77a33b72709
     m_Address: CommonDialog
     m_ReadOnly: 0

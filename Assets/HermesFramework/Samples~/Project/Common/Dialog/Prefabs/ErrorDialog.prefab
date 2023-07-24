@@ -134,6 +134,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  seName: 
+  isLongPress: 0
+  longPressDuration: 0.5
+  OnLongPressDown:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLongPressUp:
+    m_PersistentCalls:
+      m_Calls: []
+  isDrag: 0
+  isPrevPosition: 1
 --- !u!1 &259319892335884717
 GameObject:
   m_ObjectHideFlags: 0
@@ -403,6 +414,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  seName: 
+  isLongPress: 0
+  longPressDuration: 0.5
+  OnLongPressDown:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLongPressUp:
+    m_PersistentCalls:
+      m_Calls: []
+  isDrag: 0
+  isPrevPosition: 1
 --- !u!1 &4152041983505894500
 GameObject:
   m_ObjectHideFlags: 0
@@ -569,7 +591,7 @@ RectTransform:
   m_Children:
   - {fileID: 3040418658864741568}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -593,6 +615,10 @@ MonoBehaviour:
   bodyText: {fileID: 157609694466702549}
   errorText: {fileID: 7108888141705750224}
   retryButton: {fileID: 25212486537094739}
+  buttonText1: {fileID: 6837846289376368448}
+  buttonText2: {fileID: 6329773875972661382}
+  retryButtonTextKey: RETRY
+  titleButtonTextKey: TITLE
 --- !u!1 &4783666512489264837
 GameObject:
   m_ObjectHideFlags: 0
@@ -860,7 +886,7 @@ GameObject:
   - component: {fileID: 33469425012712582}
   - component: {fileID: 5733488680119356014}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
