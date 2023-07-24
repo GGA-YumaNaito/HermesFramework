@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace Hermes.API.Sample
 {
@@ -27,18 +28,24 @@ namespace Hermes.API.Sample
         /// <summary>RequestList</summary>
         [SerializeField] RequestList requestList;
 
-        /// <summary>Assembly</summary>
-        Assembly assembly;
-        /// <summary>Types</summary>
-        List<Type> types;
-        /// <summary>Type</summary>
-        Type type;
+        /// <summary>データTypes</summary>
+        List<Type> dataTypes = new();
+        /// <summary>レスポンスTypes</summary>
+        List<Type> responseTypes = new();
+        /// <summary>リクエストTypes</summary>
+        List<Type> requestTypes = new();
+        /// <summary>Data Type</summary>
+        Type dataType;
+        /// <summary>Response Type</summary>
+        Type responseType;
         /// <summary>Request type</summary>
         Type requestType;
         /// <summary>Request instance</summary>
         object requestInstance;
         /// <summary>SendWebRequest method</summary>
         MethodInfo sendWebRequestMethod;
+
+        static bool isOne = false;
 
         /// <summary>オプション</summary>
         public class Options
@@ -57,17 +64,38 @@ namespace Hermes.API.Sample
         /// <summary>
         /// スタート
         /// </summary>
-        void Start()
+        async void Start()
         {
-            assembly = Assembly.GetExecutingAssembly();
+            if (!isOne)
+            {
+                isOne = true;
+                await SceneManager.UnloadSceneAsync(GetType().Name);
+                await UI.UIManager.Instance.LoadAsync<APIManagerSampleScene>();
+                return;
+            }
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                dataTypes.AddRange(assembly.GetTypes()
+                    .Where(p => p.BaseType != null && p.BaseType.IsGenericType && p.BaseType.GetGenericTypeDefinition() == typeof(APIData<,,>))
+                    .OrderBy(o => o.Name)
+                    .ToList());
+                requestTypes.AddRange(assembly.GetTypes()
+                    .Where(p => dataTypes.Find(x => p.FullName.Contains(x.FullName + "+Request")) != null)
+                    .OrderBy(o => o.Name)
+                    .ToList());
+                responseTypes.AddRange(assembly.GetTypes()
+                    .Where(p => dataTypes.Find(x => p.FullName.Contains(x.FullName + "+Response")) != null)
+                    .OrderBy(o => o.Name)
+                    .ToList());
+            }
+            dataTypes = dataTypes.OrderBy(o => o.Name).ToList();
+            requestTypes = requestTypes.OrderBy(o => o.Name).ToList();
+            responseTypes = responseTypes.OrderBy(o => o.Name).ToList();
 
-            types = assembly.GetTypes()
-                .Where(p => p.BaseType.IsGenericType && p.BaseType.GetGenericTypeDefinition() == typeof(APIData<>))
-                .OrderBy(o => o.Name)
-                .ToList();
-
-            type = types[0];
-            requestType = assembly.GetType($"{type.FullName}+Request");
+            dataType = dataTypes[0];
+            requestType = requestTypes.Find(x => x.FullName.Contains(dataType.Name));
+            responseType = responseTypes.Find(x => x.FullName.Contains(dataType.Name));
 
             requestInstance = Activator.CreateInstance(requestType);
 
@@ -75,25 +103,24 @@ namespace Hermes.API.Sample
 
             requestList.SetItem(requestType);
 
-            var stringTypes = types.Select(x => x.Name).ToList();
+            var stringTypes = dataTypes.Select(x => x.Name).ToList();
 
             dropdown.ClearOptions();
             dropdown.AddOptions(stringTypes);
             dropdown.onValueChanged.AddListener(_ => DropdownValueChanged(dropdown));
 
-            var paramActionType = typeof(Action<>).MakeGenericType(type);
+            //var paramActionType = typeof(Action<>).MakeGenericType(dataType);
 
-            var methods = typeof(APIManager).GetMethods(BindingFlags.Public | BindingFlags.Static).Where(x => x.Name == "SendWebRequest" && x.IsGenericMethod);
+            var methods = typeof(APIManager).GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(x => x.Name == "SendWebRequest" && x.IsGenericMethod);
             foreach (var method in methods)
             {
                 var parameters = method.GetParameters();
-                if (parameters.Length == 6 &&
+                if (parameters.Length == 5 &&
                     //requestType.IsClass &&
                     //parameters[1].ParameterType == paramActionType &&
                     //parameters[2].ParameterType == paramActionType &&
                     parameters[3].ParameterType == typeof(bool) &&
-                    parameters[4].ParameterType == typeof(bool) &&
-                    parameters[5].ParameterType == typeof(ulong))
+                    parameters[4].ParameterType == typeof(bool))
                 {
                     sendWebRequestMethod = method;
                     break;
@@ -165,8 +192,9 @@ namespace Hermes.API.Sample
         /// <param name="change">TMP_Dropdown</param>
         void DropdownValueChanged(TMP_Dropdown change)
         {
-            type = types[change.value];
-            requestType = assembly.GetType($"{type.FullName}+Request");
+            dataType = dataTypes[change.value];
+            requestType = requestTypes.Find(x => x.FullName.Contains(dataType.Name));
+            responseType = responseTypes.Find(x => x.FullName.Contains(dataType.Name));
 
             requestInstance = Activator.CreateInstance(requestType);
 
@@ -183,8 +211,8 @@ namespace Hermes.API.Sample
                 requestList.SetInstance(requestInstance);
 
                 var uniTask = sendWebRequestMethod
-                    .MakeGenericMethod(requestType, type)
-                    .Invoke(type, new object[] { requestInstance, null, null, true, true, 0ul });
+                    .MakeGenericMethod(dataType, requestType, responseType)
+                    .Invoke(APIManager.Instance, new object[] { requestInstance, null, null, true, true });
 
                 await (UniTask)uniTask;
             }

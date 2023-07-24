@@ -27,8 +27,6 @@ namespace Hermes.API
         [SerializeField] bool isRequestQueue = true;
         /// <summary>TypeQueue.</summary>
         [SerializeField] Queue<Type> typeQueue = new Queue<Type>();
-        ///// <summary>シーケンスID.</summary>
-        //static ulong sequenceId = 0;
         /// <summary>リセットフラグ.</summary>
         bool isReset = false;
         /// <summary>タイトルシーン名</summary>
@@ -45,75 +43,88 @@ namespace Hermes.API
         /// <summary>暗号化の共有キー(非公開)</summary>
         static readonly string key = "abcdefghijklmnop";
 
-        // TODO:シーケンスIDをどう扱うかを考える
+        /// <summary>アクセストークン</summary>
+        string token = string.Empty;
 
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T">RequestData</typeparam>
-        /// <typeparam name="T2">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="onSuccess">成功コールバック</param>
         /// <param name="onFailed">失敗コールバック</param>
         /// <param name="isQueue">キューにためるか.</param>
         /// <param name="isRetry">リトライするか.</param>
-        /// <param name="sequenceId">シーケンスID.</param>
         /// <returns>UniTask</returns>
-        public static async UniTask SendWebRequest<T, T2>(T postData, Action<T2> onSuccess = null, Action<T2> onFailed = null, bool isQueue = false, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
+        public async UniTask SendWebRequest<TData, TRequest, TResponse>(TRequest postData, Action<TData> onSuccess = null, Action<TData> onFailed = null, bool isQueue = false, bool isRetry = true)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
-            await SendWebRequest(postData, "", onSuccess, onFailed, isQueue, isRetry, sequenceId);
+            await SendWebRequest<TData, TRequest, TResponse>(postData, "", onSuccess, onFailed, isQueue, isRetry);
         }
 
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T">RequestData</typeparam>
-        /// <typeparam name="T2">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
         /// <param name="onFailed">失敗コールバック</param>
         /// <param name="isQueue">キューにためるか.</param>
         /// <param name="isRetry">リトライするか.</param>
-        /// <param name="sequenceId">シーケンスID.</param>
         /// <returns>UniTask</returns>
-        public static async UniTask SendWebRequest<T, T2>(T postData, Dictionary<string, object> queryParams, Action<T2> onSuccess = null, Action<T2> onFailed = null, bool isQueue = false, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
+        public async UniTask SendWebRequest<TData, TRequest, TResponse>(TRequest postData, Dictionary<string, object> queryParams, Action<TData> onSuccess = null, Action<TData> onFailed = null, bool isQueue = false, bool isRetry = true)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
-            await SendWebRequest(postData, QueryParamConvertDictionaryToString(queryParams), onSuccess, onFailed, isQueue, isRetry, sequenceId);
+            await SendWebRequest<TData, TRequest, TResponse>(postData, QueryParamConvertDictionaryToString(queryParams), onSuccess, onFailed, isQueue, isRetry);
         }
 
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T">RequestData</typeparam>
-        /// <typeparam name="T2">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
         /// <param name="onFailed">失敗コールバック</param>
         /// <param name="isQueue">キューにためるか.</param>
         /// <param name="isRetry">リトライするか.</param>
-        /// <param name="sequenceId">シーケンスID.</param>
         /// <returns>UniTask</returns>
-        public static async UniTask SendWebRequest<T, T2>(T postData, object[] queryParams, Action<T2> onSuccess = null, Action<T2> onFailed = null, bool isQueue = false, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
+        public async UniTask SendWebRequest<TData, TRequest, TResponse>(TRequest postData, object[] queryParams, Action<TData> onSuccess = null, Action<TData> onFailed = null, bool isQueue = false, bool isRetry = true)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
-            await SendWebRequest(postData, QueryParamConvertObjectArrayToString(queryParams), onSuccess, onFailed, isQueue, isRetry, sequenceId);
+            await SendWebRequest<TData, TRequest, TResponse>(postData, QueryParamConvertObjectArrayToString(queryParams), onSuccess, onFailed, isQueue, isRetry);
         }
 
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T">RequestData</typeparam>
-        /// <typeparam name="T2">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
         /// <param name="onFailed">失敗コールバック</param>
         /// <param name="isQueue">キューにためるか.</param>
         /// <param name="isRetry">リトライするか.</param>
-        /// <param name="sequenceId">シーケンスID.</param>
         /// <returns>UniTask</returns>
-        static async UniTask SendWebRequest<T, T2>(T postData, string queryParams, Action<T2> onSuccess = null, Action<T2> onFailed = null, bool isQueue = false, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
+        async UniTask SendWebRequest<TData, TRequest, TResponse>(TRequest postData, string queryParams, Action<TData> onSuccess = null, Action<TData> onFailed = null, bool isQueue = false, bool isRetry = true)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
             // キューにためる場合.
             if (isQueue && Instance.retryNum <= 0)
@@ -121,14 +132,14 @@ namespace Hermes.API
                 // リセットフラグ解除.
                 Instance.isReset = false;
                 // キューにためる.
-                Instance.typeQueue.Enqueue(typeof(T));
+                Instance.typeQueue.Enqueue(typeof(TRequest));
                 // 自分の番まで処理中断.
                 while (true)
                 {
                     await UniTask.Yield();
                     if (Instance.isRequestQueue)
                     {
-                        if (Instance.typeQueue.Peek() == typeof(T))
+                        if (Instance.typeQueue.Peek() == typeof(TRequest))
                         {
                             if (Instance.isReset)
                             {
@@ -141,7 +152,7 @@ namespace Hermes.API
                     }
                 }
             }
-            await PostSendWebRequest<T, T2>(
+            await PostSendWebRequest<TData, TRequest, TResponse>(
                 postData, queryParams,
                 // 成功コールバックを実行.
                 (request, data) =>
@@ -157,31 +168,32 @@ namespace Hermes.API
                 // 失敗コールバックを実行.
                 (request) =>
                 {
+                    TData data = default;
                     if (string.IsNullOrWhiteSpace(request.downloadHandler.text))
                         onFailed?.Invoke(null);
                     else
                     {
-                        var data = GetResponseData<T2>(request);
+                        data = GetResponseData<TData, TRequest, TResponse>(request);
                         data.SetHeaders(request.GetResponseHeaders());
                         onFailed?.Invoke(data);
                     }
-#if DEBUG_LOG
-                    Debug.Log ("<color=red><" + typeof(T) + "> Failed : " + request.errorCode.Label () + "</color>");
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
+                    Debug.Log ("<color=red><" + typeof(TRequest) + "> Failed : " + data?.response.ErrorCode.Label() + "</color>");
 #endif
                 },
                 // 通信失敗.
                 (request) =>
                 {
-#if DEBUG_LOG
-                    Debug.Log ("<color=red><" + typeof(T) + "> Error : " + request.error + "</color>");
+#if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
+                    Debug.Log ("<color=red><" + typeof(TRequest) + "> Error : " + request.error + "</color>");
 #endif
-                }, isRetry, sequenceId);
+                }, isRetry);
 
             await UniTask.Yield();
             // キューにためる場合.
             if (isQueue && Instance.retryNum <= 0)
             {
-                if (Instance.typeQueue.Count > 0 && Instance.typeQueue.Peek() == typeof(T))
+                if (Instance.typeQueue.Count > 0 && Instance.typeQueue.Peek() == typeof(TRequest))
                 {
                     // リクエスト再開.
                     Instance.isRequestQueue = true;
@@ -193,19 +205,22 @@ namespace Hermes.API
         /// <summary>
         /// POST通信
         /// </summary>
-        /// <typeparam name="T">RequestData</typeparam>
-        /// <typeparam name="T2">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="postData">ポストデータ</param>
         /// <param name="queryParams">クエリパラメータ</param>
         /// <param name="onSuccess">成功コールバック</param>
         /// <param name="onFailed">失敗コールバック</param>
         /// <param name="onError">通信がエラーだった時のコールバック.</param>
         /// <param name="isRetry">リトライするか.</param>
-        /// <param name="sequenceId">シーケンスID.</param>
         /// <returns>UniTask</returns>
-        static async UniTask PostSendWebRequest<T, T2>(T postData, string queryParams, Action<UnityWebRequest, T2> onSuccess = null, Action<UnityWebRequest> onFailed = null, Action<UnityWebRequest> onError = null, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
+        async UniTask PostSendWebRequest<TData, TRequest, TResponse>(TRequest postData, string queryParams, Action<UnityWebRequest, TData> onSuccess = null, Action<UnityWebRequest> onFailed = null, Action<UnityWebRequest> onError = null, bool isRetry = true)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
-            var serverData = new T2();
+            var serverData = new TData();
 
             // TODO: 今はPOSTでなかったら弾く
             if (!serverData.IsPost)
@@ -230,7 +245,7 @@ namespace Hermes.API
                 request.uploadHandler = new UploadHandlerRaw(bytes);
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.timeout = Instance.timeout;
-                request.SetRequestHeader("Content-Type", "application/json");
+                //request.SetRequestHeader("Content-Type", "application/json");
                 //request.SetRequestHeader("accept-encoding", "gzip");
                 //request.SetRequestHeader("user-agent", "gzip");
                 request.SetRequestHeader("iv", iv);
@@ -243,16 +258,16 @@ namespace Hermes.API
                 // 通信失敗
                 if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    await PostSendWebRequestError(false, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                    await PostSendWebRequestError<TData, TRequest, TResponse>(false, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry);
                 }
                 // 通信成功
                 else
                 {
                     // 通信は成功したが、APIが失敗していたら
-                    var data = GetResponseData<T2>(request);
-                    if (data.ErrorCode > eAPIErrorCode.None)
+                    var data = GetResponseData<TData, TRequest, TResponse>(request);
+                    if (data.response.ErrorCode > eAPIErrorCode.None)
                     {
-                        await PostSendWebRequestError(true, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                        await PostSendWebRequestError<TData, TRequest, TResponse>(true, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry);
                     }
                     // APIが成功だったら
                     else
@@ -273,8 +288,9 @@ namespace Hermes.API
         /// <summary>
         /// POST通信失敗
         /// </summary>
-        /// <typeparam name="T">RequestData</typeparam>
-        /// <typeparam name="T2">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="isFailed">APIで失敗.</param>
         /// <param name="request">リクエスト</param>
         /// <param name="url">URL</param>
@@ -284,9 +300,11 @@ namespace Hermes.API
         /// <param name="onFailed">失敗コールバック</param>
         /// <param name="onError">通信がエラーだった時のコールバック.</param>
         /// <param name="isRetry">リトライするか.</param>
-        /// <param name="sequenceId">シーケンスID.</param>
         /// <returns>UniTask</returns>
-        static async UniTask PostSendWebRequestError<T, T2>(bool isFailed, UnityWebRequest request, string url, T postData, string queryParams, Action<UnityWebRequest, T2> onSuccess = null, Action<UnityWebRequest> onFailed = null, Action<UnityWebRequest> onError = null, bool isRetry = true, ulong sequenceId = 0) where T : class where T2 : APIDataBase<T2>, new()
+        async UniTask PostSendWebRequestError<TData, TRequest, TResponse>(bool isFailed, UnityWebRequest request, string url, TRequest postData, string queryParams, Action<UnityWebRequest, TData> onSuccess = null, Action<UnityWebRequest> onFailed = null, Action<UnityWebRequest> onError = null, bool isRetry = true)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
 #if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             if (isFailed)
@@ -306,17 +324,17 @@ namespace Hermes.API
                     ErrorDialog dialog = null;
                     if (isFailed)
                     {
-                        var data = GetResponseData<T2>(request);
-                        dialog = await ErrorDialog.Create(Instance.errorTitleAPIKey, Instance.errorBodyKey, data.ErrorCode.Label(), true);
+                        var data = GetResponseData<TData, TRequest, TResponse>(request);
+                        dialog = await ErrorDialog.Create(Instance.errorTitleAPIKey, Instance.errorBodyKey, data.response.ErrorCode.Label(), true);
                     }
                     else
                         dialog = await ErrorDialog.Create(Instance.errorTitleHttpKey, Instance.errorBodyKey, request.error, true);
-                    await UniTask.WaitUntil(() => dialog.ClickStateWait());
-                    if (dialog.ClickState == ErrorDialog.eClickState.Retry)
+                    await UniTask.WaitUntil(() => dialog == null || !dialog.ClickStateWait());
+                    if (dialog != null && dialog.ClickState == ErrorDialog.eClickState.Retry)
                     {
                         // リトライ.
                         await UIManager.Instance.BackAsync();
-                        await PostSendWebRequest(postData, queryParams, onSuccess, onFailed, onError, isRetry, sequenceId);
+                        await PostSendWebRequest<TData, TRequest, TResponse>(postData, queryParams, onSuccess, onFailed, onError, isRetry);
                     }
                     else
                     {
@@ -351,8 +369,8 @@ namespace Hermes.API
                     ErrorDialog dialog = null;
                     if (isFailed)
                     {
-                        var data = GetResponseData<T2>(request);
-                        dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: data.ErrorCode.Label(), isRetry: false);
+                        var data = GetResponseData<TData, TRequest, TResponse>(request);
+                        dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: data.response.ErrorCode.Label(), isRetry: false);
                     }
                     else
                         dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: request.error, isRetry: false);
@@ -387,7 +405,7 @@ namespace Hermes.API
         /// </summary>
         /// <param name="queryParams"></param>
         /// <returns>クエリパラメータ</returns>
-        static string QueryParamConvertDictionaryToString(Dictionary<string, object> queryParams)
+        string QueryParamConvertDictionaryToString(Dictionary<string, object> queryParams)
         {
             if (queryParams == null || queryParams.Count == 0)
                 return "";
@@ -416,7 +434,7 @@ namespace Hermes.API
         /// </summary>
         /// <param name="queryParams"></param>
         /// <returns>クエリパラメータ</returns>
-        static string QueryParamConvertObjectArrayToString(object[] queryParams)
+        string QueryParamConvertObjectArrayToString(object[] queryParams)
         {
             if (queryParams == null || queryParams.Length == 0)
                 return "";
@@ -445,10 +463,14 @@ namespace Hermes.API
         /// <param name="postData">ポストデータ</param>
         /// <param name="iv">初期化ベクトル(公開)</param>
         /// <returns>リクエストデータ</returns>
-        static byte[] GetRequestData<T>(T postData, string iv) where T : class
+        byte[] GetRequestData<T>(T postData, string iv) where T : class
         {
             // 1. Class Instance -> Json
             var json = JsonUtility.ToJson(postData);
+            // アクセストークンがあったら最後の文字を削除し、access_tokenを送る
+            if (!Instance.token.IsNullOrEmpty())
+                json = $"{json[..^1]},\"access_token\":\"{Instance.token}\"}}";
+
 #if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             Debug.Log($"postData = {json}");
 #endif
@@ -465,17 +487,31 @@ namespace Hermes.API
         /// <summary>
         /// レスポンスデータ取得
         /// </summary>
-        /// <typeparam name="T">ResponseData</typeparam>
+        /// <typeparam name="TData">Data</typeparam>
+        /// <typeparam name="TRequest">RequestData</typeparam>
+        /// <typeparam name="TResponse">ResponseData</typeparam>
         /// <param name="request">UnityWebRequest</param>
         /// <returns>レスポンスデータ</returns>
-        static T GetResponseData<T>(UnityWebRequest request) where T : APIDataBase<T>
+        TData GetResponseData<TData, TRequest, TResponse>(UnityWebRequest request)
+        where TData : APIData<TData, TRequest, TResponse>, new()
+        where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
+        where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
             // 1. AES -> GZip
             var aes = AES128Base64.Decode(request.downloadHandler.text, key, request.GetResponseHeader("iv"));
             // 2. GZip -> Json
             var gzip = GZipBase64.Decompress(aes);
             // 3. Json -> Class Instance
-            return JsonUtility.FromJson<T>(gzip);
+            return JsonUtility.FromJson<TData>(gzip);
+        }
+
+        /// <summary>
+        /// アクセストークン設定
+        /// </summary>
+        /// <param name="accessToken">アクセストークン</param>
+        public void SetAccessToken(string accessToken)
+        {
+            token = accessToken;
         }
     }
 }
