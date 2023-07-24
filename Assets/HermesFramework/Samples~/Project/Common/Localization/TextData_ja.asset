@@ -70,6 +70,22 @@ MonoBehaviour:
     m_Localized: "\u753B\u9762\u3092\u30BF\u30C3\u30C1\u3057\u3066\u304F\u3060\u3055\u3044"
     m_Metadata:
       m_Items: []
+  - m_Id: 34840033314725888
+    m_Localized: "API \u30A8\u30E9\u30FC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34840125765574656
+    m_Localized: "HTTP \u30A8\u30E9\u30FC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34840217557917696
+    m_Localized: "\u30A8\u30E9\u30FC\u5185\u5BB9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34842915111952384
+    m_Localized: "\u30BF\u30A4\u30C8\u30EB"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

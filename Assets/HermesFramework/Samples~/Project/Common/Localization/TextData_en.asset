@@ -70,6 +70,22 @@ MonoBehaviour:
     m_Localized: Tap to screen
     m_Metadata:
       m_Items: []
+  - m_Id: 34840033314725888
+    m_Localized: API Error
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34840125765574656
+    m_Localized: HTTP Error
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34840217557917696
+    m_Localized: Error body.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34842915111952384
+    m_Localized: Title
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
