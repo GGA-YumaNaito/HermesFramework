@@ -226,6 +226,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  seName: 
+  isLongPress: 0
+  longPressDuration: 0.5
+  OnLongPressDown:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLongPressUp:
+    m_PersistentCalls:
+      m_Calls: []
+  isDrag: 0
+  isPrevPosition: 1
 --- !u!114 &29653896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,7 +364,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transition: {fileID: 0}
   camera: {fileID: 1164964521}
-  isApiManager: 0
+  isApiManager: 1
   isPost: 1
   url: http://localhost:8000/shop/list
   dropdown: {fileID: 391888339}
