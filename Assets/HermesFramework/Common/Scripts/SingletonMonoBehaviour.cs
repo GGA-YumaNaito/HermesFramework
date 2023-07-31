@@ -18,15 +18,8 @@ namespace Hermes
         {
             get
             {
-                if (!instance)
-                {
-                    Type t = typeof(T);
-                    instance = (T)FindObjectOfType(t);
-                    if (!instance)
-                    {
-                        Debug.LogError($"{t} is nothing.");
-                    }
-                }
+                if (!HasInstance())
+                    Debug.LogError($"{typeof(T)} is nothing.");
                 return instance;
             }
         }
@@ -45,6 +38,16 @@ namespace Hermes
             {
                 DontDestroyOnLoad(gameObject);
             }
+        }
+
+        /// <summary>
+        /// Instanceが存在するか
+        /// </summary>
+        /// <returns></returns>
+        public static bool HasInstance()
+        {
+            instance ??= (T)FindObjectOfType(typeof(T));
+            return instance is not null;
         }
     }
 }
