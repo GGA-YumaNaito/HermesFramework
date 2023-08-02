@@ -116,10 +116,8 @@ namespace Hermes.Save
 #endif
             // 2. Json -> Gzip
             var gzip = GZipBase64.Compress(_data);
-            Debug.Log($"SaveData2 = {gzip}");
 
             // 3. GZip -> AES
-            Debug.Log($"SaveData3 = {AES128Base64.Encode(gzip, key, iv)}");
             return AES128Base64.Encode(gzip, key, iv);
         }
 
