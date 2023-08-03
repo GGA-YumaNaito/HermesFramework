@@ -17,12 +17,18 @@ namespace Hermes.Save
         /// <summary>バイナリフォーマッター</summary>
         BinaryFormatter bf;
 
-        string dirPass { get { return $"{FileUtils.Pass}/SaveData"; } }
-
         /// <summary>暗号化の共有キー(非公開)</summary>
         static readonly string key = "RARdRxzemkkewJQm";
         /// <summary>初期化ベクトル(公開)</summary>
         static readonly string iv = "SInKORyzckHTuMfI";
+
+        /// <summary>ディレクトリパス</summary>
+        string dirPass { get { return $"{FileUtils.Pass}/SaveData"; } }
+
+        /// <summary>
+        /// ファイルパス取得
+        /// </summary>
+        string GetFilePass(string name) => $"{dirPass}/{name}.dat";
 
         protected override void Awake()
         {
@@ -30,6 +36,16 @@ namespace Hermes.Save
 
             if (!Directory.Exists(dirPass))
                 Directory.CreateDirectory(dirPass);
+        }
+
+        /// <summary>
+        /// ファイルが存在しているか
+        /// </summary>
+        /// <param name="name">ファイル名</param>
+        /// <returns>true = 存在している : false = 存在していない</returns>
+        public bool HasFile(string name)
+        {
+            return File.Exists(GetFilePass(name));
         }
 
         /// <summary>
@@ -49,7 +65,7 @@ namespace Hermes.Save
             try
             {
                 // SaveDataフォルダにdatファイルを作成
-                fileStream = File.Open($"{dirPass}/{name}.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                fileStream = File.Open(GetFilePass(name), FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 // ファイルに保存
                 bf.Serialize(fileStream, Encode<T>(data));
             }
@@ -78,7 +94,7 @@ namespace Hermes.Save
             try
             {
                 // ファイルを読み込む
-                fileStream = File.Open($"{dirPass}/{name}.dat", FileMode.Open);
+                fileStream = File.Open(GetFilePass(name), FileMode.Open);
                 // 読み込んだデータをデシリアライズ
                 data = Decode<T>((string)bf.Deserialize(fileStream));
             }
