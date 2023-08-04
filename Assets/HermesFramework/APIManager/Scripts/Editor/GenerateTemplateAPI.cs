@@ -16,6 +16,9 @@ namespace Hermes.API.Editor
         /// <summary>APIの名前</summary>
         static string apiName { get; set; } = "hoge/hoge";
 
+        /// <summary>新しいアクティブインスタンスのパス</summary>
+        string newCurrentPath = string.Empty;
+
         [MenuItem("Hermes/GenerateTemplate/GenerateTemplateAPI")]
         private static void OpenWindow()
         {
@@ -27,7 +30,14 @@ namespace Hermes.API.Editor
             GUILayout.Label("テンプレートシーンの作成", EditorStyles.boldLabel);
 
             GUILayout.Space(10f);
-            currentPath = EditorGUILayout.TextField("Current Path", currentPath);
+            newCurrentPath = EditorGUILayout.TextField("Current Path", currentPath);
+            if (newCurrentPath != currentPath)
+            {
+                currentPath = newCurrentPath;
+                // 値を設定
+                EditorUserSettings.SetConfigValue("GenerateTemplateAPI_currentPath", currentPath);
+                AssetDatabase.SaveAssets();
+            }
 
             GUILayout.Space(10f);
             currentName = EditorGUILayout.TextField("Current Name", currentName);
@@ -36,7 +46,7 @@ namespace Hermes.API.Editor
             apiName = EditorGUILayout.TextField("API Name", apiName);
 
             GUILayout.Space(10f);
-            if (GUILayout.Button("作成"))
+            if (GUILayout.Button("Generate"))
             {
                 // スクリプトを作成
                 GenerateScripts(currentName, apiName, Template);

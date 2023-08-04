@@ -20,6 +20,9 @@ namespace Hermes.UI.Editor
         /// <summary>アクティブインスタンスの名前（フォルダ名）</summary>
         static string currentName { get; set; } = "Template";
 
+        /// <summary>新しいアクティブインスタンスのパス</summary>
+        string newCurrentPath = string.Empty;
+
         [MenuItem("Hermes/GenerateTemplate/GenerateTemplateScene")]
         private static void OpenWindow()
         {
@@ -31,13 +34,20 @@ namespace Hermes.UI.Editor
             GUILayout.Label("テンプレートシーンの作成", EditorStyles.boldLabel);
 
             GUILayout.Space(10f);
-            currentPath = EditorGUILayout.TextField("CurrentPath", currentPath);
+            newCurrentPath = EditorGUILayout.TextField("Current Path", currentPath);
+            if (newCurrentPath != currentPath)
+            {
+                currentPath = newCurrentPath;
+                // 値を設定
+                EditorUserSettings.SetConfigValue("GenerateTemplateAPI_currentPath", currentPath);
+                AssetDatabase.SaveAssets();
+            }
 
             GUILayout.Space(10f);
-            currentName = EditorGUILayout.TextField("CurrentName", currentName);
+            currentName = EditorGUILayout.TextField("Current Name", currentName);
 
             GUILayout.Space(10f);
-            if (GUILayout.Button("作成"))
+            if (GUILayout.Button("Generate"))
             {
                 CreateTemplatePackage();
             }
