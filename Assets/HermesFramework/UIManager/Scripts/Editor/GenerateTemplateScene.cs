@@ -16,47 +16,140 @@ namespace Hermes.UI.Editor
     public class GenerateTemplateScene : EditorWindow
     {
         /// <summary>アクティブインスタンスのパス</summary>
-        static string currentPath { get; set; } = "Assets/Project";
+        string currentPath = "Assets/Project";
         /// <summary>アクティブインスタンスの名前（フォルダ名）</summary>
-        static string currentName { get; set; } = "Template";
-
+        string currentName = "Template";
         /// <summary>新しいアクティブインスタンスのパス</summary>
         string newCurrentPath = string.Empty;
 
+        /// <summary>指定したフォルダ</summary>
+        DefaultAsset targetFolder = null;
+        /// <summary>新しい指定したフォルダ</summary>
+        DefaultAsset newTargetFolder = null;
+        /// <summary>指定したフォルダのパス</summary>
+        static string targetFolderPath = string.Empty;
+
         [MenuItem("Hermes/GenerateTemplate/GenerateTemplateScene")]
-        private static void OpenWindow()
+        static void OpenWindow()
         {
-            EditorWindow.GetWindow<GenerateTemplateScene>("GenerateTemplateScene");
+            GetWindow<GenerateTemplateScene>("GenerateTemplateScene");
         }
 
-        private void OnGUI()
+        void OnGUI()
         {
             GUILayout.Label("テンプレートシーンの作成", EditorStyles.boldLabel);
 
             GUILayout.Space(10f);
-            newCurrentPath = EditorGUILayout.TextField("Current Path", currentPath);
-            if (newCurrentPath != currentPath)
+            var canGenerate = false;
+            using (new EditorGUILayout.HorizontalScope())
             {
-                currentPath = newCurrentPath;
-                // 値を設定
-                EditorUserSettings.SetConfigValue("GenerateTemplateAPI_currentPath", currentPath);
-                AssetDatabase.SaveAssets();
+                currentPath = EditorUserSettings.GetConfigValue("GenerateTemplateScene_currentPath");
+                targetFolderPath = EditorUserSettings.GetConfigValue("GenerateTemplateScene_targetFolderPath");
+
+                if (AssetDatabase.LoadAssetAtPath<DefaultAsset>(currentPath))
+                {
+                    var tex = EditorGUIUtility.IconContent("lightMeter/greenLight");
+                    EditorGUILayout.LabelField(new GUIContent(tex), GUILayout.MaxWidth(10));
+                    canGenerate = true;
+                }
+                else
+                {
+                    var tex = EditorGUIUtility.IconContent("lightMeter/redLight");
+                    EditorGUILayout.LabelField(new GUIContent(tex), GUILayout.MaxWidth(10));
+                }
+                GUILayout.Label("Current Path", GUILayout.MaxWidth(100f));
+                newCurrentPath = GUILayout.TextField(currentPath);
+                if (newCurrentPath != currentPath)
+                {
+                    currentPath = newCurrentPath;
+                    // 値を設定
+                    EditorUserSettings.SetConfigValue("GenerateTemplateScene_currentPath", currentPath);
+                    AssetDatabase.SaveAssets();
+                }
+                newTargetFolder = (DefaultAsset)EditorGUILayout.ObjectField(targetFolder, typeof(DefaultAsset), false, GUILayout.Width(100f));
+                if (newTargetFolder == null && targetFolder == null)
+                {
+                    if (targetFolderPath != string.Empty)
+                    {
+                        newTargetFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>(targetFolderPath);
+                        // ディレクトリでなければ、指定を解除する
+                        if (newTargetFolder)
+                        {
+                            bool isDirectory = File.GetAttributes(targetFolderPath).HasFlag(FileAttributes.Directory);
+                            if (isDirectory)
+                            {
+                                targetFolder = newTargetFolder;
+                            }
+                            else
+                            {
+                                newTargetFolder = null;
+                                targetFolderPath = string.Empty;
+                                EditorUserSettings.SetConfigValue("GenerateTemplateScene_targetFolderPath", targetFolderPath);
+                                AssetDatabase.SaveAssets();
+                            }
+                        }
+                        else
+                        {
+                            targetFolderPath = string.Empty;
+                            EditorUserSettings.SetConfigValue("GenerateTemplateScene_targetFolderPath", targetFolderPath);
+                            AssetDatabase.SaveAssets();
+                        }
+                    }
+                }
+                if (newTargetFolder != targetFolder)
+                {
+                    targetFolder = newTargetFolder;
+                    targetFolderPath = AssetDatabase.GetAssetOrScenePath(targetFolder);
+                    currentPath = targetFolderPath;
+                    // ディレクトリでなければ、指定を解除する
+                    bool isDirectory = File.GetAttributes(targetFolderPath).HasFlag(FileAttributes.Directory);
+                    if (!isDirectory)
+                    {
+                        targetFolder = null;
+                        targetFolderPath = string.Empty;
+                        currentPath = newCurrentPath;
+                    }
+                    // 値を設定
+                    EditorUserSettings.SetConfigValue("GenerateTemplateScene_targetFolderPath", targetFolderPath);
+                    EditorUserSettings.SetConfigValue("GenerateTemplateScene_currentPath", currentPath);
+                    AssetDatabase.SaveAssets();
+                }
+                if (targetFolderPath != AssetDatabase.GetAssetOrScenePath(targetFolder))
+                {
+                    if (targetFolderPath == currentPath)
+                    {
+                        currentPath = AssetDatabase.GetAssetOrScenePath(targetFolder);
+                        EditorUserSettings.SetConfigValue("GenerateTemplateScene_currentPath", currentPath);
+                    }
+                    targetFolderPath = AssetDatabase.GetAssetOrScenePath(targetFolder);
+                    // 値を設定
+                    EditorUserSettings.SetConfigValue("GenerateTemplateScene_targetFolderPath", targetFolderPath);
+                    AssetDatabase.SaveAssets();
+                }
             }
 
             GUILayout.Space(10f);
-            currentName = EditorGUILayout.TextField("Current Name", currentName);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.Space(17f);
+                GUILayout.Label("Current Name", GUILayout.MaxWidth(100f));
+                currentName = GUILayout.TextField(currentName);
+            }
 
             GUILayout.Space(10f);
             if (GUILayout.Button("Generate"))
             {
-                CreateTemplatePackage();
+                if (canGenerate)
+                    CreateTemplatePackage();
+                else
+                    Debug.LogError("CurrentPath is not set correctly.");
             }
         }
         
         /// <summary>
         /// 作成
         /// </summary>
-        private static void CreateTemplatePackage()
+        void CreateTemplatePackage()
         {
             // フォルダを作成
             AssetDatabase.CreateFolder(currentPath, currentName);
@@ -79,7 +172,7 @@ namespace Hermes.UI.Editor
         /// 新しくシーンを作成する
         /// </summary>
         /// <param name="baseName">作成するシーンの名前</param>
-        private static void CreateScene(string baseName = "Template")
+        void CreateScene(string baseName = "Template")
         {
             var sceneName = baseName + ".unity";
             var scenePath = currentPath + "/" + currentName + "/Scenes/" + sceneName;
@@ -93,7 +186,7 @@ namespace Hermes.UI.Editor
         /// </summary>
         /// <param name="scriptName">作成するスクリプトファイルの名前</param>
         /// <param name="scriptSource">作成するスクリプトのソース</param>
-        private static void GenerateScripts(string scriptName, string scriptSource)
+        void GenerateScripts(string scriptName, string scriptSource)
         {
             var filePath = currentPath + "/" + scriptName + "/Scripts/" + scriptName + "Scene.cs";
             var scriptPath = AssetDatabase.GenerateUniqueAssetPath(filePath);
@@ -111,13 +204,13 @@ namespace Hermes.UI.Editor
         /// </summary>
         [DidReloadScripts]
         [Obsolete]
-        private static void SceneRenovation()
+        static void SceneRenovation()
         {
             // 本スクリプトでのシーン作成を行った直後かどうかをチェック（クリップボード利用）
             if (GUIUtility.systemCopyBuffer.Split('@')[0] != "GenerateTemplateScene") return;
 
             // クリップボードから情報を取得
-            currentName = GUIUtility.systemCopyBuffer.Split('@')[1];
+            var currentName = GUIUtility.systemCopyBuffer.Split('@')[1];
 
             // クリップボードクリア
             GUIUtility.systemCopyBuffer = "";
@@ -177,7 +270,7 @@ namespace Hermes.UI.Editor
         }
 
         // 作成するスクリプトファイル：Template
-        private static readonly string Template =
+        static readonly string Template =
 @"using Cysharp.Threading.Tasks;
 
 namespace #TEMPLATENAME#
