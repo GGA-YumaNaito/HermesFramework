@@ -245,7 +245,9 @@ namespace Hermes.API
                 request.uploadHandler = new UploadHandlerRaw(bytes);
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.timeout = Instance.timeout;
-                //request.SetRequestHeader("Content-Type", "application/json");
+#if API_JSON
+                request.SetRequestHeader("Content-Type", "application/json");
+#endif
                 //request.SetRequestHeader("accept-encoding", "gzip");
                 //request.SetRequestHeader("user-agent", "gzip");
                 request.SetRequestHeader("iv", iv);
@@ -474,6 +476,9 @@ namespace Hermes.API
 #if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             Debug.Log($"postData = {json}");
 #endif
+#if API_JSON
+            return Encoding.UTF8.GetBytes(json);
+#else
             // 2. Json -> Gzip
             var gzip = GZipBase64.Compress(json);
 
@@ -482,6 +487,7 @@ namespace Hermes.API
 
             // 4. AES -> Binary
             return Encoding.UTF8.GetBytes(aes);
+#endif
         }
 
         /// <summary>
@@ -497,12 +503,16 @@ namespace Hermes.API
         where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
         where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
+#if API_JSON
+            return JsonUtility.FromJson<TData>(request.downloadHandler.text);
+#else
             // 1. AES -> GZip
             var aes = AES128Base64.Decode(request.downloadHandler.text, key, request.GetResponseHeader("iv"));
             // 2. GZip -> Json
             var gzip = GZipBase64.Decompress(aes);
             // 3. Json -> Class Instance
             return JsonUtility.FromJson<TData>(gzip);
+#endif
         }
 
         /// <summary>
