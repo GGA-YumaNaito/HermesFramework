@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.SceneManagement;
@@ -243,7 +242,7 @@ namespace Hermes.UI.Editor
             // RectTransform
             obj.AddComponent<RectTransform>();
             // Scriptをアタッチ
-            var screen = obj.AddComponentExt(currentName);
+            var screen = obj.AddComponentExt(currentName, currentName + "Scene");
             // カメラを設定
             ((Screen)screen).SetCamera(camera);
 
@@ -290,36 +289,12 @@ namespace #TEMPLATENAME#
         /// <summary>
         /// ロード
         /// </summary>
-        /// <param name=""options""></param>
+        /// <param name=""options"">オプション</param>
         public override UniTask OnLoad(object options)
         {
             return UniTask.CompletedTask;
         }
     }
 }";
-    }
-
-    /// <summary>
-    /// AddComponentExtension
-    /// </summary>
-    public static class AddComponentExtension
-    {
-        /// <summary>
-        /// AddComponentExt
-        /// </summary>
-        /// <param name="obj">this GameObject</param>
-        /// <param name="scriptName">Script name</param>
-        /// <returns>Component</returns>
-        public static Component AddComponentExt(this GameObject obj, string scriptName)
-        {
-            Assembly asm = Assembly.Load("Assembly-CSharp");
-            var type = asm?.GetType(scriptName + "." + scriptName + "Scene") ?? null;
-            if (type == null)
-            {
-                Debug.LogError($"Failed to ComponentType:{scriptName + "Scene"}");
-                return null;
-            }
-            return obj.AddComponent(type);
-        }
     }
 }
