@@ -99,7 +99,7 @@ public class ComponentReplacer : EditorWindow
         foreach (var component in components)
         {
             var gameObject = component.gameObject;
-            Debug.Log($"\t{gameObject.name}");
+            Debug.Log($"Object Name = {gameObject.name}");
             Undo.SetCurrentGroupName($"Replace Components");
 
             // まず元のコンポーネントをゲームオブジェクトごと複製
@@ -118,7 +118,7 @@ public class ComponentReplacer : EditorWindow
             var newComponent = Undo.AddComponent(gameObject, toType);
 
             // 複製しておいた元コンポーネントから新しいコンポーネントにデータをコピー
-            EditorUtility.CopySerialized(cloneComponent, newComponent);
+            EditorUtility.CopySerializedManagedFieldsOnly(cloneComponent, newComponent);
 
             // 複製は不要になったので削除する
             DestroyImmediate(cloneObject);
