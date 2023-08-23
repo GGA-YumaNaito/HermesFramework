@@ -33,7 +33,7 @@ namespace Home
 			if (visible)
 			{
                 // アイコンのロード.
-                AssetManager.Load<Sprite>(data.imageUrl, (x) => m_ImageIcon.sprite = x, m_ImageIcon.gameObject, this.GetCancellationTokenOnDestroy());
+                AssetManager.Instance.Load<Sprite>(data.imageUrl, (x) => m_ImageIcon.sprite = x, m_ImageIcon.gameObject, this.GetCancellationTokenOnDestroy());
             }
         }
 

@@ -17,7 +17,7 @@ namespace Hermes.Asset
         protected override bool isDontDestroyOnLoad => false;
 
         /// <summary>AsyncOperationHandleList</summary>
-        static Dictionary<string, AsyncOperationHandle<UnityEngine.Object>> asyncOperationHandleList = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>>();
+        Dictionary<string, AsyncOperationHandle<UnityEngine.Object>> asyncOperationHandleList = new Dictionary<string, AsyncOperationHandle<UnityEngine.Object>>();
 
         /// <summary>初期化完了しているか</summary>
         public bool IsInitializad { get; private set; } = false;
@@ -70,7 +70,7 @@ namespace Hermes.Asset
         /// <param name="onLoaded">ロードが完了した時にデータが返ってくる</param>
         /// <param name="releaseTarget">指定したオブジェクトが破壊された時にAddressableをReleaseする</param>
         /// <param name="token">CancellationToken</param>
-        public static async void Load<T>(string key, Action<T> onLoaded, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
+        public async void Load<T>(string key, Action<T> onLoaded, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             var ob = await LoadAsync<T>(key, releaseTarget, token);
             onLoaded?.Invoke(ob);
@@ -84,7 +84,7 @@ namespace Hermes.Asset
         /// <param name="releaseTarget">指定したオブジェクトが破壊された時にAddressableをReleaseする</param>
         /// <param name="token">CancellationToken</param>
         /// <returns>UniTask<T>(データ)</returns>
-        public static async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
+        public async UniTask<T> LoadAsync<T>(string key, GameObject releaseTarget = null, CancellationToken token = default) where T : UnityEngine.Object
         {
             // 初期化が完了するまで待機
             await UniTask.WaitUntil(() => AssetManager.Instance.IsInitializad);
@@ -110,7 +110,7 @@ namespace Hermes.Asset
         /// AddressablesのHandleを指定してReleaseする
         /// </summary>
         /// <param name="key">Addressable Name</param>
-        public static void Release(string key)
+        public void Release(string key)
         {
             if (asyncOperationHandleList.ContainsKey(key))
             {
@@ -123,7 +123,7 @@ namespace Hermes.Asset
         /// <summary>
         /// AddressablesのHandleを全てReleaseする
         /// </summary>
-        public static void ReleaseAll()
+        public void ReleaseAll()
         {
             foreach (var op in asyncOperationHandleList)
                 Addressables.Release(op.Value);
@@ -136,7 +136,7 @@ namespace Hermes.Asset
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns>T</returns>
-        static object Convert<T>(UnityEngine.Object obj) where T : UnityEngine.Object
+        object Convert<T>(UnityEngine.Object obj) where T : UnityEngine.Object
         {
             // Texture2D
             if (obj is Texture2D)

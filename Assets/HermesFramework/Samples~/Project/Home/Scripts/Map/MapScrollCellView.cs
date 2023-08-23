@@ -69,7 +69,7 @@ namespace Home
                 return;
 
             // 画像のロード.
-            AssetManager.Load<Sprite>(
+            AssetManager.Instance.Load<Sprite>(
                 data.ImageKey,
                 (x) =>
                 {

@@ -81,7 +81,7 @@ namespace Hermes.UI.UIManagerParts
             dialogBG.SetActive(true);
 
             // ロードアセット
-            var gameObject = await AssetManager.LoadAsync<GameObject>(viewName, releaseTarget, cancellationToken);
+            var gameObject = await AssetManager.Instance.LoadAsync<GameObject>(viewName, releaseTarget, cancellationToken);
 
             // DialogBGの位置を上げる
             dialogBG.transform.SetAsLastSibling();

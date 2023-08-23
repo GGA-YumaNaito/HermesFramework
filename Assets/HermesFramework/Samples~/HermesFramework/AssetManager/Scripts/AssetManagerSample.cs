@@ -20,7 +20,7 @@ namespace Hermes.Asset
 
         void Start()
         {
-            AssetManager.Load<SpriteAtlas>(atlas_key, (x) =>
+            AssetManager.Instance.Load<SpriteAtlas>(atlas_key, (x) =>
                 {
                     spriteAtlas = x;
                     image.sprite = spriteAtlas.GetSprite(image_key);
@@ -29,7 +29,7 @@ namespace Hermes.Asset
 
         public void OnClickCreateButton()
         {
-            AssetManager.Load<GameObject>(part_key, (x) =>
+            AssetManager.Instance.Load<GameObject>(part_key, (x) =>
             {
                 // Instantiate
                 var part = Instantiate(x, partParent);
