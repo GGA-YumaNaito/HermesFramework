@@ -79,6 +79,7 @@ namespace Hermes.UI.UIManagerParts
             await OnDisableSceneTransition();
             await CurrentScreen.OnDisplay();
             await UniTask.WaitUntil(() => CurrentScreen.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+            CurrentScreen.OnStart();
 
             return CurrentScreen;
         }

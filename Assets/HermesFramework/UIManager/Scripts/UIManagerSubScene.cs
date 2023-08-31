@@ -53,6 +53,7 @@ namespace Hermes.UI.UIManagerParts
             subScene.Initialize();
             await subScene.OnLoad(options);
             await subScene.OnDisplay();
+            subScene.OnStart();
             return subScene;
         }
 

@@ -86,6 +86,11 @@ namespace Hermes.UI
         }
 
         /// <summary>
+        /// スタート
+        /// </summary>
+        public virtual void OnStart() { }
+
+        /// <summary>
         /// 終了
         /// </summary>
         /// <returns>UniTask</returns>

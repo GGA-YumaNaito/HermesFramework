@@ -101,6 +101,7 @@ namespace Hermes.UI.UIManagerParts
             await CurrentDialog.OnLoad(options);
             await CurrentDialog.OnDisplay();
             await UniTask.WaitUntil(() => CurrentDialog.Status.Value == eStatus.Display, cancellationToken: cancellationToken);
+            CurrentDialog.OnStart();
 
             return CurrentDialog;
         }
@@ -138,7 +139,9 @@ namespace Hermes.UI.UIManagerParts
                 var dialogBGTransform = dialogBG.transform;
                 dialogBGTransform.SetSiblingIndex(dialogBGTransform.GetSiblingIndex() - 1);
             }
-            dialogList.Pop();
+            var unloadData = dialogList.Pop();
+
+            AssetManager.Instance.Release(unloadData.viewName);
 
             if (dialogList.Count > 0)
             {
