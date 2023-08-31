@@ -28,7 +28,23 @@ namespace Hermes.Save
         /// <summary>
         /// ファイルパス取得
         /// </summary>
+        /// <param name="name">ファイル名</param>
+        /// <returns>パス</returns>
         string GetFilePass(string name) => $"{dirPass}/{name}.dat";
+
+        /// <summary>
+        /// ファイルパス取得
+        /// </summary>
+        /// <param name="name">ファイル名</param>
+        /// <param name="designationPass">指定パス</param>
+        /// <returns>パス</returns>
+        string GetFilePass(string name, string designationPass)
+        {
+            if (designationPass.IsNullOrEmpty())
+                return GetFilePass(name);
+            else
+                return $"{designationPass}/{name}.dat";
+        }
 
         protected override void Awake()
         {
@@ -42,10 +58,11 @@ namespace Hermes.Save
         /// ファイルが存在しているか
         /// </summary>
         /// <param name="name">ファイル名</param>
+        /// <param name="designationPass">指定パス</param>
         /// <returns>true = 存在している : false = 存在していない</returns>
-        public bool HasFile(string name)
+        public bool HasFile(string name, string designationPass = null)
         {
-            return File.Exists(GetFilePass(name));
+            return File.Exists(GetFilePass(name, designationPass));
         }
 
         /// <summary>
@@ -57,15 +74,19 @@ namespace Hermes.Save
         /// <typeparam name="T">T</typeparam>
         /// <param name="name">ファイル名</param>
         /// <param name="data">データ</param>
-        public void Save<T>(string name, T data)
+        /// <param name="designationPass">指定パス</param>
+        public void Save<T>(string name, T data, string designationPass = null)
         {
             bf = new BinaryFormatter();
             fileStream = null;
 
             try
             {
+                // 指定パスが存在し、ディレクトリがなかったら作成
+                if (!designationPass.IsNullOrEmpty() && !Directory.Exists(designationPass))
+                    Directory.CreateDirectory(designationPass);
                 // SaveDataフォルダにdatファイルを作成
-                fileStream = File.Open(GetFilePass(name), FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                fileStream = File.Open(GetFilePass(name, designationPass), FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 // ファイルに保存
                 bf.Serialize(fileStream, Encode<T>(data));
             }
@@ -84,8 +105,9 @@ namespace Hermes.Save
         /// </summary>
         /// <typeparam name="T">T</typeparam>
         /// <param name="name">ファイル名</param>
+        /// <param name="designationPass">指定パス</param>
         /// <returns>データ</returns>
-        public T Load<T>(string name)
+        public T Load<T>(string name, string designationPass = null)
         {
             bf = new BinaryFormatter();
             fileStream = null;
@@ -94,7 +116,7 @@ namespace Hermes.Save
             try
             {
                 // ファイルを読み込む
-                fileStream = File.Open(GetFilePass(name), FileMode.Open);
+                fileStream = File.Open(GetFilePass(name, designationPass), FileMode.Open);
                 // 読み込んだデータをデシリアライズ
                 data = Decode<T>((string)bf.Deserialize(fileStream));
             }
@@ -111,6 +133,17 @@ namespace Hermes.Save
                 fileStream?.Close();
             }
             return data;
+        }
+
+        /// <summary>
+        /// 削除
+        /// </summary>
+        /// <param name="name">ファイル名</param>
+        /// <param name="designationPass">指定パス</param>
+        public void Delete(string name, string designationPass = null)
+        {
+            if (HasFile(name, designationPass))
+                File.Delete(GetFilePass(name, designationPass));
         }
 
         /// <summary>
