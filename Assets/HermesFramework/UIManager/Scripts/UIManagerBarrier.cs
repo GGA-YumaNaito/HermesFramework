@@ -21,7 +21,7 @@ namespace Hermes.UI.UIManagerParts
         /// <summary>
         /// バリアをアクティブ、非アクティブ化する
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">Value</param>
         public void SetActive(bool value)
         {
             if (value)
@@ -36,6 +36,15 @@ namespace Hermes.UI.UIManagerParts
                 if (count == 0)
                     barrier.SetActive(false);
             }
+        }
+
+        /// <summary>
+        /// 強制的にバリアをアクティブ、非アクティブ化する
+        /// </summary>
+        /// <param name="value">Value</param>
+        public void SetActiveForce(bool value)
+        {
+            barrier.SetActive(value);
         }
     }
 }

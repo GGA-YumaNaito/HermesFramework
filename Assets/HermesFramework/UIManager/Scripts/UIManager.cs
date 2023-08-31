@@ -275,21 +275,24 @@ namespace Hermes.UI
                     await uiScreen.UnloadAsync(cancellationToken);
                     await uiDialog.AllUnloadAsync(cancellationToken);
                 }
+
+                StackPush(viewName, type, options);
+
                 // シーンロード
                 CurrentView = null;
                 CurrentView = await uiScreen.LoadAsync<T>(camera, uiSubScene.SubSceneList, viewName, options, cancellationToken);
+
+                // ダイアログがあったらロード
+                foreach (var dialog in resumeDialogList)
+                    await LoadAsync(dialog.Key, dialog.Value.Key, false, dialog.Value.Value, cancellationToken);
             }
             // Dialog
             else
             {
-                CurrentView = await uiDialog.LoadAsync<T>(viewName, CurrentView.gameObject, options, cancellationToken);
+                StackPush(viewName, type, options);
+
+                CurrentView = await uiDialog.LoadAsync<T>(viewName, CurrentView ? CurrentView.gameObject : null, options, cancellationToken);
             }
-
-            StackPush(viewName, type, options);
-
-            // ダイアログがあったらロード
-            foreach (var dialog in resumeDialogList)
-                await LoadAsync(dialog.Key, dialog.Value.Key, false, dialog.Value.Value, cancellationToken);
 
             // バリアOFF
             uiBarrier.SetActive(false);
@@ -614,7 +617,7 @@ namespace Hermes.UI
         /// <param name="value"></param>
         public void SetActiveBarrier(bool value)
         {
-            uiBarrier.SetActive(value);
+            uiBarrier.SetActiveForce(value);
         }
     }
 }
