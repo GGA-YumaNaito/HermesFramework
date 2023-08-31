@@ -470,9 +470,19 @@ namespace Hermes.API
         {
             // 1. Class Instance -> Json
             var json = JsonUtility.ToJson(postData);
-            // アクセストークンがあったら最後の文字を削除し、access_tokenを送る
-            if (!Instance.token.IsNullOrEmpty())
-                json = $"{json[..^1]},\"access_token\":\"{Instance.token}\"}}";
+            // jsonが空
+            if (json.IsNullOrEmpty())
+            {
+                // アクセストークンがあったらaccess_tokenを送る
+                if (!token.IsNullOrEmpty())
+                    json = $"{{\"access_token\":\"{token}\"}}";
+            }
+            else
+            {
+                // アクセストークンがあったら最後の文字を削除し、access_tokenを送る
+                if (!token.IsNullOrEmpty())
+                    json = $"{json[..^1]},\"access_token\":\"{token}\"}}";
+            }
 
 #if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
             Debug.Log($"postData = {json}");
