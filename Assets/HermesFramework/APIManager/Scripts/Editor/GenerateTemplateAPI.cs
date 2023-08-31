@@ -168,9 +168,6 @@ namespace API
 
         protected override bool isPost => true;
 
-        public override Request request { get; set; }
-        public override Response response { get; set; }
-
         /// <summary>
         /// レスポンス
         /// </summary>

@@ -127,26 +127,26 @@ namespace Hermes.API
         where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
         {
             // キューにためる場合.
-            if (isQueue && Instance.retryNum <= 0)
+            if (isQueue && retryNum <= 0)
             {
                 // リセットフラグ解除.
-                Instance.isReset = false;
+                isReset = false;
                 // キューにためる.
-                Instance.typeQueue.Enqueue(typeof(TRequest));
+                typeQueue.Enqueue(typeof(TRequest));
                 // 自分の番まで処理中断.
                 while (true)
                 {
                     await UniTask.Yield();
-                    if (Instance.isRequestQueue)
+                    if (isRequestQueue)
                     {
-                        if (Instance.typeQueue.Peek() == typeof(TRequest))
+                        if (typeQueue.Peek() == typeof(TRequest))
                         {
-                            if (Instance.isReset)
+                            if (isReset)
                             {
-                                Instance.typeQueue.Dequeue();
+                                typeQueue.Dequeue();
                                 return;
                             }
-                            Instance.isRequestQueue = false;
+                            isRequestQueue = false;
                             break;
                         }
                     }
@@ -178,7 +178,7 @@ namespace Hermes.API
                         onFailed?.Invoke(data);
                     }
 #if UNITY_EDITOR || STG || DEVELOPMENT_BUILD
-                    Debug.Log ("<color=red><" + typeof(TRequest) + "> Failed : " + data?.response.ErrorCode.Label() + "</color>");
+                    Debug.Log ("<color=red><" + typeof(TRequest) + "> Failed : " + data?.data.ErrorCode.Label() + "</color>");
 #endif
                 },
                 // 通信失敗.
@@ -191,13 +191,13 @@ namespace Hermes.API
 
             await UniTask.Yield();
             // キューにためる場合.
-            if (isQueue && Instance.retryNum <= 0)
+            if (isQueue && retryNum <= 0)
             {
-                if (Instance.typeQueue.Count > 0 && Instance.typeQueue.Peek() == typeof(TRequest))
+                if (typeQueue.Count > 0 && typeQueue.Peek() == typeof(TRequest))
                 {
                     // リクエスト再開.
-                    Instance.isRequestQueue = true;
-                    Instance.typeQueue.Dequeue();
+                    isRequestQueue = true;
+                    typeQueue.Dequeue();
                 }
             }
         }
@@ -232,7 +232,7 @@ namespace Hermes.API
             }
 
             serverData.SetQueryParam(queryParams);
-            var url = Instance.baseUrl + serverData.API;
+            var url = baseUrl + serverData.API;
 
             using (var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
             {
@@ -244,7 +244,7 @@ namespace Hermes.API
 
                 request.uploadHandler = new UploadHandlerRaw(bytes);
                 request.downloadHandler = new DownloadHandlerBuffer();
-                request.timeout = Instance.timeout;
+                request.timeout = timeout;
 #if API_JSON
                 request.SetRequestHeader("Content-Type", "application/json");
 #endif
@@ -267,7 +267,7 @@ namespace Hermes.API
                 {
                     // 通信は成功したが、APIが失敗していたら
                     var data = GetResponseData<TData, TRequest, TResponse>(request);
-                    if (data.response.ErrorCode > eAPIErrorCode.None)
+                    if (data.data.ErrorCode > eAPIErrorCode.None)
                     {
                         await PostSendWebRequestError<TData, TRequest, TResponse>(true, request, url, postData, queryParams, onSuccess, onFailed, onError, isRetry);
                     }
@@ -279,9 +279,9 @@ namespace Hermes.API
                         Debug.Log(request.downloadHandler.text);
 #endif
                         onSuccess?.Invoke(request, data);
-                        Instance.retryNum = 0;
+                        retryNum = 0;
                         // リセットフラグ起動.
-                        Instance.isReset = true;
+                        isReset = true;
                     }
                 }
             }
@@ -319,18 +319,19 @@ namespace Hermes.API
             // リトライするか.
             if (isRetry)
             {
-                if (Instance.retryNum <= Instance.maxRetryNum)
+                if (retryNum <= maxRetryNum)
                 {
-                    Instance.retryNum++;
+                    retryNum++;
                     // ダイアログ.
                     ErrorDialog dialog = null;
                     if (isFailed)
                     {
                         var data = GetResponseData<TData, TRequest, TResponse>(request);
-                        dialog = await ErrorDialog.Create(Instance.errorTitleAPIKey, Instance.errorBodyKey, data.response.ErrorCode.Label(), true);
+                        dialog = await ErrorDialog.Create(errorTitleAPIKey, errorBodyKey, data.data.ErrorCode.Label(), true);
                     }
                     else
-                        dialog = await ErrorDialog.Create(Instance.errorTitleHttpKey, Instance.errorBodyKey, request.error, true);
+                        dialog = await ErrorDialog.Create(errorTitleHttpKey, errorBodyKey, request.error, true);
+                    // 待機
                     await UniTask.WaitUntil(() => dialog == null || !dialog.ClickStateWait());
                     if (dialog != null && dialog.ClickState == ErrorDialog.eClickState.Retry)
                     {
@@ -347,13 +348,13 @@ namespace Hermes.API
                         // エラーコールバックを実行.
                         else
                             onError?.Invoke(request);
-                        Instance.retryNum = 0;
+                        retryNum = 0;
                         // リセットフラグ起動.
-                        Instance.isReset = true;
+                        isReset = true;
                         // 全てアンロード.
                         await UIManager.Instance.AllUnloadAsync();
                         // タイトルシーン.
-                        await UIManager.Instance.LoadAsync(Instance.titleName);
+                        await UIManager.Instance.LoadAsync(titleName);
                     }
                 }
                 else
@@ -364,18 +365,19 @@ namespace Hermes.API
                     else
                         Debug.LogError("Error!! Max retry num");
 #endif
-                    Instance.retryNum = 0;
+                    retryNum = 0;
                     // リセットフラグ起動.
-                    Instance.isReset = true;
+                    isReset = true;
                     // ダイアログ.
                     ErrorDialog dialog = null;
                     if (isFailed)
                     {
                         var data = GetResponseData<TData, TRequest, TResponse>(request);
-                        dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: data.response.ErrorCode.Label(), isRetry: false);
+                        dialog = await ErrorDialog.Create(titleKey: backToTitleKey, error: data.data.ErrorCode.Label(), isRetry: false);
                     }
                     else
-                        dialog = await ErrorDialog.Create(titleKey: Instance.backToTitleKey, error: request.error, isRetry: false);
+                        dialog = await ErrorDialog.Create(titleKey: backToTitleKey, error: request.error, isRetry: false);
+                    // 待機
                     await UniTask.WaitWhile(() => dialog.ClickStateWait());
                     // 失敗コールバックを実行.
                     if (isFailed)
@@ -383,12 +385,11 @@ namespace Hermes.API
                     // エラーコールバックを実行.
                     else
                         onError?.Invoke(request);
-                    
 
                     // 全てアンロード.
                     await UIManager.Instance.AllUnloadAsync();
                     // タイトルシーン.
-                    await UIManager.Instance.LoadAsync(Instance.titleName);
+                    await UIManager.Instance.LoadAsync(titleName);
                 }
             }
             else

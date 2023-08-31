@@ -1,9 +1,8 @@
 using System;
 using Cysharp.Threading.Tasks;
-using Hermes.API;
 using UnityEngine;
 
-namespace API
+namespace Hermes.API
 {
     /// <summary>
     /// ユーザーログイン
@@ -14,9 +13,6 @@ namespace API
         protected override string api => "user/login";
 
         protected override bool isPost => true;
-
-        public override Request request { get; set; }
-        public override Response response { get; set; }
 
         /// <summary>
         /// レスポンス
@@ -48,8 +44,8 @@ namespace API
         [Serializable]
         public class Request : RequestBase
         {
-            /// <summary>ユーザーID</summary>
-            [SerializeField] string user_id;
+            /// <summary>プレイヤーID</summary>
+            [SerializeField] string player_id;
             /// <summary>UUID</summary>
             [SerializeField] string uuid;
 
@@ -63,9 +59,11 @@ namespace API
             /// <summary>
             /// コンストラクタ
             /// </summary>
-            public Request(string user_id, string uuid)
+            /// <param name="player_id">プレイヤーID</param>
+            /// <param name="uuid">UUID</param>
+            public Request(string player_id, string uuid)
             {
-                this.user_id = user_id;
+                this.player_id = player_id;
                 this.uuid = uuid;
             }
         }

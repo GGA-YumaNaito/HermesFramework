@@ -43,10 +43,12 @@ namespace Hermes.API
             public ResponseBase() { }
         }
 
+        /// <summary>共通データ</summary>
+        public APIDataCommon common;
         /// <summary>リクエスト</summary>
-        public abstract TRequest request { get; set; }
+        public TRequest request;
         /// <summary>レスポンス</summary>
-        public abstract TResponse response { get; set; }
+        public TResponse data;
 
         /// <summary>
         /// POST通信
