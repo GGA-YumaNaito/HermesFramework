@@ -224,7 +224,7 @@ namespace Hermes.UI
             uiBarrier.SetActive(true);
 
             // クリア
-            ClearBackStackActions();
+            ClearBackStackAction();
 
             // 再表示ダイアログリスト
             var resumeDialogList = new List<KeyValuePair<string, KeyValuePair<Type, object>>>();
@@ -315,7 +315,7 @@ namespace Hermes.UI
             uiBarrier.SetActive(true);
 
             // クリア
-            ClearBackStackActions();
+            ClearBackStackAction();
 
             // 現在の最新がダイアログだったら削除する
             if (CurrentView is Dialog)
@@ -366,7 +366,7 @@ namespace Hermes.UI
         /// <summary>
         /// 現在のViewでの戻る時のActionクリア
         /// </summary>
-        public void ClearBackStackActions()
+        public void ClearBackStackAction()
         {
             backStackAction.Clear();
         }
