@@ -27,18 +27,18 @@ namespace Hermes.UI
         /// <summary>UIManagerBarrier</summary>
         [SerializeField] UIManagerBarrier uiBarrier;
         /// <summary>UIManagerScreen</summary>
-        [SerializeField] UIManagerScreen uiScreen = new UIManagerScreen();
+        [SerializeField] UIManagerScreen uiScreen = new();
         /// <summary>UIManagerDialog</summary>
-        [SerializeField] UIManagerDialog uiDialog = new UIManagerDialog();
+        [SerializeField] UIManagerDialog uiDialog = new();
         /// <summary>UIManagerSubScene</summary>
-        [SerializeField] UIManagerSubScene uiSubScene = new UIManagerSubScene();
+        [SerializeField] UIManagerSubScene uiSubScene = new();
 
         /// <summary>遷移StackName</summary>
-        [SerializeField] List<string> stackName = new List<string>();
+        [SerializeField] List<string> stackName = new();
         /// <summary>遷移StackType</summary>
-        Stack<Type> stackType = new Stack<Type>();
+        Stack<Type> stackType = new();
         /// <summary>遷移StackOptions</summary>
-        Stack<object> stackOptions = new Stack<object>();
+        Stack<object> stackOptions = new();
 
         /// <summary>LocalizeKey ゲーム終了タイトルテキスト</summary>
         [SerializeField] string quitTitleKey = "QUIT_TITLE";
