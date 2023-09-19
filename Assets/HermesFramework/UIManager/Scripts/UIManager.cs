@@ -40,6 +40,9 @@ namespace Hermes.UI
         /// <summary>遷移StackOptions</summary>
         Stack<object> stackOptions = new();
 
+        /// <summary>現在のViewでの戻る時のStackアクション</summary>
+        Stack<Action> backStackAction = new();
+
         /// <summary>LocalizeKey ゲーム終了タイトルテキスト</summary>
         [SerializeField] string quitTitleKey = "QUIT_TITLE";
         /// <summary>LocalizeKey ゲーム終了本文テキスト</summary>
@@ -220,6 +223,9 @@ namespace Hermes.UI
             // バリアON
             uiBarrier.SetActive(true);
 
+            // クリア
+            ClearBackStackActions();
+
             // 再表示ダイアログリスト
             var resumeDialogList = new List<KeyValuePair<string, KeyValuePair<Type, object>>>();
 
@@ -307,6 +313,10 @@ namespace Hermes.UI
         {
             // バリアON
             uiBarrier.SetActive(true);
+
+            // クリア
+            ClearBackStackActions();
+
             // 現在の最新がダイアログだったら削除する
             if (CurrentView is Dialog)
             {
@@ -334,6 +344,34 @@ namespace Hermes.UI
         }
 
         /// <summary>
+        /// 現在のViewでの戻る時のAction登録
+        /// </summary>
+        /// <param name="action">Action</param>
+        public void PushBackStackAction(Action action)
+        {
+            backStackAction.Push(action);
+        }
+
+        /// <summary>
+        /// 現在のViewでの戻る時のAction取り出し
+        /// </summary>
+        /// <returns>Action or null</returns>
+        public Action PopBackStackAction()
+        {
+            if (backStackAction.Count > 0)
+                return backStackAction.Pop();
+            return null;
+        }
+
+        /// <summary>
+        /// 現在のViewでの戻る時のActionクリア
+        /// </summary>
+        public void ClearBackStackActions()
+        {
+            backStackAction.Clear();
+        }
+
+        /// <summary>
         /// 前画面表示
         /// </summary>
         /// <param name="cancellationToken">CancellationToken</param>
@@ -343,6 +381,14 @@ namespace Hermes.UI
             if (CurrentView == null || uiBarrier.activeSelf)
                 return;
             uiBarrier.SetActive(true);
+            // Actionが登録されていたら実行しreturn
+            var action = PopBackStackAction();
+            if (action != null)
+            {
+                action();
+                uiBarrier.SetActive(false);
+                return;
+            }
             if (!CurrentView.IsBack)
             {
                 // 前の画面に戻れない時の処理
