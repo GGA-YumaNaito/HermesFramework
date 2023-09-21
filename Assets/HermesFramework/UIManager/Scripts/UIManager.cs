@@ -21,6 +21,10 @@ namespace Hermes.UI
         [SerializeField] ViewBase currentView;
         /// <summary>現在のView</summary>
         public ViewBase CurrentView { get { return currentView; } private set { currentView = value; } }
+        /// <summary>現在のScene</summary>
+        public Screen CurrentScene { get => uiScreen.CurrentScreen; }
+        /// <summary>現在のDialog</summary>
+        public Dialog CurrentDialog { get => uiDialog.CurrentDialog; }
         /// <summary>Camera</summary>
         [SerializeField] new Camera camera = null;
 

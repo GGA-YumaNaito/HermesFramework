@@ -19,17 +19,17 @@ namespace Hermes.UI.UIManagerParts
         [SerializeField] Transform dialogRoot;
 
         /// <summary>現在のダイアログ</summary>
-        [SerializeField] ViewBase currentDialog;
+        [SerializeField] Dialog currentDialog;
         /// <summary>現在のダイアログ</summary>
-        public ViewBase CurrentDialog { get => currentDialog; private set => currentDialog = value; }
+        public Dialog CurrentDialog { get => currentDialog; private set => currentDialog = value; }
         /// <summary>DialogList</summary>
-        [SerializeField] List<StackData> dialogList = new List<StackData>();
+        [SerializeField] List<StackData> dialogList = new();
 
         /// <summary>
         /// StackData
         /// </summary>
         [Serializable]
-        public class StackData
+        class StackData
         {
             /// <summary>名前</summary>
             public string viewName;
@@ -87,7 +87,7 @@ namespace Hermes.UI.UIManagerParts
             dialogBG.transform.SetAsLastSibling();
 
             // Instantiate
-            CurrentDialog = (ViewBase)GameObject.Instantiate(gameObject, dialogRoot).GetComponent(type);
+            CurrentDialog = (Dialog)UnityEngine.Object.Instantiate(gameObject, dialogRoot).GetComponent(type);
 
             if (CurrentDialog == null)
                 throw new Exception($"{viewName} is Null");
@@ -132,7 +132,7 @@ namespace Hermes.UI.UIManagerParts
             await CurrentDialog.OnUnload();
             if (isBack)
                 await UniTask.WaitUntil(() => CurrentDialog.Status.Value == eStatus.End, cancellationToken: cancellationToken);
-            GameObject.Destroy(CurrentDialog.gameObject);
+            UnityEngine.Object.Destroy(CurrentDialog.gameObject);
             if (isBack)
             {
                 // DialogBGの位置を下げる
@@ -146,7 +146,7 @@ namespace Hermes.UI.UIManagerParts
             if (dialogList.Count > 0)
             {
                 var data = dialogList.Peek();
-                CurrentDialog = (ViewBase)dialogRoot.Find(data.viewName).GetComponent(data.viewType);
+                CurrentDialog = (Dialog)dialogRoot.Find(data.viewName).GetComponent(data.viewType);
             }
             else
             {
