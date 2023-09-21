@@ -13,7 +13,7 @@ namespace Hermes.UI.UIManagerParts
         [SerializeField] GameObject barrier = null;
 
         /// <summary>オブジェクトが非表示になっているか</summary>
-        public bool activeSelf => barrier.activeSelf;
+        public bool ActiveSelf => barrier.activeSelf;
 
         /// <summary>Count</summary>
         int count = 0;

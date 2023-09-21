@@ -58,7 +58,7 @@ namespace Hermes.UI
         async void Update()
         {
             // Backキー押下
-            if (!uiBarrier.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+            if (!GetActiveBarrier() && Input.GetKeyDown(KeyCode.Escape))
             {
                 await BackAsync();
             }
@@ -376,7 +376,7 @@ namespace Hermes.UI
         /// <returns>UniTask</returns>
         public async UniTask BackAsync(CancellationToken cancellationToken = default)
         {
-            if (CurrentView == null || uiBarrier.activeSelf)
+            if (CurrentView == null || GetActiveBarrier())
                 return;
             uiBarrier.SetActive(true);
             // Actionが登録されていたら実行しreturn
