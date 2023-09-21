@@ -7,6 +7,8 @@ namespace Hermes.UI.Sample
     {
         public override bool IsBack { get; protected set; } = true;
 
+        //protected override bool IsDisableTransition { get; set; } = true;
+
         /// <summary>オプション</summary>
         public class Options
         {
