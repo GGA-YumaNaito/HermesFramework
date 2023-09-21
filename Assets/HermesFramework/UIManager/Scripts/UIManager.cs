@@ -658,6 +658,12 @@ namespace Hermes.UI
         public void SetSceneTransition(UITransition transition) => uiScreen.SetSceneTransition(transition);
 
         /// <summary>
+        /// バリアのアクティブ状態取得
+        /// </summary>
+        /// <returns></returns>
+        public bool GetActiveBarrier() => uiBarrier.ActiveSelf;
+
+        /// <summary>
         /// バリアをアクティブ、非アクティブ化する
         /// <para>このメソッドでアクティブ化した場合、手動で非アクティブ化もしないといけない</para>
         /// </summary>
