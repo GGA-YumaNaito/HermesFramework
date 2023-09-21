@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Hermes.API
 {
@@ -8,7 +7,7 @@ namespace Hermes.API
     /// サーバーデータのベースクラス
     /// </summary>
     [Serializable]
-    public abstract class APIDataBase<T> where T : APIDataBase<T>
+    public abstract class APIDataBase
     {
         /// <summary>API</summary>
         protected abstract string api { get; }

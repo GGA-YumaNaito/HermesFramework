@@ -8,7 +8,7 @@ namespace Hermes.API
     /// サーバーデータのベースクラス
     /// </summary>
     [Serializable]
-    public abstract class APIData<TData, TRequest, TResponse> : APIDataBase<TData>
+    public abstract class APIData<TData, TRequest, TResponse> : APIDataBase
         where TData : APIData<TData, TRequest, TResponse>, new()
         where TRequest : APIData<TData, TRequest, TResponse>.RequestBase
         where TResponse : APIData<TData, TRequest, TResponse>.ResponseBase
