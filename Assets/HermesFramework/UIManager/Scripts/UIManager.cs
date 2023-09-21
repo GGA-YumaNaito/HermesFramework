@@ -351,10 +351,7 @@ namespace Hermes.UI
         /// 現在のViewでの戻る時のAction登録
         /// </summary>
         /// <param name="action">Action</param>
-        public void PushBackStackAction(Action action)
-        {
-            backStackAction.Push(action);
-        }
+        public void PushBackStackAction(Action action) => backStackAction.Push(action);
 
         /// <summary>
         /// 現在のViewでの戻る時のAction取り出し
@@ -370,10 +367,7 @@ namespace Hermes.UI
         /// <summary>
         /// 現在のViewでの戻る時のActionクリア
         /// </summary>
-        public void ClearBackStackAction()
-        {
-            backStackAction.Clear();
-        }
+        public void ClearBackStackAction() => backStackAction.Clear();
 
         /// <summary>
         /// 前画面表示
@@ -655,10 +649,7 @@ namespace Hermes.UI
         /// シーン遷移アニメーション設定
         /// </summary>
         /// <param name="transition">遷移アニメーション</param>
-        public void SetSceneTransition(UITransition transition)
-        {
-            uiScreen.SetSceneTransition(transition);
-        }
+        public void SetSceneTransition(UITransition transition) => uiScreen.SetSceneTransition(transition);
 
         /// <summary>
         /// バリアをアクティブ、非アクティブ化する
