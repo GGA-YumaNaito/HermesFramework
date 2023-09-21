@@ -604,6 +604,12 @@ namespace Hermes.UI
         }
 
         /// <summary>
+        /// スタック数取得
+        /// </summary>
+        /// <returns>スタック数</returns>
+        public int GetStackCount() => stackType.Count;
+
+        /// <summary>
         /// スタッククリア
         /// </summary>
         public void ClearStack()
