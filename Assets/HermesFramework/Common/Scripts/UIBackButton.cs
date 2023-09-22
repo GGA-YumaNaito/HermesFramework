@@ -1,4 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Hermes.UI
 {
@@ -13,4 +16,20 @@ namespace Hermes.UI
             onClick.AddListener(() => UIManager.Instance.BackAsync(this.GetCancellationTokenOnDestroy()).Forget());
         }
     }
+
+    //==============================================================================================
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// UIBackButtonEditor
+    /// </summary>
+    [CustomEditor(typeof(UIBackButton))]
+    public class UIBackButtonEditor : UIButtonEditor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+        }
+    }
+#endif
 }
