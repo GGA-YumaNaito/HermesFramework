@@ -14,6 +14,7 @@ public static class JenkinsBuild
     static string productName = "HermesFramework";
     static string companyName = "GGA";
     static string buildName = "Build";
+    static string defineSymbols = "";
 
     /// <summary>
     /// ビルド
@@ -55,6 +56,10 @@ public static class JenkinsBuild
                 case "/buildName":
                     buildName = args[i + 1];
                     break;
+                // Define Symbols
+                case "/defineSymbols":
+                    defineSymbols = args[i + 1];
+                    break;
             }
         }
 
@@ -72,6 +77,18 @@ public static class JenkinsBuild
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
 
         // デファインシンボル
+        var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+        var defines = PlayerSettings.GetScriptingDefineSymbols(namedBuildTarget);
+        if (string.IsNullOrEmpty(defines))
+        {
+            defines = defineSymbols;
+        }
+        else
+        {
+            defines += string.IsNullOrEmpty(defineSymbols) ? "" : ";" + defineSymbols;
+        }
+        defines = string.Join(";", defines.Split(";").Distinct());
+        PlayerSettings.SetScriptingDefineSymbols(namedBuildTarget, defines);
         //PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.Android, "");
         ////PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, "");
         ////PlayerSettings.SetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup, "");
@@ -83,18 +100,18 @@ public static class JenkinsBuild
 
         var scene_name_array = CreateBuildTargetScenes().ToArray();
 
-        //Splash Screenをオフにする(Personalだと動かないよ）
+        //Splash Screenをオフにする(Personalだと動かないよ)
         PlayerSettings.SplashScreen.show = false;
         PlayerSettings.SplashScreen.showUnityLogo = false;
 
-        //AppBundleは使用しない（本番ビルドのときだけ使うイメージ）
+        //AppBundleは使用しない(本番ビルドのときだけ使うイメージ)
         EditorUserBuildSettings.buildAppBundle = false;
 
         var report = BuildPipeline.BuildPlayer(scene_name_array, buildName + ".apk", BuildTarget.Android, BuildOptions.Development);
         var summary = report.summary;
 
         if (summary.result == BuildResult.Succeeded)
-            Debug.Log($"<color=green>Build succeeded: {summary.totalSize} bytes</color>");
+            Debug.Log($"Build succeeded: {summary.totalSize} bytes");
         else if (summary.result == BuildResult.Failed)
             Debug.LogError("Build failed");
     }
