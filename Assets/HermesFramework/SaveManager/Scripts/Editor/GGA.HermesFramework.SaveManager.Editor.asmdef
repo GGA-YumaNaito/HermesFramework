@@ -1,0 +1,18 @@
+{
+    "name": "GGA.HermesFramework.SaveManager.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a8c0ba5b553c02b4f9b0c2ace9bfdbfe"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
