@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -24,6 +25,9 @@ namespace Hermes.Save
 
         /// <summary>ディレクトリパス</summary>
         string dirPass { get { return $"{FileUtils.Pass}/SaveData"; } }
+
+        /// <summary>リストパス</summary>
+        string listPass { get { return $"{dirPass}/list.txt"; } }
 
         /// <summary>
         /// ファイルパス取得
@@ -52,6 +56,8 @@ namespace Hermes.Save
 
             if (!Directory.Exists(dirPass))
                 Directory.CreateDirectory(dirPass);
+            if (!File.Exists(listPass))
+                File.Create(listPass).Close();
         }
 
         /// <summary>
@@ -63,6 +69,17 @@ namespace Hermes.Save
         public bool HasFile(string name, string designationPass = null)
         {
             return File.Exists(GetFilePass(name, designationPass));
+        }
+
+        /// <summary>
+        /// ファイルが空か
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns>true = 空 : false = 空ではない</returns>
+        bool IsFileEmpty(string fileName)
+        {
+            var f = new FileInfo(fileName);
+            return f.Length == 0 || f.Length < 10 && File.ReadAllText(fileName).Length == 0;
         }
 
         /// <summary>
@@ -82,13 +99,29 @@ namespace Hermes.Save
 
             try
             {
+                var filePass = GetFilePass(name, designationPass);
                 // 指定パスが存在し、ディレクトリがなかったら作成
                 if (!designationPass.IsNullOrEmpty() && !Directory.Exists(designationPass))
                     Directory.CreateDirectory(designationPass);
-                // SaveDataフォルダにdatファイルを作成
-                fileStream = File.Open(GetFilePass(name, designationPass), FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                // datファイルを作成
+                fileStream = File.Open(filePass, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 // ファイルに保存
                 bf.Serialize(fileStream, Encode<T>(data));
+
+                // パスが書かれていなかったら書き込む
+                if (!File.ReadAllText(listPass).Contains(filePass))
+                {
+                    // パスを把握するため書き込む
+                    // ファイルの末尾に追加する
+                    StreamWriter sw = new(listPass, true);
+                    // パスを書き込む
+                    if (IsFileEmpty(listPass))
+                        sw.Write(filePass);
+                    else
+                        sw.Write(sw.NewLine + filePass);
+                    // 閉じる
+                    sw.Close();
+                }
             }
             catch (IOException e1)
             {
@@ -144,6 +177,32 @@ namespace Hermes.Save
         {
             if (HasFile(name, designationPass))
                 File.Delete(GetFilePass(name, designationPass));
+
+            var filePass = GetFilePass(name, designationPass);
+            var lines = File
+                .ReadLines(listPass)
+                .Where((line, num) => line != filePass)
+                .ToList();
+            File.WriteAllLines(listPass, lines);
+        }
+
+        /// <summary>
+        /// 全削除
+        /// </summary>
+        public void AllDelete()
+        {
+            var lines = File.ReadLines(listPass);
+
+            foreach (var line in lines)
+            {
+                Debug.Log(line);
+                if (File.Exists(line))
+                    File.Delete(line);
+                else
+                    Debug.LogError($"ファイルが存在していません : {line}");
+            }
+
+            File.WriteAllText(listPass, string.Empty);
         }
 
         /// <summary>
