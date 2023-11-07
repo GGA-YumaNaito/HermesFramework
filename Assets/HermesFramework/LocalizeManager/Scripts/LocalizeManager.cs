@@ -90,6 +90,17 @@ namespace Hermes.Localize
         }
 
         /// <summary>
+        /// データ取得(Format)
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="args">args</param>
+        /// <returns>value</returns>
+        public string GetValue(string key, params object[] args)
+        {
+            return string.Format(stringTable.GetEntry(key).Value, args);
+        }
+
+        /// <summary>
         /// 再初期化
         /// </summary>
         /// <returns></returns>
