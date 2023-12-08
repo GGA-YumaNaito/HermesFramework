@@ -49,5 +49,10 @@ namespace Hermes
             instance ??= (T)FindObjectOfType(typeof(T));
             return instance is not null;
         }
+
+        void OnDestroy()
+        {
+            instance = null;
+        }
     }
 }
