@@ -18,6 +18,8 @@ namespace Hermes.UI
     {
         /// <summary>SE Name</summary>
         public string seName = "";
+        /// <summary>SE Name</summary>
+        public AudioClip seClip = null;
         /// <summary>長押しするか</summary>
         public bool isLongPress = false;
         /// <summary>長押しの時間</summary>
@@ -45,6 +47,8 @@ namespace Hermes.UI
                 // SE呼び出し
                 if (!seName.IsNullOrEmpty())
                     SoundManager.SE.Play(seName);
+                else if (seClip != null)
+                    SoundManager.SE.Play(seClip);
 
                 // 長押し
                 if (isLongPressed)
@@ -62,6 +66,8 @@ namespace Hermes.UI
             // SE呼び出し
             if (!seName.IsNullOrEmpty())
                 SoundManager.SE.Play(seName);
+            else if (seClip != null)
+                SoundManager.SE.Play(seClip);
 
             // 長押し
             if (isLongPressed)
@@ -137,6 +143,7 @@ namespace Hermes.UI
             var component = (UIButton)target;
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(component.seName)), new GUIContent("SE Name"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(component.seClip)), new GUIContent("SE Audio Clip"));
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(component.isLongPress)), new GUIContent("Is Long Press"));
             if (component.isLongPress)
