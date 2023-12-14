@@ -20,6 +20,12 @@ namespace Hermes.UI.Editor
         {
             ChangeProcess<UIBackButton>(menuCommand);
         }
+
+        [MenuItem("CONTEXT/Button/Change Button to UIDragButton")]
+        static void ChangeButtonToUIDragButton(MenuCommand menuCommand)
+        {
+            ChangeProcess<UIDragButton>(menuCommand);
+        }
         static void ChangeProcess<T>(MenuCommand menuCommand) where T : Button
         {
             EditorGUI.BeginChangeCheck();
