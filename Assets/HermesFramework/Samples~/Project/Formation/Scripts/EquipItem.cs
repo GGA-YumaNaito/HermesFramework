@@ -11,7 +11,7 @@ namespace Formation
     public class EquipItem : MonoBehaviour
     {
         /// <summary>UIButton</summary>
-        [SerializeField] UIButton uiButton;
+        [SerializeField] UIDragButton dragButton;
 
         /// <summary>DragEndDelegate</summary>
         /// <typeparam name="T">T</typeparam>
@@ -22,9 +22,11 @@ namespace Formation
 
         async void Awake()
         {
+            if (dragButton == null)
+                return;
             await UniTask.WaitWhile(() => DragEndEvent == null);
 
-            uiButton.DragEndEvent += (x) => DragEndEvent(x);
+            dragButton.DragEndEvent += (x) => DragEndEvent(x);
         }
 
         /// <summary>
@@ -33,7 +35,9 @@ namespace Formation
         /// <param name="isDrag"></param>
         public void DragControl(bool isDrag)
         {
-            uiButton.isDrag = isDrag;
+            if (dragButton == null)
+                return;
+            dragButton.isDrag = isDrag;
         }
 
         /// <summary>
@@ -43,7 +47,9 @@ namespace Formation
         /// <param name="isPrevPosition">isPrevPosition</param>
         public void SetIsPrevPosition(bool isPrevPosition)
         {
-            uiButton.SetIsPrevPosition(isPrevPosition);
+            if (dragButton == null)
+                return;
+            dragButton.SetIsPrevPosition(isPrevPosition);
         }
     }
 }
