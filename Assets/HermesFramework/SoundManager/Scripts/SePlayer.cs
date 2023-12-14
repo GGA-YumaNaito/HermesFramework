@@ -34,6 +34,6 @@ namespace Hermes.Sound
 		/// 停止
         /// </summary>
         /// <param name="clip">clip</param>
-        public void Stop(AudioClip clip = null) => StopTargetClip(clip);
+        public void Stop(AudioClip clip) => StopTargetClip(clip);
     }
 }
