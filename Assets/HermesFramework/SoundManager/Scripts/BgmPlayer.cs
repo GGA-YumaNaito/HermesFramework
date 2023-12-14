@@ -148,11 +148,13 @@ namespace Hermes.Sound
         /// <summary>
         /// 再生Async
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="key">key</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>UniTask</returns>
         protected async UniTask PlayAsync(string key, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(key))
+                return;
             var smsc = subChannel(playChannel); // 裏チャネル
 
             // 再生中の裏と一致
@@ -193,6 +195,57 @@ namespace Hermes.Sound
             }
         }
 
+        /// <summary>
+        /// 再生Async
+        /// </summary>
+        /// <param name="clip">clip</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>UniTask</returns>
+        protected async UniTask PlayAsync(AudioClip clip, CancellationToken cancellationToken)
+        {
+            if (clip == null)
+                return;
+            var key = clip.name;
+            var smsc = subChannel(playChannel); // 裏チャネル
+
+            // 再生中の裏と一致
+            if (useList.ContainsKey(key))
+            {
+                var keyIndex = useList[key][0].Key;
+                if (keyIndex < 0)
+                    return;
+                if (source[smsc].isPlaying && source[smsc].clip == source[keyIndex].clip)
+                {
+                    state[playChannel] = source[playChannel].isPlaying ? eStatus.FADEOUT : eStatus.STOP; // 表を停止
+                    state[smsc] = eStatus.FADEIN; // 裏を開始
+                    playChannel = smsc; // 表裏入れ替え
+                }
+            }
+            // どちらとも一致しない
+            else
+            {
+                var i = clipList.IndexOf(null);
+                // 同時再生数を超えていたら処理をしない
+                if (i < 0)
+                {
+                    Debug.LogError("The number of simultaneous playback of sound is exceeded.");
+                    return;
+                }
+                playChannel = musicActiveChannel; // アクティブな方を表に
+                smsc = subChannel(playChannel);
+                state[playChannel] = source[playChannel].isPlaying ? eStatus.FADEOUT : eStatus.STOP; // 表をフェードアウト
+                lastState[smsc] = eStatus.STOP; // 裏を即時停止
+                source[smsc].Stop();
+                source[smsc].volume = 0f;
+                state[smsc] = eStatus.WAIT_INTERVAL; // 裏を開始
+                playChannel = smsc; // 表裏入れ替え
+                await PlayAsync(clip, ePlayType.IfNot, cancellationToken);
+                // BGMが全て消えていたら
+                if (clipList.Count(x => x == null) >= max)
+                    playChannel = 1; // 初期化
+            }
+        }
+
         /// <summary>サブチャネル</summary>
         protected int subChannel(int main) => (main == 0) ? 1 : 0;
 
@@ -217,7 +270,7 @@ namespace Hermes.Sound
         /// <summary>
         /// 全体を止める(keyが指定された時はそのkeyの音を止める)
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">key</param>
         protected override void StopTargetKey(string key = null)
         {
             if (string.IsNullOrEmpty(key))
@@ -243,16 +296,38 @@ namespace Hermes.Sound
         }
 
         /// <summary>
+        /// 全体を止める(clipが指定された時はそのclipの音を止める)
+        /// </summary>
+        /// <param name="clip">clip</param>
+        protected override void StopTargetClip(AudioClip clip = null)
+        {
+            var key = clip != null ? clip.name : null;
+            StopTargetKey(key);
+        }
+
+        /// <summary>
         /// 再生
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">key</param>
         public void Play(string key) => PlayAsync(key, this.GetCancellationTokenOnDestroy()).Forget();
+
+        /// <summary>
+        /// 再生
+        /// </summary>
+        /// <param name="clip">clip</param>
+        public void Play(AudioClip clip) => PlayAsync(clip, this.GetCancellationTokenOnDestroy()).Forget();
 
         /// <summary>
 		/// 停止
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">key</param>
         public void Stop(string key = null) => StopTargetKey(key);
+
+        /// <summary>
+		/// 停止
+        /// </summary>
+        /// <param name="clip">clip</param>
+        public void Stop(AudioClip clip = null) => StopTargetClip(clip);
     }
 
 }

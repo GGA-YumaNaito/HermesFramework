@@ -65,15 +65,19 @@ namespace Hermes.Sound
             frameSounds.Clear();
         }
 
+        #region Key
+
         /// <summary>
         /// 再生Async
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="playType"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="key">key</param>
+        /// <param name="playType">play type</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>UniTask</returns>
         protected virtual async UniTask PlayAsync(string key, ePlayType playType = ePlayType.Play, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(key))
+                return;
             var i = clipList.IndexOf(null);
             // 同時再生数を超えていたら処理をしない
             if (i < 0)
@@ -115,9 +119,9 @@ namespace Hermes.Sound
         /// <summary>
         /// 同じ音を制限数まで鳴らす
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="i"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="key">key</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>UniTask</returns>
         async UniTask PlayAsyncTypePlay(string key, int i, CancellationToken cancellationToken)
         {
@@ -146,9 +150,9 @@ namespace Hermes.Sound
         /// <summary>
         /// 同じ音が鳴っていたら止めてから鳴らす
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="i"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="key">key</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>UniTask</returns>
         async UniTask PlayAsyncTypeStopPlus(string key, int i, CancellationToken cancellationToken)
         {
@@ -174,9 +178,9 @@ namespace Hermes.Sound
         /// <summary>
         /// 同じ音が鳴っていない場合だけ鳴らす
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="i"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="key">key</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>UniTask</returns>
         async UniTask PlayAsyncTypeIfNot(string key, int i, CancellationToken cancellationToken)
         {
@@ -191,9 +195,9 @@ namespace Hermes.Sound
         /// <summary>
         /// 作成
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="i"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="key">key</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
         /// <returns>UniTask</returns>
         async UniTask PlayAsyncCreate(string key, int i, CancellationToken cancellationToken)
         {
@@ -220,7 +224,7 @@ namespace Hermes.Sound
         /// <summary>
         /// 全体を止める(keyが指定された時はそのkeyの音を止める)
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">key</param>
         protected virtual void StopTargetKey(string key = null)
         {
             if (string.IsNullOrEmpty(key))
@@ -248,6 +252,176 @@ namespace Hermes.Sound
                 source[pair.Key].Stop();
             }
         }
+
+        #endregion
+
+        #region AudioClip
+
+        /// <summary>
+        /// 再生Async
+        /// </summary>
+        /// <param name="clip">clip</param>
+        /// <param name="playType">play type</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>UniTask</returns>
+        protected virtual async UniTask PlayAsync(AudioClip clip, ePlayType playType = ePlayType.Play, CancellationToken cancellationToken = default)
+        {
+            if (clip == null)
+                return;
+            var key = clip.name;
+            var i = clipList.IndexOf(null);
+            // 同時再生数を超えていたら処理をしない
+            if (i < 0)
+            {
+                Debug.LogError("The number of simultaneous playback of sound is exceeded.");
+                return;
+            }
+
+            // 1フレーム内で同じ音は出さない
+            if (frameSounds.Contains(key))
+                return;
+            frameSounds.Add(key);
+
+            // 存在していなかったら追加
+            if (!useList.ContainsKey(key))
+            {
+                useList.Add(key, new List<KeyValuePair<int, bool>>());
+                for (var l = 0; l < sameMax; l++)
+                    useList[key].Add(new KeyValuePair<int, bool>(-1, false));
+            }
+
+            switch (playType)
+            {
+                // 同じ音を制限数まで鳴らす
+                case ePlayType.Play:
+                    await PlayAsyncTypePlay(clip, i, cancellationToken);
+                    break;
+                // 同じ音が鳴っていたら止めてから鳴らす
+                case ePlayType.StopPlus:
+                    await PlayAsyncTypeStopPlus(clip, i, cancellationToken);
+                    break;
+                // 同じ音が鳴っていない場合だけ鳴らす
+                case ePlayType.IfNot:
+                    await PlayAsyncTypeIfNot(clip, i, cancellationToken);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 同じ音を制限数まで鳴らす
+        /// </summary>
+        /// <param name="clip">clip</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>UniTask</returns>
+        async UniTask PlayAsyncTypePlay(AudioClip clip, int i, CancellationToken cancellationToken)
+        {
+            var key = clip.name;
+            // 超えていたら古い音を最初から再生する
+            if (useList[key].Count(x => x.Value) >= sameMax)
+            {
+                var time = 0f;
+                var l = 0;
+                foreach (var x in useList[key])
+                {
+                    if (source[x.Key].time > time)
+                    {
+                        l = x.Key;
+                        time = source[x.Key].time;
+                    }
+                }
+                source[l].Play();
+            }
+            // 新たに追加する
+            else
+            {
+                await PlayAsyncCreate(clip, i, cancellationToken);
+            }
+        }
+
+        /// <summary>
+        /// 同じ音が鳴っていたら止めてから鳴らす
+        /// </summary>
+        /// <param name="clip">clip</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>UniTask</returns>
+        async UniTask PlayAsyncTypeStopPlus(AudioClip clip, int i, CancellationToken cancellationToken)
+        {
+            var key = clip.name;
+            var time = 0f;
+            var l = -1;
+            foreach (var x in useList[key])
+            {
+                if (x.Key < 0)
+                    continue;
+                if (source[x.Key].time > time)
+                {
+                    l = x.Key;
+                    source[l].Stop();
+                    time = source[x.Key].time;
+                }
+            }
+            if (l < 0)
+                await PlayAsyncCreate(clip, i, cancellationToken);
+            else
+                source[l].Play();
+        }
+
+        /// <summary>
+        /// 同じ音が鳴っていない場合だけ鳴らす
+        /// </summary>
+        /// <param name="clip">clip</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>UniTask</returns>
+        async UniTask PlayAsyncTypeIfNot(AudioClip clip, int i, CancellationToken cancellationToken)
+        {
+            var key = clip.name;
+            // 鳴っていたら鳴らさない
+            foreach (var use in useList[key])
+                if (use.Value)
+                    return;
+
+            await PlayAsyncCreate(clip, i, cancellationToken);
+        }
+
+        /// <summary>
+        /// 作成
+        /// </summary>
+        /// <param name="clip">clip</param>
+        /// <param name="i">i</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns>UniTask</returns>
+        async UniTask PlayAsyncCreate(AudioClip clip, int i, CancellationToken cancellationToken)
+        {
+            var key = clip.name;
+            clipList[i] = clip;
+            source[i].clip = clip;
+            source[i].Play();
+
+            var l = useList[key].FindIndex(x => !x.Value);
+            useList[key][l] = new KeyValuePair<int, bool>(i, true);
+            await UniTask.WaitUntil(() => source[i].clip != clip || !source[i].isPlaying, cancellationToken: cancellationToken);
+
+            clipList[i] = null;
+            source[i].clip = null;
+            useList[key][l] = new KeyValuePair<int, bool>(-1, false);
+            if (useList[key].Count(x => !x.Value) >= sameMax)
+                useList.Remove(key);
+        }
+
+        /// <summary>
+        /// 全体を止める(clipが指定された時はそのclipの音を止める)
+        /// </summary>
+        /// <param name="clip">clip</param>
+        protected virtual void StopTargetClip(AudioClip clip = null)
+        {
+            var key = clip != null ? clip.name : null;
+            StopTargetKey(key);
+        }
+
+        #endregion
 
         /// <summary>
         /// 音量設定
