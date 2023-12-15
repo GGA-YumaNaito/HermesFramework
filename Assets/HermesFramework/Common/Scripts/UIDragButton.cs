@@ -1,8 +1,8 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine;
-#endif
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Hermes.UI
 {
