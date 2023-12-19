@@ -517,7 +517,7 @@ namespace Mobcast.Coffee.UI
 			if (loop)
 			{
 				// スクロール領域に足りない大きさ分は、セルサイズ配列を複製して結合します.
-				if (offset < scrollRectSize)
+				if (offset != 0f && offset < scrollRectSize)
 					_DuplicateCellViewSizes(Mathf.CeilToInt(scrollRectSize / offset));
 
 				// ループ開始/終了インデックスを計算します.
