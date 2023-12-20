@@ -14,14 +14,14 @@ public static class JenkinsBuild
     static string productName = "HermesFramework";
     static string companyName = "GGA";
     static string buildName = "Build";
-    static string defineSymbols = "";
+    static string defineSymbols = string.Empty;
+    static string environment = string.Empty;
 
     /// <summary>
     /// ビルド
     /// </summary>
     public static void Build()
     {
-        var environment = string.Empty;
         var platform = BuildTarget.StandaloneWindows;
 
         // 引数取得
@@ -107,7 +107,12 @@ public static class JenkinsBuild
         //AppBundleは使用しない(本番ビルドのときだけ使うイメージ)
         EditorUserBuildSettings.buildAppBundle = false;
 
-        var report = BuildPipeline.BuildPlayer(scene_name_array, buildName + ".apk", BuildTarget.Android, BuildOptions.Development);
+        BuildOptions buildOptions;
+        if (environment == "develop")
+            buildOptions = BuildOptions.Development;
+        else
+            buildOptions = BuildOptions.None;
+        var report = BuildPipeline.BuildPlayer(scene_name_array, buildName + ".apk", BuildTarget.Android, buildOptions);
         var summary = report.summary;
 
         if (summary.result == BuildResult.Succeeded)
